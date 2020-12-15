@@ -26,17 +26,17 @@ CONST
     RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
 
 VAR
-    {Standard variables}
-    s_ObjName                                               : STRING;
-    h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
-    b_Result                                                : BOOLEAN;
-    i_Counter                                               : INTEGER;
-    {Script specific variables}
-    pt1,pt2                                                 : POINT;
-    p_Start,p_StartCorner,p_Midpoint,p_EndCorner,p_End      : POINT;
-    h_Poly                                                  : HANDLE;
-    r_CornerSize,r_test                                     : REAL;
-    i_CornerStyle,i_FlipX1,i_FlipX2                         : INTEGER;
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	pt1,pt2                                                 : POINT;
+	p_Start,p_StartCorner,p_Midpoint,p_EndCorner,p_End      : POINT;
+	h_Poly                                                  : HANDLE;
+	r_CornerSize,r_test                                     : REAL;
+	i_CornerStyle,i_FlipX1,i_FlipX2                         : INTEGER;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
