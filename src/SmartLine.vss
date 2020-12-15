@@ -43,7 +43,7 @@ VAR
 {// Sets Version info parameter //}
 PROCEDURE Set_Version_Info(s : STRING);
 BEGIN
-    SetRField(h_Obj,s_ObjName,'ver',s);
+	SetRField(h_Obj,s_ObjName,'ver',s);
 END;
 
 
