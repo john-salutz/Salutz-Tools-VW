@@ -1,0 +1,455 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, 2020. Please share freely.
+//
+//  This draws a Salutz Lx Posi poly and adds text fields.
+
+=== CHANGELOG ===
+2020-11-24 10am:	Make Linetype solid
+2020-12-12
+-	12pm:	Test Drawline as polyline
+-	20pm:	Add 'Show in 3D Views?' Bool
+
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE LxPosi_Label;
+
+CONST
+    RGBmax =  65535;
+
+VAR
+	{Standard variables}
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	s_ObjName                                               : STRING;
+	b_Result                                                : BOOLEAN;
+	{Script specific variables}
+	h_PosiName,h_Line1,h_Line2,h_Shape,h_Circle,h_Trim      : HANDLE;
+	p_OffsetPosiName,p_OffsetLine1,p_OffsetLine2,p_LineOrig : POINT;
+	r_Scale,r_TextScaler                                    : REAL;
+	i_Flip                                                  : INTEGER;
+	{ p_ControlPntTmp                                         : POINT; }
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+	SetRField(h_Obj,s_ObjName,'ver',s);
+END;
+
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+	SetObjectVariableBoolean(h,800,True);
+END;
+
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetFillBack(h, i, i, i);
+	SetFillFore(h, i, i, i);
+	SetFPat(h, 1); {Blank pattern}
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetPenFore(h, i, i, i);
+	SetPenBack(h, i, i, i);
+	SetLSN(h,2); {Solid pattern}
+END;
+
+PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
+BEGIN
+	SetObjectVariableBoolean(h,684,b);
+END;
+
+PROCEDURE Set_Text_HardBold (h : HANDLE);
+BEGIN
+	SetTextStyle(h,0,GetTextLength(h),0);
+	SetTextStyle(h,0,GetTextLength(h),1);
+END;
+
+FUNCTION Get_Zcoor(h : HANDLE) : REAL;
+VAR
+	x,y,z : REAL;
+BEGIN
+	GetSymLoc3D(h_Obj,x,y,z);
+	Get_Zcoor := z;
+END;
+
+{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
+PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
+VAR b	  : BOOLEAN;
+	ActLS : REAL;
+BEGIN
+	ActLS := GetLScale(ActLayer);
+	IF sBeg = 'Dot' THEN {Dot}
+		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Arrow' THEN {Arrow}
+		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+	IF sEnd	 = 'Dot' THEN {Dot}
+		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Arrow' THEN {Arrow}
+		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+END;
+
+PROCEDURE From_Back_Set_Pen (source : HANDLE; target : HANDLE);
+VAR r,g,b : LONGINT;
+BEGIN
+	GetFillBack(source,r,g,b);
+	{ Message(r); }
+	SetPenFore(target,r,g,b);
+END;
+
+PROCEDURE Draw_Squiggle (p1X,p1Y,p2X,p2Y : REAL);
+VAR
+	{ midpnt : POINT; }
+	m1,v1,v2  : VECTOR;
+BEGIN
+	{ m1 := p2-p1; }
+	{ m1.X := (p2X-p1X); }
+	{ m1.Y := (p2Y-p1Y); }
+	{ m1.X := (m1.X/2)+p1X; }
+	{ m1.Y := (m1.Y/2)+p1Y; }
+	m1.X := ((p2X-p1X)/2)+p1X;
+	m1.Y := ((p2Y-p1Y)/2)+p1Y;
+	{ Locus((m1.X/2)+p1.X,(m1.Y/2)+p1.Y); }
+	v1.X := p2X-p1X;
+	v1.Y := p2Y-p1Y;
+	{ v1 := p2-p1; }
+	{ v1.Z := 0; }
+	v2 := Perp(v1);
+	v2 := UnitVec(v2);
+	BeginPoly;
+	Add2DVertex(p1X,p1Y,0,0);
+	Add2DVertex(m1.X-v2.X,m1.Y-v2.Y,2,0);
+	Add2DVertex(m1.X+v2.X,m1.Y+v2.Y,2,0);
+	Add2DVertex(p2X,p2Y,0,0);
+	EndPoly;
+END;
+
+{===================================}
+{         -==<  MAIN  >==-          }
+{===================================}
+
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 3');
+	Use_PIO_Text_Attributes(h_Obj);
+	PushAttrs;
+	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
+	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
+	SetParameterVisibility(h_Obj,'WrapWidth',PWRAPTEXT);
+
+	{===== Parameter Limits =====}
+	IF (PSCALE<=0) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'Scale','1');
+		r_Scale := 1;
+		AlrtDialog('Scale Out of Bounds, Scale may not be zero or negative.');
+	END ELSE r_Scale := PSCALE;
+	r_TextScaler := 48/GetLScale(ActLayer)*r_Scale;
+
+	{===== Draw Shapes & Set Text Orig Points =====}
+	IF ((PLABELSTYLE = 'Small') OR (PLABELSTYLE = 'Smaller')) THEN BEGIN
+		SetParameterVisibility(h_Obj,'WrapText',FALSE);
+		SetParameterVisibility(h_Obj,'WrapWidth',FALSE);
+		TextJust(2);
+		TextVerticalAlign(3);
+
+		{===== "Small" size =====}
+		IF (PLABELSTYLE = 'Small') THEN BEGIN
+			IF (PLABELDIRECTION<>'---') THEN BEGIN
+				IF (PLABELDIRECTION='<<') THEN i_Flip := 1
+				ELSE i_Flip := -1;
+				p_LineOrig.X := -9*i_Flip*r_Scale;
+				p_LineOrig.Y := 0;
+
+				{// Create Poly Shape Small //}
+				BeginPoly;
+				Add2DVertex(-3*i_Flip*r_Scale,-5.196*r_Scale,0,0);
+				Add2DVertex(-3*i_Flip*r_Scale,-6*r_Scale,0,0);
+				Add2DVertex(-9*i_Flip*r_Scale,0,0,0);
+				Add2DVertex(-3*i_Flip*r_Scale,6*r_Scale,0,0);
+				Add2DVertex(-3*i_Flip*r_Scale,5.196*r_Scale,0,0);
+				Add2DVertex(6*i_Flip*r_Scale,0,4,6*r_Scale);
+				Add2DVertex(-3*i_Flip*r_Scale,-5.196*r_Scale,0,0);
+				EndPoly;
+			END ELSE BEGIN {PLABELDIRECTION = '---'}
+				p_LineOrig.X := 0;
+				p_LineOrig.Y := 0;
+				Oval(-6*r_Scale,6*r_Scale,6*r_Scale,-6*r_Scale);
+			END;
+			h_Shape := LNewObj;
+
+			{// Create Circle Small //}
+			Oval(-5.5*r_Scale,5.5*r_Scale,5.5*r_Scale,-5.5*r_Scale);
+			h_Circle := LNewObj;
+			HMoveForward(h_Circle,TRUE);
+
+			{// Create Position Name Small //}
+			TextOrigin(0,0);
+			CreateText(PPOSINAME);
+			h_PosiName := LNewObj;
+			SetTextSize(h_PosiName,0,GetTextLength(h_PosiName),10*r_TextScaler);
+
+			{// Create Trim Text Small //}
+			IF PSHOWTRIM THEN BEGIN
+				TextVerticalAlign(1);
+				TextSize(5*r_TextScaler);
+				TextOrigin(0,-6.25*r_Scale);
+				CreateText(Concat('TRIM@ ',Num2StrF(Get_Zcoor(h_Obj))));
+				h_Trim := LNewObj;
+				HMoveBackward(h_Trim,TRUE);
+			END;
+		END {Small} ELSE
+
+		BEGIN {===== "Smaller" size =====}
+			IF (PLABELDIRECTION<>'---') THEN BEGIN
+				IF (PLABELDIRECTION='<<') THEN i_Flip := 1
+				ELSE i_Flip := -1;
+				p_LineOrig.X := -6*i_Flip*r_Scale;
+				p_LineOrig.Y := 0;
+
+				{// Create Poly Shape Smaller //}
+				BeginPoly;
+				Add2DVertex(0,-3.75*r_Scale,0,0);
+				Add2DVertex(0,-5.5*r_Scale,0,0);
+				Add2DVertex(-6*i_Flip*r_Scale,0,0,0);
+				Add2DVertex(0,5.5*r_Scale,0,0);
+				Add2DVertex(0,3.75*r_Scale,0,0);
+				Add2DVertex(3.75*i_Flip*r_Scale,0,4,3.75);
+				Add2DVertex(0,-3.75*r_Scale,0,0);
+				EndPoly;
+			END ELSE BEGIN {PLABELDIRECTION = '---'}
+				p_LineOrig.X := 0;
+				p_LineOrig.Y := 0;
+				Oval(-3.75*r_Scale,3.75*r_Scale,3.75*r_Scale,-3.75*r_Scale);
+			END;
+			h_Shape := LNewObj;
+
+			{// Create Circle Smaller //}
+			Oval(-3.5*r_Scale,3.5*r_Scale,3.5*r_Scale,-3.5*r_Scale);
+			h_Circle := LNewObj;
+			HMoveForward(h_Circle,TRUE);
+
+			{// Create Position Name Label Smaller//}
+			TextOrigin(0,0);
+			TextSize(7*r_TextScaler);
+			TextVerticalAlign(3);
+			CreateText(PPOSINAME);
+			h_PosiName := LNewObj;
+
+			{// Create Trim Text Smaller//}
+			IF PSHOWTRIM THEN BEGIN
+				TextVerticalAlign(1);
+				TextSize(4*r_TextScaler);
+				TextOrigin(0,-5.5*r_Scale);
+				CreateText(Concat('TRIM@ ',Num2StrF(Get_Zcoor(h_Obj))));
+				h_Trim := LNewObj;
+				HMoveBackward(h_Trim,TRUE);
+			END;
+		END; {Smaller}
+
+		{===== Attributes for Small & Smaller =====}
+		{// Set Position Label Attributes //}
+		Set_Pen_WtoB(h_PosiName,1);
+		SetFPat(h_PosiName,0);
+		Set_Text_HardBold(h_PosiName);
+		SetLW(h_Shape,5);
+		SetLSN(h_Shape,2);
+		{// Set Circle Attributes //}
+		SetLSN(h_Circle,2);
+		SetLW(h_Circle,5);
+		From_Back_Set_Pen(h_Obj,h_Circle);
+		Set_Background_WtoB(h_Circle,0);
+		{// Set Trim text Attributes //}
+		SetTextStyle(h_Trim,0,GetTextLength(h_Trim),0);
+		Set_Background_WtoB(h_Trim,0);
+		Set_Pen_WtoB(h_Trim,1);
+	END {"Small" & "Smaller"} ELSE
+
+	BEGIN {===== "Regular" size =====}
+		p_OffsetPosiName.X := 0*r_Scale;
+		p_OffsetPosiName.Y := -4.5*r_Scale;
+		TextOrigin(0,0);
+		TextSize(10*r_TextScaler);
+		TextVerticalAlign(3);
+		IF (PLABELDIRECTION<>'---') THEN
+		BEGIN {// Direction "<<" & ">>" //}
+			IF (PLABELDIRECTION='<<') THEN BEGIN
+				SetTextJust(h_PosiName,1);
+				TextJust(1);
+				i_Flip := 1;
+			END ELSE BEGIN
+				TextJust(3);
+				i_Flip := -1;
+			END;
+			TextOrigin(i_Flip*r_Scale,0);
+			CreateText(PPOSINAME);
+			h_PosiName := LNewObj;
+			SetTextVertAlignN(h_PosiName,5);
+			Set_Text_HardBold(h_PosiName);
+			IF (PWRAPTEXT) THEN BEGIN
+				SetTextWidth(h_PosiName,PWRAPWIDTH);
+				SetTextLeading(h_PosiName,GetTextSize(h_PosiName,0)*0.9);
+			END;
+
+			{// Create Poly Shape //}
+			BeginPoly;
+			Add2DVertex(0,-4.5*r_Scale,0,0);
+			Add2DVertex((HWidth(h_PosiName)+r_Scale)*i_Flip,-4.5*r_Scale,0,0);
+			Add2DVertex(HWidth(h_PosiName)*i_Flip,-5.25*r_Scale,0,0);
+			Add2DVertex(0,-5.25*r_Scale,0,0);
+			Add2DVertex(0,-6*r_Scale,0,0);
+			Add2DVertex(-6*i_Flip*r_Scale,0,0,0);
+			Add2DVertex(0,6*r_Scale,0,0);
+			Add2DVertex(0,4.5*r_Scale,0,0);
+			Add2DVertex(-2.5*i_Flip*r_Scale,0,4,5.3*r_Scale);
+			Add2DVertex(0,-4.5*r_Scale,0,0);
+			EndPoly;
+			h_Shape := LNewObj;
+			p_OffsetLine1.X := 1*i_Flip*r_Scale;
+			p_OffsetLine1.Y := -6*r_Scale;
+			p_LineOrig.X := -6*i_Flip*r_Scale;
+			p_LineOrig.Y := 0;
+
+		END {Direction "<<" & ">>"}
+		ELSE IF (PLABELDIRECTION='---') THEN
+		BEGIN {// Direction "---" //}
+			TextSize(10*r_TextScaler);
+			TextVerticalAlign(3);
+			CreateText(PPOSINAME);
+			h_PosiName := LNewObj;
+			SetTextVertAlignN(h_PosiName,5);
+			Set_Text_HardBold(h_PosiName);
+			i_Flip := 1;
+			p_OffsetLine1.X := 0;
+			p_OffsetLine1.Y := -6*r_Scale;
+			p_OffsetPosiName.X := 0;
+			p_OffsetPosiName.Y := 0;
+			p_LineOrig.X := 0;
+			p_LineOrig.Y := -4.5*r_Scale;
+			IF (PWRAPTEXT) THEN BEGIN
+				SetTextWidth(h_PosiName,PWRAPWIDTH);
+				SetTextLeading(h_PosiName,GetTextSize(h_PosiName,0)*0.9);
+			END;
+
+			{// Create Poly Shape //}
+			BeginPoly;
+			Add2DVertex(0,-4.5*r_Scale,0,0);
+			Add2DVertex(HWidth(h_PosiName)/2,-4.5*r_Scale,0,0);
+			Add2DVertex((HWidth(h_PosiName)-r_Scale)/2,-5.25*r_Scale,0,0);
+			Add2DVertex(0,-6*r_Scale,0,0);
+			Add2DVertex(-(HWidth(h_PosiName)-r_Scale)/2,-5.25*r_Scale,0,0);
+			Add2DVertex(-HWidth(h_PosiName)/2,-4.5*r_Scale,0,0);
+			Add2DVertex(0,-4.5*r_Scale,0,0);
+			EndPoly;
+			h_Shape := LNewObj;
+		END; {Direction ---}
+
+		{// Setup Line 1&2 Attributes //}
+		TextVerticalAlign(1);
+		TextSize(6*r_TextScaler);
+		{// Create Trim Text //}
+		IF PSHOWTRIM THEN BEGIN
+			TextOrigin(p_OffsetLine1.X,p_OffsetLine1.Y);
+			CreateText(Concat('TRIM@ ',Num2StrF(Get_Zcoor(h_Obj))));
+			h_Trim := LNewObj;
+			SetTextStyle(h_Trim,0,GetTextLength(h_Trim),0);
+			IF (PWRAPTEXT) THEN BEGIN
+				SetTextWidth(h_Trim,PWRAPWIDTH);
+				SetTextLeading(h_Trim,GetTextSize(h_Trim,0)*0.9);
+			END;
+			p_OffsetLine1.Y := p_OffsetLine1.Y - HHeight(h_Trim);
+		END;
+
+		{// Create Line 1 Text //}
+		IF PLINE1<>'' THEN BEGIN
+			TextOrigin(p_OffsetLine1.X,p_OffsetLine1.Y);
+			CreateText(PLINE1);
+			h_Line1 := LNewObj;
+			SetTextStyle(h_Line1,0,GetTextLength(h_Line1),0);
+			IF (PWRAPTEXT) THEN BEGIN
+				SetTextWidth(h_Line1,PWRAPWIDTH);
+				SetTextLeading(h_Line1,GetTextSize(h_Line1,0)*0.9);
+			END;
+		END;
+
+		{// Create Line 2 Text //}
+		TextOrigin(p_OffsetLine1.X,p_OffsetLine1.Y-HHeight(h_Line1));
+		IF PLINE2<>'' THEN BEGIN
+			CreateText(PLINE2);
+			h_Line2 := LNewObj;
+			SetTextStyle(h_Line2,0,GetTextLength(h_Line2),0);
+			IF (PWRAPTEXT) THEN BEGIN
+				SetTextWidth(h_Line2,PWRAPWIDTH);
+				SetTextLeading(h_Line2,GetTextSize(h_Line2,0)*0.9);
+			END;
+		END;
+
+		{// "Regular" Text Appearance //}
+		Set_Background_WtoB(h_PosiName,0);
+		Set_Background_WtoB(h_Trim,0);
+		Set_Background_WtoB(h_Line1,0);
+		Set_Background_WtoB(h_Line2,0);
+		Set_Pen_WtoB(h_PosiName,1);
+		Set_Pen_WtoB(h_Trim,1);
+		Set_Pen_WtoB(h_Line1,1);
+		Set_Pen_WtoB(h_Line2,1);
+		Set_Tight_TextFill(h_PosiName,TRUE);
+		Set_Tight_TextFill(h_Trim,TRUE);
+		Set_Tight_TextFill(h_Line1,TRUE);
+		Set_Tight_TextFill(h_Line2,TRUE);
+		SetLW(h_Shape,5);
+		SetLSN(h_Shape,2);
+		HMoveForward(h_Shape,TRUE);
+	END; {"Regular" size}
+
+	PopAttrs;
+
+	{===== Draw Leader Line =====}
+	SetCntrlPtVis(h_Obj,1,PUSEPOINT);
+	IF PUSEPOINT THEN BEGIN
+		{ MoveTo(p_LineOrig.X,p_LineOrig.Y); }
+		{ LineTo(PCONTROLPOINT01X,PCONTROLPOINT01Y); }
+		{ p_ControlPntTmp.X := PCONTROLPOINT01X; }
+		{ p_ControlPntTmp.Y := PCONTROLPOINT01Y; }
+		Draw_Squiggle(
+		              p_LineOrig.X,
+		              p_LineOrig.Y,
+		              PCONTROLPOINT01X,
+		              PCONTROLPOINT01Y
+		              );
+		HMoveBackward(LNewObj,TRUE);
+		Set_Markers_Cust(LNewObj,'NA','Arrow');
+		SetLW(LNewObj,7);
+		SetFPat(LNewObj,0);
+	END;
+
+	{// Hide/Show in 3D Views //}
+	IF PSHOW3D=FALSE THEN Locus3D(0,0,0);
+
+END; {IFGetCustomObjectInfo} END; {MAIN}
+Run(LxPosi_Label);

@@ -1,0 +1,229 @@
+{//////////////////////////////////////////////////////////////////////////////
+    Developed by John Salutz, (c) 2020. Please share freely.
+
+    This script draws a dynamic polyline with midpoint control & markers.
+
+=== CHANGELOG: ===
+
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE SmartLine;
+
+CONST
+    RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
+
+VAR
+    {Standard variables}
+    s_ObjName                                               : STRING;
+    h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+    b_Result                                                : BOOLEAN;
+    i_Counter                                               : INTEGER;
+    {Script specific variables}
+    pt1,pt2                                                 : POINT;
+    p_Start,p_StartCorner,p_Midpoint,p_EndCorner,p_End      : POINT;
+    h_Poly                                                  : HANDLE;
+    r_CornerSize,r_test                                     : REAL;
+    i_CornerStyle,i_FlipX1,i_FlipX2                         : INTEGER;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+    SetRField(h_Obj,s_ObjName,'ver',s);
+END;
+
+
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+    SetObjectVariableBoolean(h,800,True);
+END;
+
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+    IF r<0 THEN r:=0;
+    IF r>1 THEN r:=1;
+    i := Trunc(RGBmax*(1-r));
+    SetFillBack(h, i, i, i);
+    SetFillFore(h, i, i, i);
+    SetFPat(h, 1); {Blank pattern}
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+    IF r<0 THEN r:=0;
+    IF r>1 THEN r:=1;
+    i := Trunc(RGBmax*(1-r));
+    SetPenFore(h, i, i, i);
+    SetPenBack(h, i, i, i);
+    SetLSN(h,2); {Solid pattern}
+END;
+
+PROCEDURE Resolve_MidPoint_Conflict;
+VAR
+    matchPoint,matchField : BOOLEAN;
+    correctValue          : STRING;
+BEGIN
+    matchPoint := (P__STOREMIDPOINTDIST=Num2StrF(PCONTROLPOINT01X));
+    matchField := (P__STOREMIDPOINTDIST=Num2StrF(PMIDPOINTDIST));
+    correctValue := '';
+    IF matchPoint AND NOT matchField THEN BEGIN
+        {Field correct, set value from field}
+        correctValue := Num2StrF(PMIDPOINTDIST);
+    END ELSE IF NOT matchPoint AND matchField THEN BEGIN
+        {Point correct, set value from control point}
+        correctValue := Num2StrF(PCONTROLPOINT01X);
+    END ELSE IF NOT matchPoint AND NOT matchField THEN BEGIN
+        {Neither correct, set value from control point}
+        correctValue := Num2StrF(PCONTROLPOINT01X);
+    END;
+    IF correctValue<>'' THEN BEGIN
+        SetRField(h_Obj,s_ObjName,'ControlPoint01X',correctValue);
+        SetRField(h_Obj,s_ObjName,'MidpointDist',correctValue);
+        SetRField(h_Obj,s_ObjName,'__StoreMidpointDist',correctValue);
+    END;
+END; {PROCEDURE Resolve_MidPoint_Conflict}
+
+PROCEDURE Resolve_Endpoint_Conflict;
+VAR
+    matchPoint,matchField : BOOLEAN;
+    correctValue          : STRING;
+BEGIN
+    matchPoint := (P__STOREENDDIST=Num2StrF(PCONTROLPOINT02X));
+    matchField := (P__STOREENDDIST=Num2StrF(PENDDIST));
+    correctValue := '';
+    IF matchPoint AND NOT matchField THEN BEGIN
+        {Field correct, set value from field}
+        correctValue := Num2StrF(PENDDIST);
+    END ELSE IF NOT matchPoint AND matchField THEN BEGIN
+        {Point correct, set value from control point}
+        correctValue := Num2StrF(PCONTROLPOINT02X);
+    END ELSE IF NOT matchPoint AND NOT matchField THEN BEGIN
+        {Neither correct, set value from control point}
+        correctValue := Num2StrF(PCONTROLPOINT02X);
+    END;
+    IF correctValue<>'' THEN BEGIN
+        SetRField(h_Obj,s_ObjName,'ControlPoint02X',correctValue);
+        SetRField(h_Obj,s_ObjName,'EndDist',correctValue);
+        SetRField(h_Obj,s_ObjName,'__StoreEndDist',correctValue);
+    END;
+END; {PROCEDURE Resolve_Endpoint_Conflict}
+
+{===================================}
+{         -==<  MAIN  >==-          }
+{===================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+    Set_Version_Info('0 . 2');
+    Use_PIO_Text_Attributes(h_Obj);
+    SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
+    SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
+    SetParameterVisibility(h_Obj,'ControlPoint02X',FALSE);
+    SetParameterVisibility(h_Obj,'ControlPoint02Y',FALSE);
+
+    {===== Parameter checking =====}
+    Resolve_MidPoint_Conflict;
+    Resolve_Endpoint_Conflict;
+    ResetObject(h_Obj);
+
+    {===== Variable Assignment =====}
+    p_Start.X := 0;
+    p_Start.Y := 0;
+    p_Midpoint.X := PCONTROLPOINT01X;
+    p_Midpoint.Y := PCONTROLPOINT01Y;
+    p_End.X := PCONTROLPOINT02X;
+    p_End.Y := PCONTROLPOINT02Y;
+    IF PCORNERS='Square' THEN i_CornerStyle := 0;
+    IF PCORNERS='Rounded' THEN i_CornerStyle := 3;
+
+    {// Corner Sizing //}
+    r_CornerSize := 12;
+    IF Abs(p_End.Y)<(r_CornerSize*2)
+        THEN r_CornerSize := Abs(p_End.Y/2);
+    IF Abs(p_Midpoint.X)<(r_CornerSize)
+        THEN r_CornerSize := Abs(p_Midpoint.X/2);
+    IF Abs(p_End.X-p_Midpoint.X)<(r_CornerSize)
+        THEN r_CornerSize := Abs((p_End.X-p_Midpoint.X)/2);
+    IF p_End.Y<p_Start.Y THEN r_CornerSize := -r_CornerSize;
+
+    {===== Draw Poly =====}
+    MoveTo(0,0);
+    BeginPoly;
+    {Start point}
+    Add2DVertex(p_Start.X,p_Start.Y,0,0);
+    IF PCORNERS='Angle' THEN BEGIN
+        {// Set Direction Flips //}
+        IF (p_Midpoint.X<p_Start.X) THEN i_FlipX1 := -1 ELSE i_FlipX1 := 1;
+        IF (p_End.X<p_Midpoint.X) THEN i_FlipX2 := -1 ELSE i_FlipX2 := 1;
+        {Pre offset}
+        Add2DVertex(p_Midpoint.X-(Abs(r_CornerSize)*i_FlipX1),p_Start.Y,0,0);
+        {Post offset}
+        Add2DVertex(p_Midpoint.X,p_Start.Y+r_CornerSize,0,0);
+        {Pre offset}
+        Add2DVertex(p_Midpoint.X,p_End.Y-r_CornerSize,0,0);
+        {Post offset}
+        Add2DVertex(p_Midpoint.X+(Abs(r_CornerSize)*i_FlipX2),p_End.Y,0,0);
+    END ELSE BEGIN
+        {Corner1}
+        Add2DVertex(p_Midpoint.X,p_Start.Y,i_CornerStyle,Abs(r_CornerSize));
+        {Corner2}
+        Add2DVertex(p_Midpoint.X,p_End.Y,i_CornerStyle,Abs(r_CornerSize));
+    END;
+    {End point}
+    Add2DVertex(p_End.X,p_End.Y,0,0);
+    EndPoly;
+    h_Poly := LNewObj;
+
+    {===== Set poly markers =====}
+    IF PUSEBEGINMARK THEN
+    b_Result := SetObjBeginningMarker(
+                                      h_Poly,
+                                      2,
+                                      0,
+                                      1/GetLScale(ActLayer),
+                                      1/GetLScale(ActLayer),
+                                      0,
+                                      0,
+                                      TRUE
+                                      );
+    IF PUSEENDMARK THEN
+    b_Result := SetObjEndMarker(
+                                h_Poly,
+                                2176,
+                                15,
+                                3/GetLScale(ActLayer),
+                                2/GetLScale(ActLayer),
+                                0,
+                                0,
+                                TRUE
+                                );
+    SetFPat(h_Poly,0);
+    SetRField(
+              h_Obj,
+              s_ObjName,
+              'ControlPoint01Y',
+              Num2StrF((p_End.Y-p_Start.Y)/2)
+              );
+
+END; END; Run(SmartLine);

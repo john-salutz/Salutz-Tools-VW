@@ -1,0 +1,304 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, 2020. Please share freely.
+//
+//  DoubleBox creates a dynamic double rectangle object around text notes.
+=== CHANGELOG: ===
+2020-12-04
+-	14pm:	Tabify
+-	23pm:	Cleanup
+2020-12-05
+-	00am:	Cleanup
+-	01am:	remove extra variables, add underline toggle
+2020-12-11
+-	11am:	Add Dashed Line settings for inner rectangle
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE DoubleBox_and_Notes;
+CONST
+	RGBmax =  65535;
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	r_ObjWidth,r_ObjHeight                                  : REAL;
+	h_BackRect,h_FrontRect,h_PadRect,h_Text,h_Note          : HANDLE;
+	s_LabelText,s_NoteText,s_NoteTextTemp                   : STRING;
+	i_result,dialog1                                        : INTEGER;
+	p_Tmp1,p_Tmp2                                           : POINT;
+	li_Dash                                                 : LONGINT;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+	{// Sets Version info parameter //}
+	PROCEDURE Set_Version_Info(s : STRING);
+	BEGIN
+		SetRField(h_Obj,s_ObjName,'ver',s);
+	END;
+
+	{// Sets the specified text object to use the attributes of PIO //}
+	PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+	BEGIN
+		SetObjectVariableBoolean(h,800,True);
+	END;
+
+	{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+	PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+	VAR i : LONGINT;
+	BEGIN
+		IF r<0 THEN r:=0;
+		IF r>1 THEN r:=1;
+		i := Trunc(RGBmax*(1-r));
+		SetFillBack(h, i, i, i);
+		SetFillFore(h, i, i, i);
+		SetFPat(h, 1); {Blank pattern}
+	END;
+
+	{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+	PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+	VAR i : LONGINT;
+	BEGIN
+		IF r<0 THEN r:=0;
+		IF r>1 THEN r:=1;
+		i := Trunc(RGBmax*(1-r));
+		SetPenFore(h, i, i, i);
+		SetPenBack(h, i, i, i);
+		SetLSN(h,2); {Solid pattern}
+	END;
+
+	{// Dialog Handler for the "Edit Notes" section //}
+	PROCEDURE Dialog_Handler(VAR item :LONGINT; data :LONGINT);
+	BEGIN
+		message('Item: ', item, '  Data in that item: ', data);
+		GetMultilineText(dialog1,4,s_NoteTextTemp);
+	END;
+
+	{// Draws a rectangle or a rounded rectangle based on 'roundTrue' //}
+	FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
+	VAR r_RRectDiam : REAL;
+	BEGIN
+		IF roundTrue THEN BEGIN
+			r_RRectDiam := POFFSET_EDGE*2;
+			RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
+		END {IF roundTrue} ELSE BEGIN
+			r_RRectDiam := 0;
+			Rect(x1,y1,x2,y2);
+		END;
+		RectOrRRect := LNewObj;
+	END;
+
+	{// Draws a rectangle offset from the passed obj //}
+	FUNCTION DrawOffsetRect(
+	                           offsetFrom : HANDLE;
+	                           offset : REAL;
+	                           roundTrue : BOOLEAN
+	                         ) : HANDLE;
+	VAR Pt1,Pt2 : POINT;
+	BEGIN
+		GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
+		DrawOffsetRect := RectOrRRect(
+		                              Pt1.X-offset,
+		                              Pt1.Y+offset,
+		                              Pt2.X+offset,
+		                              Pt2.Y-offset,
+		                              roundTrue
+		                              );
+	END;
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 3');
+
+	r_ObjHeight := PBOXWIDTH;
+	r_ObjWidth := PLINELENGTH;
+	s_LabelText := PLABEL;
+
+	{===== Parameter Limits =====}
+	IF (POFFSET_EDGE<0) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'Offset Edge', '0');
+		AlrtDialog('Offset Out of Bounds, Offset may not be less than zero.');
+		ResetObject(h_Obj);
+	END;
+	IF (PPAD<0) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'Pad', '0');
+		AlrtDialog('Pad Out of Bounds, Pad may not be less than 0 (zero).');
+		ResetObject(h_Obj);
+	END;
+	IF (PSHOWLABEL) THEN BEGIN
+		SetParameterVisibility(h_Obj,'Label',TRUE);
+		SetParameterVisibility(h_Obj,'Label Position',TRUE);
+		SetParameterVisibility(h_Obj,'Underline',TRUE);
+	END ELSE BEGIN
+		SetParameterVisibility(h_Obj,'Label',FALSE);
+		SetParameterVisibility(h_Obj,'Label Position',FALSE);
+		SetParameterVisibility(h_Obj,'Underline',FALSE);
+	END;
+
+	Use_PIO_Text_Attributes(h_Obj);
+	Locus(0,0);
+
+	{===== Create rectangles =====}
+	IF PINOROUT='Inward' THEN BEGIN {Inward offset version}
+		{// Create background rectangle //}
+		h_BackRect := RectOrRRect(
+		                          0,
+		                          r_ObjHeight/2,
+		                          r_ObjWidth,
+		                          -r_ObjHeight/2,
+		                          PISROUNDED
+		                          );
+		{// Create foreground rectangle //}
+		h_FrontRect := DrawOffsetRect(h_BackRect,-POFFSET_EDGE,PISROUNDED);
+		{// Create pad rectangle //}
+		h_PadRect := DrawOffsetRect(h_FrontRect,-PPAD,PISROUNDED);
+	END{IF PINOROUT='Inward'}
+
+	ELSE IF PINOROUT='Outward' THEN BEGIN {Outward offset version}
+		{// Create pad rectangle //}
+		h_PadRect := RectOrRRect(
+		                         0,
+		                         r_ObjHeight/2,
+		                         r_ObjWidth,
+		                         -r_ObjHeight/2,
+		                         PISROUNDED
+		                         );
+		{// Create foreground rectangle //}
+		h_FrontRect := DrawOffsetRect(h_PadRect,PPAD,PISROUNDED);
+		HMoveBackward(h_FrontRect,TRUE);
+		{// Create background rectangle //}
+		h_BackRect := DrawOffsetRect(h_FrontRect,POFFSET_EDGE,PISROUNDED);
+		HMoveBackward(h_BackRect,TRUE);
+	END;{ELSE IF PINOROUT='Outward'}
+
+	{===== Setup and create label text =====}
+	IF (PSHOWLABEL AND (s_LabelText<>'')) THEN BEGIN
+		PushAttrs;
+		TextJust(2);
+		TextRotate(90);
+		IF (PLABEL_POSITION='Inside') THEN BEGIN
+			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			TextOrigin(p_Tmp1.X,0);
+			CreateText(s_LabelText);
+			h_Text := LNewObj;
+			SetTextVerticalAlign(h_Text,1);
+			SetFPat(h_Text, 0); {Fill none}
+		END ELSE IF (PLABEL_POSITION='Outside') THEN BEGIN
+			GetBBox(h_BackRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			TextOrigin(p_Tmp1.X+((-POFFSET_EDGE-PPAD)/4),0);
+			CreateText(s_LabelText);
+			h_Text := LNewObj;
+			SetTextVerticalAlign(h_Text,5);
+			Set_Background_WtoB(h_Text,0); {Fill white}
+		END;
+		PopAttrs;
+		{// Label Text Color //}
+		IF (PTEXTCOLOR='Keep Text Black') THEN Set_Pen_WtoB(h_Text,1);
+		{// Underline creation //}
+		IF (GetTextLength(h_Text)>0) AND PUNDERLINE THEN BEGIN
+			GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			MoveTo(p_Tmp2.X,p_Tmp2.Y);
+			LineTo(p_Tmp2.X,p_Tmp1.Y);
+			SetLW(LNewObj, 7);
+			SetLSN(LNewObj,2);
+			IF (PTEXTCOLOR='Keep Text Black') THEN Set_Pen_WtoB(LNewObj,1);
+		END{IF (GetTextLength(h_Text)>0)}
+	END;
+
+	{===== Set rectangle attributes =====}
+	Set_Background_WtoB(h_FrontRect,0);
+	SetLW(h_FrontRect, 7);
+	{// Dashed Line Setup //}
+	IF PDASH = 'Solid' THEN SetLSN(h_FrontRect,2)
+	ELSE IF PDASH='Dashed' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.03);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed');
+		SetLSN(h_FrontRect,li_Dash);
+	END
+	ELSE IF PDASH='Dashed Spaced' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.18);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed Spaced');
+		SetLSN(h_FrontRect,li_Dash);
+	END
+	ELSE IF PDASH='Dotted' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.005, 0.03);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-07 Dotted');
+		SetLSN(h_FrontRect,li_Dash);
+	END
+	ELSE IF PDASH='None' THEN BEGIN
+		SetLSN(h_FrontRect,2);
+		SetLW(h_FrontRect,0);
+	END;
+	SetFPat(h_PadRect,0);
+	SetLSN(h_PadRect,2);
+	SetLW(h_PadRect, 0);
+
+	{===== Notes dialog, setup and creation =====}
+	IF (PSHOWNOTES) THEN BEGIN
+		SetParameterVisibility(h_Obj,'EditNotes',TRUE);
+		SetParameterVisibility(h_Obj,'NoteSize',TRUE);
+		SetTextVertAlignN(h_Text,1);
+		MoveTo(0,0);
+		IF (PLABEL_POSITION='Inside') THEN BEGIN
+			GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			TextOrigin(p_Tmp2.X,0);
+		END;
+		IF (PLABEL_POSITION='Outside')
+			OR (NOT PSHOWLABEL)
+			OR (GetTextLength(h_Text)=0)THEN BEGIN
+				GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+				TextOrigin(p_Tmp1.X,0);
+			END;
+		s_NoteText := P__NOTESTRING; {get default or current value}
+		{=== Edit Notes Dialog ===}
+		IF PEDITNOTES THEN BEGIN
+			dialog1 := CreateLayout('Notes Dialog', FALSE, 'OK', 'Cancel');
+			CreateEditTextBox(dialog1, 4, s_NoteText, 80, 16);
+			SetFirstLayoutItem(dialog1, 4);
+			i_result := RunLayoutDialog(dialog1, Dialog_Handler);
+			IF (i_result=1) THEN BEGIN
+				s_NoteText := s_NoteTextTemp;
+				SetRField(h_Obj,s_ObjName,'__NoteString',s_NoteText);
+			END;{IF (i_result=1)}
+			SetRField(h_Obj,s_ObjName,'EditNotes','FALSE');
+		END;{IF PEDITNOTES}
+		PushAttrs;
+		TextRotate(90);
+		TextVerticalAlign(1);
+		TextJust(2);
+		CreateText(s_NoteText);
+		PopAttrs;
+		h_Note := LNewObj;
+		{// Set Note attributes //}
+		SetFPat(h_Note, 0);
+		SetTextSize(h_Note,0,GetTextLength(h_Note),PNOTESIZE);
+		SetTextWidth(h_Note,HHeight(h_PadRect));
+		SetTextStyle(h_Note,0,GetTextLength(h_Note),0);
+		SetTextJustN(h_Note,1);
+		{// Note Text Color //}
+		IF (PTEXTCOLOR='Keep Text Black') THEN Set_Pen_WtoB(h_Note,1);
+	END{IF (PSHOWNOTES)}
+	ELSE {IF PSHOWNOTES=FALSE} BEGIN
+		SetParameterVisibility(h_Obj,'EditNotes',FALSE);
+		SetParameterVisibility(h_Obj,'NoteSize',FALSE);
+	END{ELSE}
+END;{IF GetCustomObjectInfo} END;{MAIN} Run(DoubleBox_and_Notes);

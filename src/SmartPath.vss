@@ -1,0 +1,130 @@
+{//////////////////////////////////////////////////////////////////////////////
+    Developed by John Salutz, (c) 2020. Please share freely.
+
+    This script draws a dynamic polyline for use with system flow drawings.
+
+=== CHANGELOG: ===
+
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE SmartPath;
+
+CONST
+    k_DefaultCornerSize = 9;
+    RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
+
+VAR
+    {Standard variables}
+    s_ObjName                                               : STRING;
+    h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+    b_Result                                                : BOOLEAN;
+    i_Counter                                               : INTEGER;
+    {Script specific variables}
+    p_Current                                               : POINT;
+    h_Poly                                                  : HANDLE;
+    r_CornerSize                                            : REAL;
+    i_CornerStyle,i_numVerts                                : INTEGER;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+    SetRField(h_Obj,s_ObjName,'ver',s);
+END;
+
+
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+    SetObjectVariableBoolean(h,800,True);
+END;
+
+{// Resizes 'cs' to half length of smaller segment
+    adjacent to given point //}
+FUNCTION Set_Corner_Size(cs : REAL; h : HANDLE; i : INTEGER) : REAL;
+VAR
+    pLength,nLength : REAL;
+BEGIN
+    pLength := CalcPolySegLen(h,i-1,i);
+    nLength := CalcPolySegLen(h,i,i+1);
+    IF (pLength/2<(cs)) THEN cs := pLength/2;
+    IF (nLength/2<(cs)) THEN cs := nLength/2;
+    Set_Corner_Size := cs;
+END;
+
+{===================================}
+{         -==<  MAIN  >==-          }
+{===================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+    Set_Version_Info('0 . 2');
+    Use_PIO_Text_Attributes(h_Obj);
+
+    {===== Parameter checking =====}
+
+    {===== Variable Assignment =====}
+    IF PCORNERS='Square' THEN i_CornerStyle := 0;
+    IF PCORNERS='Rounded' THEN i_CornerStyle := 3;
+    h_Poly := GetCustomObjectPath(h_Obj);
+    i_numVerts := GetVertNum(h_Poly);
+    r_CornerSize := k_DefaultCornerSize;
+
+    {===== Draw Poly =====}
+    BeginPoly;
+    {Start point}
+    GetPolyPt(h_Poly,1,p_Current.X,p_Current.Y);
+    Add2DVertex(p_Current.X,p_Current.Y,0,0);
+    {Interior points}
+    FOR i_Counter :=2 TO (i_numVerts-1) DO BEGIN
+        GetPolyPt(h_Poly,i_Counter,p_Current.X,p_Current.Y);
+        r_CornerSize := Set_Corner_Size(r_CornerSize,h_Poly,i_Counter);
+        Add2DVertex(p_Current.X,p_Current.Y,i_CornerStyle,r_CornerSize);
+        r_CornerSize := k_DefaultCornerSize;
+    END;
+    {End point}
+    GetPolyPt(h_Poly,i_numVerts,p_Current.X,p_Current.Y);
+    Add2DVertex(p_Current.X,p_Current.Y,0,0);
+    EndPoly;
+    h_Poly := LNewObj;
+
+    {===== Set poly markers =====}
+    IF PUSEBEGINMARK THEN
+    b_Result := SetObjBeginningMarker(
+                                      h_Poly,
+                                      2,
+                                      0,
+                                      1/GetLScale(ActLayer),
+                                      1/GetLScale(ActLayer),
+                                      0,
+                                      0,
+                                      TRUE
+                                      );
+    IF PUSEENDMARK THEN
+    b_Result := SetObjEndMarker(
+                                h_Poly,
+                                2176,
+                                15,
+                                3/GetLScale(ActLayer),
+                                2/GetLScale(ActLayer),
+                                0,
+                                0,
+                                TRUE
+                                );
+    SetFPat(h_Poly,0);
+
+END; END; Run(SmartPath);

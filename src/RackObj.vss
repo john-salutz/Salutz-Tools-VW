@@ -1,0 +1,247 @@
+{//////////////////////////////////////////////////////////////////////////////
+//	Developed by John Salutz, 2020. Please share freely.
+//
+//	This script creates a dynamic rack for mounted equipment.
+
+=== CHANGELOG: ===
+2020-11-18 10am: Change build direction
+
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//	This program is free software: you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published by
+//	the Free Software Foundation, either version 3 of the License, or
+//	(at your option) any later version.
+//
+//	This program is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//	GNU General Public License for more details.
+//	<https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE Rack_Obj;
+
+CONST {Rack size constants}
+	k_RackU = 1.75; {1 rack unit height (1.75")}
+	k_RackWidth = 19; {19" rack width}
+	k_EarWidth = .625; {Rack ear width (5/8")}
+	RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
+
+VAR
+	{Standard variables}
+	s_ObjName                                             : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                           : HANDLE;
+	b_Result                                              : BOOLEAN;
+	{Script specific variables}
+	i_NumSpaces,i_Counter                                 : INTEGER;
+	h_OuterRect,h_InnerRect,h_RackID                      : HANDLE;
+	r_Height,r_Width                                      : REAL;
+	p_Tmp1,p_Tmp2                                         : POINT;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+	SetRField(h_Obj,s_ObjName,'ver',s);
+END;
+
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+	SetObjectVariableBoolean(h,800,True);
+END;
+
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetFillBack(h, i, i, i);
+	SetFillFore(h, i, i, i);
+	SetFPat(h, 1); {Blank pattern}
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetPenFore(h, i, i, i);
+	SetPenBack(h, i, i, i);
+	SetLSN(h,2); {Solid pattern}
+END;
+
+{// Scales 'toScale' to fit to a percentage (scaleFactor) of 'fitTo' height //}
+PROCEDURE Scale_Fit_Height (toScale,fitTo : HANDLE; scaleFactor : REAL);
+VAR		p1 : POINT;
+BEGIN
+	HCenter(toScale,p1.X,p1.Y);
+	HScale2D(
+			 toScale,
+			 p1.X,
+			 p1.Y,
+			 (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
+			 (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
+			 TRUE
+			 );
+END;
+
+{// Scales 'toScale' to fit to a percentage (scaleFactor) of 'fitTo' width //}
+PROCEDURE Scale_Fit_Width (toScale,fitTo : HANDLE; scaleFactor : REAL);
+VAR		p1 : POINT;
+BEGIN
+	HCenter(toScale,p1.X,p1.Y);
+	HScale2D(
+			 toScale,
+			 p1.X,
+			 p1.Y,
+			 HWidth(fitTo)*scaleFactor/HWidth(toScale),
+			 HWidth(fitTo)*scaleFactor/HWidth(toScale),
+			 TRUE
+			 );
+END;
+
+{// Resets all 'RackEquip objects inside the RackObj's boundaries //}
+PROCEDURE Refresh_Gear_In_Rack(h : HANDLE);
+VAR
+	pt1,pt2		: POINT;
+	criteria,n	: STRING;
+	c			: ARRAY [1..6] OF STRING;
+BEGIN
+	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y);
+	pt1.X := pt1.X/12;
+	pt1.Y := pt1.Y/12;
+	pt2.X := pt2.X/12;
+	pt2.Y := pt2.Y/12;
+	n := ' & ';
+	c[1] := Concat('(T=PLUGINOBJECT)');
+	c[2] := Concat('(R IN [','''','RackEquip (Salutz)','''','])');
+	c[3] := Concat('(',pt2.Y,'<YCOORDINATE)');
+	c[4] := Concat('(YCOORDINATE<',pt1.Y,')');
+	c[5] := Concat('(',pt1.X,'<XCOORDINATE)');
+	c[6] := Concat('(XCOORDINATE<',pt2.X,')');
+	criteria := Concat(c[1],n,c[2],n,c[3],n,c[4],n,c[5],n,c[6]);
+	ForEachObject(ResetObject,criteria);
+END;
+
+{// Draws Rack Space Numbers on side of RackObj //}
+PROCEDURE Draw_RackSpace_Numbers(leftOrRight : CHAR);
+VAR
+	i			  : INTEGER;
+	offsetX		   : REAL;
+	pt1,pt2,start : POINT;
+BEGIN
+	GetBBox(h_OuterRect,pt1.X,pt1.Y,pt2.X,pt2.Y);
+	IF leftOrRight='L' THEN BEGIN
+		offsetX := -1.25;
+		start.X := pt1.X+offsetX;
+	END;
+	IF leftOrRight='R' THEN BEGIN
+		offsetX := 1.25;
+		start.X := pt2.X+offsetX;
+	END;
+	start.Y := 0+(k_RackU/2);
+	TextOrigin(start.X,start.Y);
+	MoveTo(start.X,start.Y);
+	Relative;
+	PushAttrs;
+	TextSize(8*(12/GetLScale(ActLayer)));
+	TextJust(2);
+	TextVerticalAlign(3);
+	FOR i:=1 TO i_NumSpaces DO BEGIN
+		CreateText(Num2Str(0,i));
+		SetTextStyle(LNewObj,0,GetTextLength(LNewObj),0);
+		Set_Background_WtoB(LNewObj,0);
+		Set_Pen_WtoB(LNewObj,0.5);
+		Line(-offsetX,0);
+		SetLW(LNewObj,2);
+		Set_Pen_WtoB(LNewObj,0.25);
+		HMoveBackward(LNewObj,TRUE);
+		Move(offsetX,k_RackU);
+	END;
+	PopAttrs;
+	Absolute;
+END;
+
+{===================================}
+{         -==<  MAIN  >==-          }
+{===================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 3');
+	i_NumSpaces := PNUMSPACES;
+	Use_PIO_Text_Attributes(h_Obj);
+
+	{===== Parameter Limits =====}
+	IF (i_NumSpaces<1) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
+		i_NumSpaces := 1;
+		AlrtDialog(
+				   'Out of Bounds, Number of spaces must be greater than zero.'
+				   );
+	END;
+	r_Height := k_RackU*i_NumSpaces;
+	r_Width := k_RackWidth;
+
+	{// Rectangle Creation //}
+	MoveTo(0,0);
+	Rect(-r_Width/2,0,r_Width/2,r_Height);
+	h_InnerRect := LNewObj;
+	Set_Pen_WtoB(h_InnerRect,1);
+	Set_Background_WtoB(h_InnerRect,0.1);
+	IF PFRONTORBACK='Back' THEN Set_Background_WtoB(h_InnerRect,0.2);
+	SetLW(h_InnerRect,2);
+	GetBBox(h_InnerRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+	Rect(p_Tmp1.X-PFRAME,p_Tmp1.Y+PFRAME,p_Tmp2.X+PFRAME,p_Tmp2.Y-PFRAME);
+	h_OuterRect := LNewObj;
+	HMoveBackward(h_OuterRect,TRUE);
+
+	{// Rack Spaces Line Guides //}
+	MoveTo(r_Width/2,0);
+	Relative;
+	FOR i_Counter := 2 TO i_NumSpaces DO BEGIN
+		Move(-r_Width,k_RackU);
+		Line(r_Width,0);
+		Set_Pen_WtoB(LNewObj,0.35);
+		SetLW(LNewObj,1);
+	END;
+	Absolute;
+
+	{// Rack Ear Vertical Lines //}
+	Rect(p_Tmp1.X,p_Tmp1.Y,p_Tmp1.X+k_EarWidth,p_Tmp1.Y-r_Height);
+	Set_Pen_WtoB(LNewObj,1);
+	SetLW(LNewObj,1);
+	Set_Background_WtoB(LNewObj,0.35);
+	Rect(p_Tmp2.X,p_Tmp2.Y,p_Tmp2.X-k_EarWidth,p_Tmp2.Y+r_Height);
+	Set_Pen_WtoB(LNewObj,1);
+	SetLW(LNewObj,1);
+	Set_Background_WtoB(LNewObj,0.35);
+
+	{// Label Text Creation and Formating //}
+	MoveTo(0,0);
+	TextOrigin(0,r_Height+PFRAME+0.5);
+	IF (PFRONTORBACK<>' ') THEN
+		CreateText(Concat(PRACKID,' (',PFRONTORBACK,')'))
+		ELSE CreateText(PRACKID);
+	h_RackID := LNewObj;
+	SetTextJust(h_RackID,2);
+	SetTextVerticalAlign(h_RackID,5);
+	Set_Background_WtoB(h_RackID,0);
+	HMoveBackward(h_RackID,TRUE);
+
+	{// Rack Space Number Creation //}
+	IF (PSHOWNUM='Left') OR (PSHOWNUM='Both') THEN Draw_RackSpace_Numbers('L');
+	IF (PSHOWNUM='Right') OR (PSHOWNUM='Both') THEN Draw_RackSpace_Numbers('R');
+
+	Refresh_Gear_In_Rack(h_Obj);
+END; END; Run(Rack_Obj);

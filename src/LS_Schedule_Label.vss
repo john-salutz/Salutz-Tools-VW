@@ -1,0 +1,219 @@
+{//////////////////////////////////////////////////////////////////////////////
+    Developed by John Salutz, (c) 2020. Please share freely.
+
+    Creates a lineset label object which displays
+    y & z coordinates and/or user info fields.
+
+=== CHANGELOG: ===
+2020-11-24
+-	10am:	Fix 'Weight' Pen, add rectangle marker
+-	12pm:	Add PL Dist and Trim toggles
+2020-12-11
+-	21pm:	Make Trim blank if equal to 0
+
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE LS_Schedule_Label;
+
+CONST
+	RGBmax =  65535;
+
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	i_Flip                                                  : INTEGER;
+	r_TextScaler,x_coor,y_coor,z_coor                       : REAL;
+	h_Num,h_Purpose,h_TypeMark,h_DistPL,h_Trim,h_Weight     : HANDLE;
+	p_Tmp1                                                  : POINT;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+	{// Sets Version info parameter //}
+	PROCEDURE Set_Version_Info(s : STRING);
+	BEGIN
+		SetRField(h_Obj,s_ObjName,'ver',s);
+	END;
+
+	{// Sets the specified text object to use the attributes of PIO //}
+	PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+	BEGIN
+		SetObjectVariableBoolean(h,800,True);
+	END;
+
+	{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+	PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+	VAR i : LONGINT;
+	BEGIN
+		IF r<0 THEN r:=0;
+		IF r>1 THEN r:=1;
+		i := Trunc(RGBmax*(1-r));
+		SetFillBack(h, i, i, i);
+		SetFillFore(h, i, i, i);
+		SetFPat(h, 1); {Blank pattern}
+	END;
+
+	{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+	PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+	VAR i : LONGINT;
+	BEGIN
+		IF r<0 THEN r:=0;
+		IF r>1 THEN r:=1;
+		i := Trunc(RGBmax*(1-r));
+		SetPenFore(h, i, i, i);
+		SetPenBack(h, i, i, i);
+		SetLSN(h,2); {Solid pattern}
+	END;
+
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 3');
+	Use_PIO_Text_Attributes(h_Obj);
+
+	{===== Parameter Limits =====}
+
+	{===== Variable Assignment =====}
+	IF PDIRECTION = '>>' THEN i_Flip := 1
+	ELSE i_Flip := -1;
+	r_TextScaler := 48/GetLScale(ActLayer);
+	GetSymLoc3D(h_Obj,x_coor,y_coor,z_coor);
+
+	{===== Draw Shapes =====}
+	{// Draw Poly //}
+	BeginPoly;
+	Add2DVertex(0,0,0,0);
+	Add2DVertex(-2*i_Flip,0,0,0);
+	Add2DVertex(-5.464*i_Flip,2,0,0);
+	Add2DVertex(-60*i_Flip,2,0,0);
+	Add2DVertex(-60*i_Flip,-2,0,0);
+	Add2DVertex(-5.464*i_Flip,-2,0,0);
+	Add2DVertex(-2*i_Flip,0,0,0);
+	Add2DVertex(0,0,0,0);
+	EndPoly;
+	Set_Background_WtoB(LNewObj,0);
+	Set_Pen_WtoB(LNewObj,1);
+	{// Draw Number rectangle //}
+	Rect(-19*i_Flip,2,-13*i_Flip,-2);
+	Set_Background_WtoB(LNewObj,0.25);
+	Set_Pen_WtoB(LNewObj,1);
+	{// Draw division line //}
+	MoveTo(-31*i_Flip,2);
+	Line(0,-4);
+	Set_Pen_WtoB(LNewObj,1);
+
+	{===== Draw Text =====}
+	PushAttrs;
+	TextVerticalAlign(3);
+	TextJust(2);
+	TextSize(4*r_TextScaler);
+	{Plasterline distance}
+	TextOrigin(-9*i_Flip,0);
+	IF (PUSEOBJY) THEN BEGIN
+		CreateText(Num2StrF(y_coor));
+		SetParameterVisibility(h_Obj,'PLDist',FALSE);
+	END ELSE CreateText(Num2StrF(PPLDIST));
+	h_DistPL := LNewObj;
+	{Lineset Number}
+	TextOrigin(-16*i_Flip,0);
+	CreateText(PLSNUM);
+	h_Num := LNewObj;
+	{Trim}
+	TextOrigin(-25*i_Flip,0);
+	IF PUSEOBJZ THEN BEGIN
+		SetParameterVisibility(h_Obj,'Trim',FALSE);
+		IF (z_coor <> 0) THEN BEGIN
+			CreateText(Concat('@',Num2StrF(z_coor)));
+			h_Trim := LNewObj;
+		END;
+	END ELSE IF (PTRIM <> 0) THEN BEGIN
+		CreateText(Concat('@',Num2StrF(PTRIM)));
+		h_Trim := LNewObj;
+	END;
+	{Lineset Name / Purpose}
+	TextOrigin(-32*i_Flip,0);
+	CreateText(PPURPOSE);
+	h_Purpose := LNewObj;
+	{Weight}
+	IF PWEIGHT>0 THEN BEGIN
+		TextOrigin(1*i_Flip,0);
+		CreateText(Concat(PWEIGHT,' ',PWEIGHTUNITS));
+		h_Weight := LNewObj;
+	END;
+	PopAttrs;
+
+	{===== Format Text =====}
+	{// Set all Style 'Plain' //}
+	SetTextStyle(h_DistPL,0,GetTextLength(h_DistPL),0);
+	SetTextStyle(h_Num,0,GetTextLength(h_Num),0);
+	SetTextStyle(h_Trim,0,GetTextLength(h_Trim),0);
+	SetTextStyle(h_Purpose,0,GetTextLength(h_Purpose),0);
+	SetTextStyle(h_Weight,0,GetTextLength(h_Weight),0);
+	{// Set all but 'Weight' as no fill //}
+	SetFPat(h_DistPL,0);
+	SetFPat(h_Num,0);
+	SetFPat(h_Trim,0);
+	SetFPat(h_Purpose,0);
+	Set_Background_WtoB(h_Weight,0);
+
+	{// Set Alignment //}
+	IF PDIRECTION = '>>' THEN BEGIN
+		SetTextJust(h_Purpose,3);
+		SetTextJust(h_Weight,1);
+	END ELSE BEGIN
+		SetTextJust(h_Purpose,1);
+		SetTextJust(h_Weight,3);
+	END;
+
+	{// Set attributes //}
+	{Plasterline distance}
+	Set_Pen_WtoB(h_DistPL,0.5);
+	SetTextSize(h_DistPL,0,GetTextLength(h_DistPL),3.5*r_TextScaler);
+	{Lineset Number}
+	Set_Pen_WtoB(h_Num,1);
+	SetTextSize(h_Num,0,GetTextLength(h_Num),5*r_TextScaler);
+	SetTextStyle(h_Num,0,GetTextLength(h_Num),1);
+	{Trim}
+	Set_Pen_WtoB(h_Trim,1);
+	SetTextStyle(h_Trim,0,GetTextLength(h_Trim),2);
+	{Weight}
+	Set_Pen_WtoB(h_Weight,1);
+
+	{// Draw Marker //}
+	IF PTYPE<>' ' THEN BEGIN
+		Rect(-5.5*i_Flip,2,0*i_Flip,-2);
+		h_TypeMark := LNewObj;
+		HMoveBackward(h_TypeMark,TRUE);
+		SetLSN(h_TypeMark,0);
+		SetLW(h_TypeMark,0);
+	END;
+	IF PTYPE='LX' THEN BEGIN
+		SetTextStyle(h_Purpose,0,GetTextLength(h_Purpose),1);
+	END;
+
+	{// Hide/Show in 3D Views //}
+	IF PSHOW3D=FALSE THEN Locus3D(0,0,0);
+
+
+END; END; Run(LS_Schedule_Label);
