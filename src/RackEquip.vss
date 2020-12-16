@@ -85,37 +85,29 @@ BEGIN
 END;
 
 PROCEDURE Scale_Fit_Height (toScale,fitTo : HANDLE; scaleFactor : REAL);
-VAR			p1 : POINT;
+VAR p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
-			 toScale,
-			 p1.X,
-			 p1.Y,
-			 (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
-			 (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
-			 TRUE
-			 );
+			toScale, p1.X, p1.Y, (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
+			(HHeight(fitTo)*scaleFactor)/HHeight(toScale), TRUE
+			);
 END;
 
 PROCEDURE Scale_Fit_Width (toScale,fitTo : HANDLE; scaleFactor : REAL);
-VAR			p1 : POINT;
+VAR p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
-			 toScale,
-			 p1.X,
-			 p1.Y,
-			 HWidth(fitTo)*scaleFactor/HWidth(toScale),
-			 HWidth(fitTo)*scaleFactor/HWidth(toScale),
-			 TRUE
-			 );
+			toScale, p1.X, p1.Y, HWidth(fitTo)*scaleFactor/HWidth(toScale),
+			HWidth(fitTo)*scaleFactor/HWidth(toScale), TRUE
+			);
 END;
 
 FUNCTION Get_RackHandle_At_Pt(p1 : POINT) : HANDLE;
 VAR
-	li_List						: LONGINT;
-	i_ListCount,i_NumPickObj	: INTEGER;
+	li_List                   : LONGINT;
+	i_ListCount,i_NumPickObj  : INTEGER;
 BEGIN
 	li_List := FindObjAtPt_Create(NIL,1, 0, p1.x, p1.y, 1);
 	i_NumPickObj := FindObjAtPt_GetCount(li_List);
@@ -132,23 +124,19 @@ FUNCTION Get_RackName(h : HANDLE) : STRING;
 VAR	s1,s2 : STRING;
 BEGIN
 	s1 := GetRField(
-					h,
-					GetName(GetRecord(h,NumRecords(h))),
-					'RackID'
-					);
+			h, GetName(GetRecord(h,NumRecords(h))), 'RackID'
+			);
 	s2 := GetRField(
-					h,
-					GetName(GetRecord(h,NumRecords(h))),
-					'FrontOrBack'
-					);
+			h, GetName(GetRecord(h,NumRecords(h))), 'FrontOrBack'
+			);
 	IF (s2<>' ') THEN
 		Get_RackName := Concat(s1,' (',s2,')')
 	ELSE Get_RackName := s1;
 END;
 
-{===================================}
-{         -==<  MAIN  >==-          }
-{===================================}
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
@@ -160,8 +148,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
 		i_NumSpaces := 1;
 		AlrtDialog(
-				   'Out of Bounds, Number of spaces must be greater than zero.'
-				   );
+				'Out of Bounds, Number of spaces must be greater than zero.'
+				);
 		END;
 	r_Height := k_RackU*i_NumSpaces;
 	IF PHALFWIDTH THEN r_Width := k_RackWidth/2
@@ -180,18 +168,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		s_PosiInRack := Num2Str(0,((p_EquipLoc.Y-p_RackLoc.Y)/k_RackU));
 		IF ((p_EquipLoc.X<p_RackLoc.X) AND PHALFWIDTH)
 			THEN SetRField(
-						   h_Obj,
-						   s_ObjName,
-						   'RackPosition',
-						   Concat(s_PosiInRack,'-L')
-						   )
+					h_Obj, s_ObjName, 'RackPosition', Concat(s_PosiInRack,'-L')
+					)
 		ELSE IF ((p_EquipLoc.X>p_RackLoc.X) AND PHALFWIDTH)
 			THEN SetRField(
-						   h_Obj,
-						   s_ObjName,
-						   'RackPosition',
-						   Concat(s_PosiInRack,'-R')
-						   )
+					h_Obj, s_ObjName, 'RackPosition', Concat(s_PosiInRack,'-R')
+					)
 		ELSE SetRField(h_Obj,s_ObjName,'RackPosition', s_PosiInRack);
 	END ELSE SetRField(h_Obj,s_ObjName,'RackPosition', Num2Str(0,0));
 

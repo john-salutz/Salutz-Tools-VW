@@ -86,36 +86,28 @@ VAR		p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
-			 toScale,
-			 p1.X,
-			 p1.Y,
-			 (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
-			 (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
-			 TRUE
-			 );
+			toScale, p1.X, p1.Y, (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
+			(HHeight(fitTo)*scaleFactor)/HHeight(toScale), TRUE
+			);
 END;
 
 {// Scales 'toScale' to fit to a percentage (scaleFactor) of 'fitTo' width //}
 PROCEDURE Scale_Fit_Width (toScale,fitTo : HANDLE; scaleFactor : REAL);
-VAR		p1 : POINT;
+VAR p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
-			 toScale,
-			 p1.X,
-			 p1.Y,
-			 HWidth(fitTo)*scaleFactor/HWidth(toScale),
-			 HWidth(fitTo)*scaleFactor/HWidth(toScale),
-			 TRUE
-			 );
+			toScale, p1.X, p1.Y, HWidth(fitTo)*scaleFactor/HWidth(toScale),
+			HWidth(fitTo)*scaleFactor/HWidth(toScale), TRUE
+			);
 END;
 
 {// Resets all 'RackEquip objects inside the RackObj's boundaries //}
 PROCEDURE Refresh_Gear_In_Rack(h : HANDLE);
 VAR
-	pt1,pt2		: POINT;
-	criteria,n	: STRING;
-	c			: ARRAY [1..6] OF STRING;
+	pt1,pt2     : POINT;
+	criteria,n  : STRING;
+	c           : ARRAY [1..6] OF STRING;
 BEGIN
 	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y);
 	pt1.X := pt1.X/12;
@@ -136,8 +128,8 @@ END;
 {// Draws Rack Space Numbers on side of RackObj //}
 PROCEDURE Draw_RackSpace_Numbers(leftOrRight : CHAR);
 VAR
-	i			  : INTEGER;
-	offsetX		   : REAL;
+	i             : INTEGER;
+	offsetX       : REAL;
 	pt1,pt2,start : POINT;
 BEGIN
 	GetBBox(h_OuterRect,pt1.X,pt1.Y,pt2.X,pt2.Y);
@@ -172,9 +164,9 @@ BEGIN
 	Absolute;
 END;
 
-{===================================}
-{         -==<  MAIN  >==-          }
-{===================================}
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
@@ -187,8 +179,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
 		i_NumSpaces := 1;
 		AlrtDialog(
-				   'Out of Bounds, Number of spaces must be greater than zero.'
-				   );
+				'Out of Bounds, Number of spaces must be greater than zero.'
+				);
 	END;
 	r_Height := k_RackU*i_NumSpaces;
 	r_Width := k_RackWidth;

@@ -1,7 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
-    Developed by John Salutz, (c) 2020. Please share freely.
+//  Developed by John Salutz, (c) 2020. Please share freely.
 
-    Creates a header for use on a magic sheet
+//  Creates a header for use on a magic sheet
 
 === CHANGELOG: ===
 
@@ -23,30 +23,30 @@
 PROCEDURE MagicSheet_Header;
 
 CONST
-    RGBmax =  65535;
+	RGBmax =  65535;
 
 VAR
-    {Standard variables}
-    s_ObjName                                               : STRING;
-    h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
-    b_Result                                                : BOOLEAN;
-    i_Counter                                               : INTEGER;
-    {Script specific variables}
-    h_SystemText,h_ColorText,h_OuterRect,h_InnerRect        : HANDLE;
-    pt1,pt2                                                 : POINT;
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	h_SystemText,h_ColorText,h_OuterRect,h_InnerRect        : HANDLE;
+	pt1,pt2                                                 : POINT;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
 {// Sets Version info parameter //}
 PROCEDURE Set_Version_Info(s : STRING);
 BEGIN
-    SetRField(h_Obj,s_ObjName,'ver',s);
+	SetRField(h_Obj,s_ObjName,'ver',s);
 END;
 
 {// Sets the specified text object to use the attributes of PIO //}
 PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
 BEGIN
-    SetObjectVariableBoolean(h,800,True);
+	SetObjectVariableBoolean(h,800,True);
 END;
 
 {// Sets Background Fore and Back as White to Black, percentage set by 'r',
@@ -54,12 +54,12 @@ format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
 PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
 VAR i : LONGINT;
 BEGIN
-    IF r<0 THEN r:=0;
-    IF r>1 THEN r:=1;
-    i := Trunc(RGBmax*(1-r));
-    SetFillBack(h, i, i, i);
-    SetFillFore(h, i, i, i);
-    SetFPat(h, 1); {Blank pattern}
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetFillBack(h, i, i, i);
+	SetFillFore(h, i, i, i);
+	SetFPat(h, 1); {Blank pattern}
 END;
 
 {// Sets Pen Fore and Back as White to Black, percentage set by 'r',
@@ -67,68 +67,68 @@ format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
 PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
 VAR i : LONGINT;
 BEGIN
-    IF r<0 THEN r:=0;
-    IF r>1 THEN r:=1;
-    i := Trunc(RGBmax*(1-r));
-    SetPenFore(h, i, i, i);
-    SetPenBack(h, i, i, i);
-    SetLSN(h,2); {Solid pattern}
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetPenFore(h, i, i, i);
+	SetPenBack(h, i, i, i);
+	SetLSN(h,2); {Solid pattern}
 END;
 
 PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
 BEGIN
-    SetObjectVariableBoolean(h,684,b);
+	SetObjectVariableBoolean(h,684,b);
 END;
 
-{===================================}
-{         -==<  MAIN  >==-          }
-{===================================}
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-    Set_Version_Info('0 . 2');
-    Use_PIO_Text_Attributes(h_Obj);
+	Set_Version_Info('0 . 3');
+	Use_PIO_Text_Attributes(h_Obj);
 
-    {===== Boundary Setup =====}
-    pt1.X := -1;
-    pt1.Y := 0;
-    pt2.X := 1;
-    pt2.Y := -0.25;
+	{===== Boundary Setup =====}
+	pt1.X := -1;
+	pt1.Y := 0;
+	pt2.X := 1;
+	pt2.Y := -0.25;
 
-    {===== Draw Objects =====}
-    Rect(pt1.X,pt1.Y,pt2.X,pt2.Y);
-    h_OuterRect := LNewObj;
-    RRect(pt1.X+0.025,pt1.Y-0.05,pt2.X-0.025,pt2.Y+0.025,0.125,0.125);
-    h_InnerRect := LNewObj;
-    GetBBox(h_InnerRect,pt1.X,pt1.Y,pt2.X,pt2.Y);
-    PushAttrs;
-        TextVerticalAlign(3);
-        TextSize(9);
-        TextOrigin(pt1.X,pt2.Y-((pt2.Y-pt1.Y)/2));
-        CreateText(Concat(' ',PSYSTEMNAME));
-        h_SystemText := LNewObj;
-        TextOrigin(pt2.X,pt2.Y-((pt2.Y-pt1.Y)/2));
-        CreateText(Concat(PCOLOR,' '));
-        h_ColorText := LNewObj;
-    PopAttrs;
+	{===== Draw Objects =====}
+	Rect(pt1.X,pt1.Y,pt2.X,pt2.Y);
+	h_OuterRect := LNewObj;
+	RRect(pt1.X+0.025,pt1.Y-0.05,pt2.X-0.025,pt2.Y+0.025,0.125,0.125);
+	h_InnerRect := LNewObj;
+	GetBBox(h_InnerRect,pt1.X,pt1.Y,pt2.X,pt2.Y);
+	PushAttrs;
+		TextVerticalAlign(3);
+		TextSize(9);
+		TextOrigin(pt1.X,pt2.Y-((pt2.Y-pt1.Y)/2));
+		CreateText(Concat(' ',PSYSTEMNAME));
+		h_SystemText := LNewObj;
+		TextOrigin(pt2.X,pt2.Y-((pt2.Y-pt1.Y)/2));
+		CreateText(Concat(PCOLOR,' '));
+		h_ColorText := LNewObj;
+	PopAttrs;
 
-    {===== Object Attributes =====}
-    {// Inner Rectangle //}
-    Set_Background_WtoB(h_InnerRect,0);
-    SetLW(h_InnerRect,0);
-    SetLSN(h_InnerRect,0);
-    SetOpacity(h_InnerRect,85);
+	{===== Object Attributes =====}
+	{// Inner Rectangle //}
+	Set_Background_WtoB(h_InnerRect,0);
+	SetLW(h_InnerRect,0);
+	SetLSN(h_InnerRect,0);
+	SetOpacity(h_InnerRect,85);
 
-    {// System Text //}
-    SetFPat(h_SystemText,0);
-    Set_Pen_WtoB(h_SystemText,1);
-    SetTextJust(h_SystemText,1);
-    SetTextStyle(h_SystemText,0,GetTextLength(h_SystemText),0);
+	{// System Text //}
+	SetFPat(h_SystemText,0);
+	Set_Pen_WtoB(h_SystemText,1);
+	SetTextJust(h_SystemText,1);
+	SetTextStyle(h_SystemText,0,GetTextLength(h_SystemText),0);
 
-    {// Color Text //}
-    SetFPat(h_ColorText,0);
-    Set_Pen_WtoB(h_ColorText,1);
-    SetTextJust(h_ColorText,3);
-    SetTextStyle(h_ColorText,0,GetTextLength(h_ColorText),0);
+	{// Color Text //}
+	SetFPat(h_ColorText,0);
+	Set_Pen_WtoB(h_ColorText,1);
+	SetTextJust(h_ColorText,3);
+	SetTextStyle(h_ColorText,0,GetTextLength(h_ColorText),0);
 
 END; END; Run(MagicSheet_Header);

@@ -72,7 +72,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 2');
+	Set_Version_Info('0 . 3');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter checking =====}
