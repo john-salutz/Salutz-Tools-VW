@@ -2,13 +2,6 @@
 //  Developed by John Salutz, (c) 2020. Please share freely.
 //
 //  This script creates a text label object with a double rectangle border.
-
-=== CHANGELOG: ===
-2020-12-12
--	21pm:	Code Cleanup
--	22pm:	Simplify Arrows
--	23pm:	Add Dash options for inner rectangle
-
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -27,7 +20,7 @@
 PROCEDURE Text_Box;
 
 CONST
-	RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
+	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
 
 VAR
 	{Standard variables}
@@ -98,20 +91,15 @@ END;
 
 	{// Draws a rectangle offset from the passed obj //}
 	FUNCTION DrawOffsetRect(
-	                           offsetFrom : HANDLE;
-	                           offset : REAL;
-	                           roundTrue : BOOLEAN
-	                         ) : HANDLE;
+			offsetFrom : HANDLE; offset : REAL; roundTrue : BOOLEAN
+			) : HANDLE;
 	VAR Pt1,Pt2 : POINT;
 	BEGIN
 		GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
 		DrawOffsetRect := RectOrRRect(
-		                              Pt1.X-offset,
-		                              Pt1.Y+offset,
-		                              Pt2.X+offset,
-		                              Pt2.Y-offset,
-		                              roundTrue
-		                              );
+				Pt1.X-offset, Pt1.Y+offset,
+				Pt2.X+offset, Pt2.Y-offset, roundTrue
+				);
 	END;
 
 {====================================}
@@ -134,19 +122,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF (POFFSET_EDGE<0) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'Offset Edge', '0');
 		AlertInform(
-		            'Offset Out of Bounds',
-		            'Offset may not be less than 0 (zero).',
-		            FALSE
-		            );
+				'Offset Out of Bounds',
+				'Offset may not be less than 0 (zero).', FALSE
+				);
 		ResetObject(h_Obj);
 	END;
 	IF (PPAD<0) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'Pad', '0');
 		AlertInform(
-		            'Pad Out of Bounds',
-		            'Pad may not be less than 0 (zero).',
-		            FALSE
-		            );
+				'Pad Out of Bounds',
+				'Pad may not be less than 0 (zero).', FALSE
+				);
 		ResetObject(h_Obj);
 	END;
 

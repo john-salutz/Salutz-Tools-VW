@@ -2,15 +2,6 @@
 //  Developed by John Salutz, 2020. Please share freely.
 //
 //  DoubleBox creates a dynamic double rectangle object around text notes.
-=== CHANGELOG: ===
-2020-12-04
--	14pm:	Tabify
--	23pm:	Cleanup
-2020-12-05
--	00am:	Cleanup
--	01am:	remove extra variables, add underline toggle
-2020-12-11
--	11am:	Add Dashed Line settings for inner rectangle
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////

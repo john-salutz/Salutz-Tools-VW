@@ -1,10 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
-
+//
 //  This script draws a dynamic polyline with midpoint control & markers.
-
-=== CHANGELOG: ===
-
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -23,7 +20,7 @@
 PROCEDURE SmartLine;
 
 CONST
-	RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
+	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
 
 VAR
 	{Standard variables}

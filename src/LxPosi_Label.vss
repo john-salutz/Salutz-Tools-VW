@@ -2,13 +2,6 @@
 //  Developed by John Salutz, 2020. Please share freely.
 //
 //  This draws a Salutz Lx Posi poly and adds text fields.
-
-=== CHANGELOG ===
-2020-11-24 10am:	Make Linetype solid
-2020-12-12
--	12pm:	Test Drawline as polyline
--	20pm:	Add 'Show in 3D Views?' Bool
-
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -27,7 +20,7 @@
 PROCEDURE LxPosi_Label;
 
 CONST
-    RGBmax =  65535;
+	RGBmax = 65535;
 
 VAR
 	{Standard variables}
@@ -151,9 +144,9 @@ BEGIN
 	EndPoly;
 END;
 
-{===================================}
-{         -==<  MAIN  >==-          }
-{===================================}
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
 
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Set_Version_Info('0 . 3');
@@ -437,11 +430,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		{ p_ControlPntTmp.X := PCONTROLPOINT01X; }
 		{ p_ControlPntTmp.Y := PCONTROLPOINT01Y; }
 		Draw_Squiggle(
-		              p_LineOrig.X,
-		              p_LineOrig.Y,
-		              PCONTROLPOINT01X,
-		              PCONTROLPOINT01Y
-		              );
+				p_LineOrig.X, p_LineOrig.Y, PCONTROLPOINT01X, PCONTROLPOINT01Y
+				);
 		HMoveBackward(LNewObj,TRUE);
 		Set_Markers_Cust(LNewObj,'NA','Arrow');
 		SetLW(LNewObj,7);

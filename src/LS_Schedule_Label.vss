@@ -1,16 +1,8 @@
 {//////////////////////////////////////////////////////////////////////////////
-    Developed by John Salutz, (c) 2020. Please share freely.
-
-    Creates a lineset label object which displays
-    y & z coordinates and/or user info fields.
-
-=== CHANGELOG: ===
-2020-11-24
--	10am:	Fix 'Weight' Pen, add rectangle marker
--	12pm:	Add PL Dist and Trim toggles
-2020-12-11
--	21pm:	Make Trim blank if equal to 0
-
+//  Developed by John Salutz, (c) 2020. Please share freely.
+//
+//  Creates a lineset label object which displays
+//  y & z coordinates and/or user info fields.
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -29,7 +21,7 @@
 PROCEDURE LS_Schedule_Label;
 
 CONST
-	RGBmax =  65535;
+	RGBmax = 65535;
 
 VAR
 	{Standard variables}

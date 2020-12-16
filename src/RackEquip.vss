@@ -1,11 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
-    Developed by John Salutz, (c) 2020. Please share freely.
-
-    Rack_Equip creates a dynamic piece of rack mounted equipment.
-
-=== CHANGELOG: ===
-2020-11-18 12pm:	Change Rack ID info
-
+//  Developed by John Salutz, (c) 2020. Please share freely.
+//
+//  Rack_Equip creates a dynamic piece of rack mounted equipment.
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -27,7 +23,7 @@ CONST {Rack Related Constants}
 	k_RackU = 1.75; {1 rack unit height (1.75")}
 	k_RackWidth = 19; {19" rack width}
 	k_EarWidth = .625; {Rack ear width (5/8")}
-	RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
+	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
 
 VAR
 	{Standard variables}

@@ -1,11 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
-
+//
 //  Creates a number for use on a magic sheet
-
-=== CHANGELOG: ===
-2020-11-18 16pm:	Add sidelight container
-
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -24,7 +20,7 @@
 PROCEDURE MagicSheet_Number;
 
 CONST
-	RGBmax =  65535;
+	RGBmax = 65535;
 
 VAR
 	{Standard variables}
@@ -81,9 +77,9 @@ VAR
 		SetObjectVariableBoolean(h,684,b);
 	END;
 
-{===================================}
-{         -==<  MAIN  >==-          }
-{===================================}
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
