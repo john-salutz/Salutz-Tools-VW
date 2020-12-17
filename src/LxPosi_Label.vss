@@ -32,7 +32,6 @@ VAR
 	p_OffsetPosiName,p_OffsetLine1,p_OffsetLine2,p_LineOrig : POINT;
 	r_Scale,r_TextScaler                                    : REAL;
 	i_Flip                                                  : INTEGER;
-	{ p_ControlPntTmp                                         : POINT; }
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -103,7 +102,7 @@ BEGIN
 		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
 		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
-	IF sEnd	 = 'Dot' THEN {Dot}
+	IF sEnd = 'Dot' THEN {Dot}
 		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
 		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
@@ -113,27 +112,17 @@ PROCEDURE From_Back_Set_Pen (source : HANDLE; target : HANDLE);
 VAR r,g,b : LONGINT;
 BEGIN
 	GetFillBack(source,r,g,b);
-	{ Message(r); }
 	SetPenFore(target,r,g,b);
 END;
 
 PROCEDURE Draw_Squiggle (p1X,p1Y,p2X,p2Y : REAL);
 VAR
-	{ midpnt : POINT; }
-	m1,v1,v2  : VECTOR;
+	m1,v1,v2 : VECTOR;
 BEGIN
-	{ m1 := p2-p1; }
-	{ m1.X := (p2X-p1X); }
-	{ m1.Y := (p2Y-p1Y); }
-	{ m1.X := (m1.X/2)+p1X; }
-	{ m1.Y := (m1.Y/2)+p1Y; }
 	m1.X := ((p2X-p1X)/2)+p1X;
 	m1.Y := ((p2Y-p1Y)/2)+p1Y;
-	{ Locus((m1.X/2)+p1.X,(m1.Y/2)+p1.Y); }
 	v1.X := p2X-p1X;
 	v1.Y := p2Y-p1Y;
-	{ v1 := p2-p1; }
-	{ v1.Z := 0; }
 	v2 := Perp(v1);
 	v2 := UnitVec(v2);
 	BeginPoly;
@@ -425,10 +414,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Draw Leader Line =====}
 	SetCntrlPtVis(h_Obj,1,PUSEPOINT);
 	IF PUSEPOINT THEN BEGIN
-		{ MoveTo(p_LineOrig.X,p_LineOrig.Y); }
-		{ LineTo(PCONTROLPOINT01X,PCONTROLPOINT01Y); }
-		{ p_ControlPntTmp.X := PCONTROLPOINT01X; }
-		{ p_ControlPntTmp.Y := PCONTROLPOINT01Y; }
 		Draw_Squiggle(
 				p_LineOrig.X, p_LineOrig.Y, PCONTROLPOINT01X, PCONTROLPOINT01Y
 				);

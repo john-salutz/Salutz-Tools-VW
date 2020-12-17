@@ -1,10 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
-
+//
 //  This script draws a dynamic polyline for use with system flow drawings.
-
-=== CHANGELOG: ===
-
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -24,7 +21,7 @@ PROCEDURE SmartPath;
 
 CONST
 	k_DefaultCornerSize = 9;
-	RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
+	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
 
 VAR
 	{Standard variables}

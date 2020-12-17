@@ -204,7 +204,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			SetLW(h_FrontRect,0);
 		END;
 
-		{ SetLSN(h_FrontRect,2); }
 		b_Result := SetOpacityN(h_FrontRect,100,100);
 	END ELSE BEGIN
 		SetParameterVisibility(h_Obj,'Dash',FALSE);
