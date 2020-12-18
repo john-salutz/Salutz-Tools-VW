@@ -1,7 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
-//  Developed by John Salutz, (c) 2020. Please share freely.
+// Developed by John Salutz, (c) 2020. Please share freely.
 //
-//  Creates a compass style marker to show boom hanging directions.
+// Creates a compass style marker to show boom hanging directions.
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ VAR
 	h_Label,h_West,h_East,h_South,h_DimHead,h_DimFrom       : HANDLE;
 	h_NoteHead,h_NoteText                                   : HANDLE;
 	r_TextScaler                                            : REAL;
-	p_Tmp1,p_Tmp2                                           : POINT;
+	p_Tmp1,p_Tmp2,p_NoteStart                               : POINT;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -108,11 +108,11 @@ BEGIN
 	IF sBeg = 'Dot' THEN {Dot}
 		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
-		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+		b := SetObjBeginningMarker(h,2176-128,15,3/ActLS,2/ActLS,0,0,TRUE);
 	IF sEnd	 = 'Dot' THEN {Dot}
 		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
-		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+		b := SetObjEndMarker(h,2176-128,15,3/ActLS,2/ActLS,0,0,TRUE);
 END;
 
 PROCEDURE From_Back_Set_Pen (source : HANDLE; target : HANDLE);
@@ -134,25 +134,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	FillPat(1);
 	FillFore(65535,65535,65535);
 	FillBack(65535,65535,65535);
+	PenSize(7);
 
 	{===== Parameter Limits =====}
 	r_TextScaler := 24/GetLScale(ActLayer);
+	p_NoteStart.X := 0;
+	p_NoteStart.Y := -1.5;
 
-	MoveTo(0,0);
-	LineTo(6,0);
-	Set_Markers_Cust(LNewObj,'NA','Arrow');
-	MoveTo(0,0);
-	LineTo(-6,0);
-	Set_Markers_Cust(LNewObj,'NA','Arrow');
-	MoveTo(0,0);
-	LineTo(0,-4.5);
-	Set_Markers_Cust(LNewObj,'NA','Arrow');
-	Oval(-1,1,1,-1);
-	Set_Background_WtoB(LNewObj,0.2);
-	ArcByCenter(0,0,1,0,90);
-	Set_Background_WtoB(LNewObj,1);
-	ArcByCenter(0,0,1,180,90);
-	Set_Background_WtoB(LNewObj,1);
 	{// Label Text //}
 	TextOrigin(0,2);
 	TextJust(2);
@@ -160,18 +148,33 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	CreateText(PLABEL);
 	h_Label := LNewObj;
 	Set_Text_HardBold(h_Label);
+	{// Draw Underline //}
+	IF PUNDERLINE THEN BEGIN
+		GetBBox(h_Label,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		MoveTo(p_Tmp1.X,p_Tmp2.Y);
+		LineTo(p_Tmp2.X,p_Tmp2.Y);
+	END;
 
+	{// Draw Horz Lines //}
+	MoveTo(0,0);
+	LineTo(6,0);
+	Set_Markers_Cust(LNewObj,'NA','Arrow');
+	MoveTo(0,0);
+	LineTo(-6,0);
+	Set_Markers_Cust(LNewObj,'NA','Arrow');
+
+	{// Draw Center Marker //}
+	Oval(-1,1,1,-1);
+	Set_Background_WtoB(LNewObj,0.2);
+	ArcByCenter(0,0,1,0,90);
+	Set_Background_WtoB(LNewObj,1);
+	ArcByCenter(0,0,1,180,90);
+	Set_Background_WtoB(LNewObj,1);
 	TextSize(9*r_TextScaler);
-	{// South Text //}
-	TextOrigin(0,-4.5);
-	TextVerticalAlign(1);
-	IF PSOUTH <> '' THEN BEGIN
-		CreateText(PSOUTH);
-		h_South := LNewObj;
-		Set_Text_HardPlain(h_South);
-		HMoveBackward(h_South,TRUE);
-		GetBBox(h_South,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-	END ELSE p_Tmp2.Y := -4.5;
+
+	{// Text Style 'Plain' //}
+	TextFace([]);
+
 	{// East Text //}
 	TextOrigin(6.5,0);
 	TextVerticalAlign(3);
@@ -179,41 +182,101 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PEAST <> '' THEN BEGIN
 		CreateText(PEAST);
 		h_East := LNewObj;
-		Set_Text_HardPlain(h_East);
+		{ Set_Text_HardPlain(h_East); }
+		Set_Pen_WtoB(h_East,1);
 	END;
+
 	{// West Text //}
 	TextOrigin(-6.5,0);
 	TextJust(3);
 	IF PWEST <> '' THEN BEGIN
 		CreateText(PWEST);
 		h_West := LNewObj;
-		Set_Text_HardPlain(h_West);
+		{ Set_Text_HardPlain(h_West); }
+		Set_Pen_WtoB(h_West,1);
 	END;
 
-	{ GetBBox(h_Obj,p_Tmp1,p_Tmp2); }
-	{ IF p_Tmp1 = p_Tmp2 THEN ResetObject; }
-	TextOrigin(0,p_Tmp2.Y);
+	{// South Text //}
+	TextOrigin(0,-4);
 	TextVerticalAlign(1);
 	TextJust(2);
+	IF PSOUTH <> '' THEN BEGIN
+		{// Draw Vert Line //}
+		MoveTo(0,0);
+		LineTo(0,-4);
+		Set_Markers_Cust(LNewObj,'NA','Arrow');
+		HMoveBackward(LNewObj,TRUE);
+		{// Draw Text //}
+		CreateText(PSOUTH);
+		h_South := LNewObj;
+		{ Set_Text_HardPlain(h_South); }
+		HMoveBackward(h_South,TRUE);
+		Set_Pen_WtoB(h_South,1);
+		GetBBox(h_South,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_NoteStart.Y);
+	END ELSE p_Tmp2.Y := -4;
+
+	{===== Start Dimension/Notes Text =====}
+	TextOrigin(p_NoteStart.X,p_NoteStart.Y);
+	TextVerticalAlign(1);
+	TextJust(2);
+	PenPatN(1);
+	PenFore(0,0,0);
+	PenBack(0,0,0);
+	PenSize(5);
+
+	{// Dimension Text //}
 	IF PDIMFROM <> '' THEN BEGIN
 		TextSize(5*r_TextScaler);
+		TextFace([Italic]);
 		CreateText('DIMENSION FROM:');
 		h_DimHead := LNewObj;
 		HMoveBackward(h_DimHead,TRUE);
-		SetTextStyle(h_DimHead,0,GetTextLength(h_DimHead),2);
+		{ Set_Text_HardPlain(h_DimHead); }
+		{ SetTextStyle(h_DimHead,0,GetTextLength(h_DimHead),2); }
 		GetBBox(h_DimHead,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 		MoveTo(p_Tmp1.X,p_Tmp2.Y);
 		LineTo(p_Tmp2.X,p_Tmp2.Y);
-		SetLSN(LNewObj,2);
-		SetLW(LNewObj,5);
 		TextOrigin(0,p_Tmp2.Y);
 		TextSize(6*r_TextScaler);
+		TextFace([]);
 		CreateText(PDIMFROM);
 		h_DimFrom := LNewObj;
+		{ Set_Text_HardPlain(h_DimFrom); }
 		Set_Tight_TextFill(h_DimFrom,TRUE);
 		SetTextWidth(h_DimFrom,24);
 		HMoveBackward(h_DimFrom,TRUE);
 	END;
 
+	{// Start Notes Text //}
+	GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+	TextOrigin(0,p_Tmp2.Y);
+	TextVerticalAlign(1);
+	TextJust(2);
+	
+	
+	IF PNOTES <> '' THEN BEGIN
+		TextSize(5*r_TextScaler);
+		TextFace([Italic]);
+		CreateText('NOTE:');
+		h_NoteHead := LNewObj;
+		HMoveBackward(h_NoteHead,TRUE);
+		
+		{ Set_Text_HardPlain(h_NoteHead); }
+		{ SetTextStyle(h_NoteHead,0,GetTextLength(h_NoteHead),2); }
+		GetBBox(h_NoteHead,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		MoveTo(p_Tmp1.X,p_Tmp2.Y);
+		LineTo(p_Tmp2.X,p_Tmp2.Y);
+		TextOrigin(0,p_Tmp2.Y);
+		TextSize(6*r_TextScaler);
+		TextFace([]);
+		CreateText(PNOTES);
+		h_NoteText := LNewObj;
+		{ Set_Text_HardPlain(h_NoteText); }
+		Set_Tight_TextFill(h_NoteText,TRUE);
+		SetTextWidth(h_NoteText,24);
+		HMoveBackward(h_NoteText,TRUE);
+	END;
+
+	{===== End Sequence =====}
 	PopAttrs;
 END; END; Run(BoomMarker);
