@@ -1,0 +1,219 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, (c) 2020. Please share freely.
+//
+//  Creates a compass style marker to show boom hanging directions.
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE BoomMarker;
+
+CONST
+	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	h_Label,h_West,h_East,h_South,h_DimHead,h_DimFrom       : HANDLE;
+	h_NoteHead,h_NoteText                                   : HANDLE;
+	r_TextScaler                                            : REAL;
+	p_Tmp1,p_Tmp2                                           : POINT;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+	SetRField(h_Obj,s_ObjName,'ver',s);
+END;
+
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+	SetObjectVariableBoolean(h,800,True);
+END;
+
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetFillBack(h, i, i, i);
+	SetFillFore(h, i, i, i);
+	SetFPat(h, 1); {Blank pattern}
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetPenFore(h, i, i, i);
+	SetPenBack(h, i, i, i);
+	SetLSN(h,2); {Solid pattern}
+END;
+
+PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
+BEGIN
+	SetObjectVariableBoolean(h,684,b);
+END;
+
+PROCEDURE Set_Text_HardBold (h : HANDLE);
+BEGIN
+	SetTextStyle(h,0,GetTextLength(h),0);
+	SetTextStyle(h,0,GetTextLength(h),1);
+END;
+
+PROCEDURE Set_Text_HardPlain (h : HANDLE);
+BEGIN
+	SetTextStyle(h,0,GetTextLength(h),0);
+END;
+
+
+FUNCTION Get_Zcoor(h : HANDLE) : REAL;
+VAR
+	x,y,z : REAL;
+BEGIN
+	GetSymLoc3D(h_Obj,x,y,z);
+	Get_Zcoor := z;
+END;
+
+{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
+PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
+VAR b	  : BOOLEAN;
+	ActLS : REAL;
+BEGIN
+	ActLS := GetLScale(ActLayer);
+	IF sBeg = 'Dot' THEN {Dot}
+		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Arrow' THEN {Arrow}
+		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+	IF sEnd	 = 'Dot' THEN {Dot}
+		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Arrow' THEN {Arrow}
+		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+END;
+
+PROCEDURE From_Back_Set_Pen (source : HANDLE; target : HANDLE);
+VAR r,g,b : LONGINT;
+BEGIN
+	GetFillBack(source,r,g,b);
+	SetPenFore(target,r,g,b);
+END;
+
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 3');
+	Use_PIO_Text_Attributes(h_Obj);
+	PushAttrs;
+	FillPat(1);
+	FillFore(65535,65535,65535);
+	FillBack(65535,65535,65535);
+
+	{===== Parameter Limits =====}
+	r_TextScaler := 24/GetLScale(ActLayer);
+
+	MoveTo(0,0);
+	LineTo(6,0);
+	Set_Markers_Cust(LNewObj,'NA','Arrow');
+	MoveTo(0,0);
+	LineTo(-6,0);
+	Set_Markers_Cust(LNewObj,'NA','Arrow');
+	MoveTo(0,0);
+	LineTo(0,-4.5);
+	Set_Markers_Cust(LNewObj,'NA','Arrow');
+	Oval(-1,1,1,-1);
+	Set_Background_WtoB(LNewObj,0.2);
+	ArcByCenter(0,0,1,0,90);
+	Set_Background_WtoB(LNewObj,1);
+	ArcByCenter(0,0,1,180,90);
+	Set_Background_WtoB(LNewObj,1);
+	{// Label Text //}
+	TextOrigin(0,2);
+	TextJust(2);
+	TextVerticalAlign(5);
+	CreateText(PLABEL);
+	h_Label := LNewObj;
+	Set_Text_HardBold(h_Label);
+
+	TextSize(9*r_TextScaler);
+	{// South Text //}
+	TextOrigin(0,-4.5);
+	TextVerticalAlign(1);
+	IF PSOUTH <> '' THEN BEGIN
+		CreateText(PSOUTH);
+		h_South := LNewObj;
+		Set_Text_HardPlain(h_South);
+		HMoveBackward(h_South,TRUE);
+		GetBBox(h_South,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+	END ELSE p_Tmp2.Y := -4.5;
+	{// East Text //}
+	TextOrigin(6.5,0);
+	TextVerticalAlign(3);
+	TextJust(1);
+	IF PEAST <> '' THEN BEGIN
+		CreateText(PEAST);
+		h_East := LNewObj;
+		Set_Text_HardPlain(h_East);
+	END;
+	{// West Text //}
+	TextOrigin(-6.5,0);
+	TextJust(3);
+	IF PWEST <> '' THEN BEGIN
+		CreateText(PWEST);
+		h_West := LNewObj;
+		Set_Text_HardPlain(h_West);
+	END;
+
+	{ GetBBox(h_Obj,p_Tmp1,p_Tmp2); }
+	{ IF p_Tmp1 = p_Tmp2 THEN ResetObject; }
+	TextOrigin(0,p_Tmp2.Y);
+	TextVerticalAlign(1);
+	TextJust(2);
+	IF PDIMFROM <> '' THEN BEGIN
+		TextSize(5*r_TextScaler);
+		CreateText('DIMENSION FROM:');
+		h_DimHead := LNewObj;
+		HMoveBackward(h_DimHead,TRUE);
+		SetTextStyle(h_DimHead,0,GetTextLength(h_DimHead),2);
+		GetBBox(h_DimHead,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		MoveTo(p_Tmp1.X,p_Tmp2.Y);
+		LineTo(p_Tmp2.X,p_Tmp2.Y);
+		SetLSN(LNewObj,2);
+		SetLW(LNewObj,5);
+		TextOrigin(0,p_Tmp2.Y);
+		TextSize(6*r_TextScaler);
+		CreateText(PDIMFROM);
+		h_DimFrom := LNewObj;
+		Set_Tight_TextFill(h_DimFrom,TRUE);
+		SetTextWidth(h_DimFrom,24);
+		HMoveBackward(h_DimFrom,TRUE);
+	END;
+
+	PopAttrs;
+END; END; Run(BoomMarker);
