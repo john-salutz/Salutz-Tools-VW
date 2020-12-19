@@ -76,6 +76,12 @@ BEGIN
 	SetLSN(h,2); {Solid pattern}
 END;
 
+FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
+BEGIN
+	IF GetLayer(obj) = NIL THEN ResetObject(obj)
+	ELSE Find_Layer := GetLayer(obj);
+END;
+
 PROCEDURE Resolve_MidPoint_Conflict;
 VAR
 	matchPoint,matchField : BOOLEAN;
@@ -195,14 +201,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Set poly markers =====}
 	IF PUSEBEGINMARK THEN
 	b_Result := SetObjBeginningMarker(
-			h_Poly, 2, 0, 1/GetLScale(ActLayer), 1/GetLScale(ActLayer),
-			0, 0, TRUE
+			h_Poly, 2, 0, 1/GetLScale(Find_Layer(h_Obj)),
+			1/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE
 			);
 
 	IF PUSEENDMARK THEN
 	b_Result := SetObjEndMarker(
-			h_Poly, 2176, 15, 3/GetLScale(ActLayer), 2/GetLScale(ActLayer),
-			0, 0, TRUE
+			h_Poly, 2176, 15, 3/GetLScale(Find_Layer(h_Obj)),
+			2/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE
 			);
 	SetFPat(h_Poly,0);
 	SetRField(

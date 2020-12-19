@@ -121,6 +121,12 @@ BEGIN
 	ForEachObject(ResetObject,criteria);
 END;
 
+FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
+BEGIN
+	IF GetLayer(obj) = NIL THEN ResetObject(obj)
+	ELSE Find_Layer := GetLayer(obj);
+END;
+
 {// Draws Rack Space Numbers on side of RackObj //}
 PROCEDURE Draw_RackSpace_Numbers(leftOrRight : CHAR);
 VAR
@@ -142,7 +148,7 @@ BEGIN
 	MoveTo(start.X,start.Y);
 	Relative;
 	PushAttrs;
-	TextSize(8*(12/GetLScale(ActLayer)));
+	TextSize(8*(12/GetLScale(Find_Layer(h_Obj))));
 	TextJust(2);
 	TextVerticalAlign(3);
 	FOR i:=1 TO i_NumSpaces DO BEGIN

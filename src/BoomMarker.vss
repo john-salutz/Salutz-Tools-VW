@@ -85,10 +85,10 @@ BEGIN
 	SetTextStyle(h,0,GetTextLength(h),1);
 END;
 
-PROCEDURE Set_Text_HardPlain (h : HANDLE);
-BEGIN
-	SetTextStyle(h,0,GetTextLength(h),0);
-END;
+{ PROCEDURE Set_Text_HardPlain (h : HANDLE); }
+{ BEGIN }
+{ 	SetTextStyle(h,0,GetTextLength(h),0); }
+{ END; }
 
 
 FUNCTION Get_Zcoor(h : HANDLE) : REAL;
@@ -99,12 +99,27 @@ BEGIN
 	Get_Zcoor := z;
 END;
 
+
+
+PROCEDURE From_Back_Set_Pen (source : HANDLE; target : HANDLE);
+VAR r,g,b : LONGINT;
+BEGIN
+	GetFillBack(source,r,g,b);
+	SetPenFore(target,r,g,b);
+END;
+
+FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
+BEGIN
+	IF GetLayer(obj) = NIL THEN ResetObject(obj)
+	ELSE Find_Layer := GetLayer(obj);
+END;
+
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
 PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
-VAR b	  : BOOLEAN;
+VAR b     : BOOLEAN;
 	ActLS : REAL;
 BEGIN
-	ActLS := GetLScale(ActLayer);
+	ActLS := GetLScale(Find_Layer(h_Obj));
 	IF sBeg = 'Dot' THEN {Dot}
 		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
@@ -115,13 +130,6 @@ BEGIN
 		b := SetObjEndMarker(h,2176-128,15,3/ActLS,2/ActLS,0,0,TRUE);
 END;
 
-PROCEDURE From_Back_Set_Pen (source : HANDLE; target : HANDLE);
-VAR r,g,b : LONGINT;
-BEGIN
-	GetFillBack(source,r,g,b);
-	SetPenFore(target,r,g,b);
-END;
-
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -130,16 +138,18 @@ END;
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Set_Version_Info('0 . 3');
 	Use_PIO_Text_Attributes(h_Obj);
+
+	{===== Parameter Limits =====}
+	{===== Variable Setup =====}
+	r_TextScaler := 24/GetLScale(Find_Layer(h_Obj));
+	p_NoteStart.X := 0;
+	p_NoteStart.Y := -1.5;
+	{===== Attribute Setup =====}
 	PushAttrs;
 	FillPat(1);
 	FillFore(65535,65535,65535);
 	FillBack(65535,65535,65535);
-	PenSize(7);
-
-	{===== Parameter Limits =====}
-	r_TextScaler := 24/GetLScale(ActLayer);
-	p_NoteStart.X := 0;
-	p_NoteStart.Y := -1.5;
+	PenSize(7*r_TextScaler);
 
 	{// Label Text //}
 	TextOrigin(0,2);
@@ -154,6 +164,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		MoveTo(p_Tmp1.X,p_Tmp2.Y);
 		LineTo(p_Tmp2.X,p_Tmp2.Y);
 	END;
+
+	PenSize(5*r_TextScaler);
 
 	{// Draw Horz Lines //}
 	MoveTo(0,0);
@@ -170,10 +182,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Set_Background_WtoB(LNewObj,1);
 	ArcByCenter(0,0,1,180,90);
 	Set_Background_WtoB(LNewObj,1);
-	TextSize(9*r_TextScaler);
 
 	{// Text Style 'Plain' //}
 	TextFace([]);
+	TextSize(9*r_TextScaler);
 
 	{// East Text //}
 	TextOrigin(6.5,0);
@@ -222,11 +234,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	PenPatN(1);
 	PenFore(0,0,0);
 	PenBack(0,0,0);
-	PenSize(5);
+	PenSize(2*r_TextScaler);
 
 	{// Dimension Text //}
 	IF PDIMFROM <> '' THEN BEGIN
-		TextSize(5*r_TextScaler);
+		TextSize(7*r_TextScaler);
 		TextFace([Italic]);
 		CreateText('DIMENSION FROM:');
 		h_DimHead := LNewObj;
@@ -237,13 +249,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		MoveTo(p_Tmp1.X,p_Tmp2.Y);
 		LineTo(p_Tmp2.X,p_Tmp2.Y);
 		TextOrigin(0,p_Tmp2.Y);
-		TextSize(6*r_TextScaler);
+		TextSize(8*r_TextScaler);
 		TextFace([]);
 		CreateText(PDIMFROM);
 		h_DimFrom := LNewObj;
 		{ Set_Text_HardPlain(h_DimFrom); }
 		Set_Tight_TextFill(h_DimFrom,TRUE);
-		SetTextWidth(h_DimFrom,24);
+		SetTextWidth(h_DimFrom,33);
 		HMoveBackward(h_DimFrom,TRUE);
 	END;
 
@@ -255,7 +267,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	
 	
 	IF PNOTES <> '' THEN BEGIN
-		TextSize(5*r_TextScaler);
+		TextSize(7*r_TextScaler);
 		TextFace([Italic]);
 		CreateText('NOTE:');
 		h_NoteHead := LNewObj;
@@ -267,13 +279,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		MoveTo(p_Tmp1.X,p_Tmp2.Y);
 		LineTo(p_Tmp2.X,p_Tmp2.Y);
 		TextOrigin(0,p_Tmp2.Y);
-		TextSize(6*r_TextScaler);
+		TextSize(8*r_TextScaler);
 		TextFace([]);
 		CreateText(PNOTES);
 		h_NoteText := LNewObj;
 		{ Set_Text_HardPlain(h_NoteText); }
 		Set_Tight_TextFill(h_NoteText,TRUE);
-		SetTextWidth(h_NoteText,24);
+		SetTextWidth(h_NoteText,33);
 		HMoveBackward(h_NoteText,TRUE);
 	END;
 

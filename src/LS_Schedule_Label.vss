@@ -75,6 +75,12 @@ VAR
 		SetLSN(h,2); {Solid pattern}
 	END;
 
+FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
+BEGIN
+	IF GetLayer(obj) = NIL THEN ResetObject(obj)
+	ELSE Find_Layer := GetLayer(obj);
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -89,7 +95,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Variable Assignment =====}
 	IF PDIRECTION = '>>' THEN i_Flip := 1
 	ELSE i_Flip := -1;
-	r_TextScaler := 48/GetLScale(ActLayer);
+	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
 	GetSymLoc3D(h_Obj,x_coor,y_coor,z_coor);
 
 	{===== Draw Shapes =====}

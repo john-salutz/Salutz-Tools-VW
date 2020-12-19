@@ -50,6 +50,12 @@ BEGIN
 	SetObjectVariableBoolean(h,800,True);
 END;
 
+FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
+BEGIN
+	IF GetLayer(obj) = NIL THEN ResetObject(obj)
+	ELSE Find_Layer := GetLayer(obj);
+END;
+
 {// Resizes 'cs' to half length of smaller segment
     adjacent to given point //}
 FUNCTION Set_Corner_Size(cs : REAL; h : HANDLE; i : INTEGER) : REAL;
@@ -100,15 +106,16 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	h_Poly := LNewObj;
 
 	{===== Set poly markers =====}
-	IF PUSEBEGINMARK THEN
+		IF PUSEBEGINMARK THEN
 	b_Result := SetObjBeginningMarker(
-			h_Poly, 2, 0, 1/GetLScale(ActLayer), 1/GetLScale(ActLayer),
-			0, 0, TRUE
+			h_Poly, 2, 0, 1/GetLScale(Find_Layer(h_Obj)),
+			1/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE
 			);
+
 	IF PUSEENDMARK THEN
 	b_Result := SetObjEndMarker(
-			h_Poly, 2176, 15, 3/GetLScale(ActLayer), 2/GetLScale(ActLayer),
-			0, 0, TRUE
+			h_Poly, 2176, 15, 3/GetLScale(Find_Layer(h_Obj)),
+			2/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE
 			);
 	SetFPat(h_Poly,0);
 

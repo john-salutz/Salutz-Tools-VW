@@ -92,12 +92,18 @@ BEGIN
 	Get_Zcoor := z;
 END;
 
+FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
+BEGIN
+	IF GetLayer(obj) = NIL THEN ResetObject(obj)
+	ELSE Find_Layer := GetLayer(obj);
+END;
+
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
 PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
-VAR b	  : BOOLEAN;
+VAR b     : BOOLEAN;
 	ActLS : REAL;
 BEGIN
-	ActLS := GetLScale(ActLayer);
+	ActLS := GetLScale(Find_Layer(h_Obj));
 	IF sBeg = 'Dot' THEN {Dot}
 		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
@@ -151,7 +157,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		r_Scale := 1;
 		AlrtDialog('Scale Out of Bounds, Scale may not be zero or negative.');
 	END ELSE r_Scale := PSCALE;
-	r_TextScaler := 48/GetLScale(ActLayer)*r_Scale;
+	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj))*r_Scale;
 
 	{===== Draw Shapes & Set Text Orig Points =====}
 	IF ((PLABELSTYLE = 'Small') OR (PLABELSTYLE = 'Smaller')) THEN BEGIN
