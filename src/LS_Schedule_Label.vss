@@ -99,6 +99,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	GetSymLoc3D(h_Obj,x_coor,y_coor,z_coor);
 
 	{===== Draw Shapes =====}
+	PushAttrs;
+	{Set Pen Black}
+	PenPatN(2);
+	PenFore(0,0,0);
+	PenBack(0,0,0);
 	{// Draw Poly //}
 	BeginPoly;
 	Add2DVertex(0,0,0,0);
@@ -111,21 +116,31 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Add2DVertex(0,0,0,0);
 	EndPoly;
 	Set_Background_WtoB(LNewObj,0);
-	Set_Pen_WtoB(LNewObj,1);
 	{// Draw Number rectangle //}
 	Rect(-19*i_Flip,2,-13*i_Flip,-2);
 	Set_Background_WtoB(LNewObj,0.25);
-	Set_Pen_WtoB(LNewObj,1);
 	{// Draw division line //}
 	MoveTo(-31*i_Flip,2);
 	Line(0,-4);
-	Set_Pen_WtoB(LNewObj,1);
+	PopAttrs;
 
 	{===== Draw Text =====}
 	PushAttrs;
+	TextFace([]);
+	FillPat(0);
 	TextVerticalAlign(3);
 	TextJust(2);
 	TextSize(4*r_TextScaler);
+	{Lineset Name / Purpose}
+	TextOrigin(-32*i_Flip,0);
+	CreateText(PPURPOSE);
+	h_Purpose := LNewObj;
+
+	{Set Pen Black}
+	PenPatN(2);
+	PenFore(0,0,0);
+	PenBack(0,0,0);
+
 	{Plasterline distance}
 	TextOrigin(-9*i_Flip,0);
 	IF (PUSEOBJY) THEN BEGIN
@@ -149,32 +164,16 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		CreateText(Concat('@',Num2StrF(PTRIM)));
 		h_Trim := LNewObj;
 	END;
-	{Lineset Name / Purpose}
-	TextOrigin(-32*i_Flip,0);
-	CreateText(PPURPOSE);
-	h_Purpose := LNewObj;
 	{Weight}
 	IF PWEIGHT>0 THEN BEGIN
 		TextOrigin(1*i_Flip,0);
 		CreateText(Concat(PWEIGHT,' ',PWEIGHTUNITS));
 		h_Weight := LNewObj;
+		Set_Background_WtoB(h_Weight,0);
 	END;
 	PopAttrs;
 
 	{===== Format Text =====}
-	{// Set all Style 'Plain' //}
-	SetTextStyle(h_DistPL,0,GetTextLength(h_DistPL),0);
-	SetTextStyle(h_Num,0,GetTextLength(h_Num),0);
-	SetTextStyle(h_Trim,0,GetTextLength(h_Trim),0);
-	SetTextStyle(h_Purpose,0,GetTextLength(h_Purpose),0);
-	SetTextStyle(h_Weight,0,GetTextLength(h_Weight),0);
-	{// Set all but 'Weight' as no fill //}
-	SetFPat(h_DistPL,0);
-	SetFPat(h_Num,0);
-	SetFPat(h_Trim,0);
-	SetFPat(h_Purpose,0);
-	Set_Background_WtoB(h_Weight,0);
-
 	{// Set Alignment //}
 	IF PDIRECTION = '>>' THEN BEGIN
 		SetTextJust(h_Purpose,3);
@@ -189,14 +188,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Set_Pen_WtoB(h_DistPL,0.5);
 	SetTextSize(h_DistPL,0,GetTextLength(h_DistPL),3.5*r_TextScaler);
 	{Lineset Number}
-	Set_Pen_WtoB(h_Num,1);
 	SetTextSize(h_Num,0,GetTextLength(h_Num),5*r_TextScaler);
 	SetTextStyle(h_Num,0,GetTextLength(h_Num),1);
 	{Trim}
-	Set_Pen_WtoB(h_Trim,1);
 	SetTextStyle(h_Trim,0,GetTextLength(h_Trim),2);
-	{Weight}
-	Set_Pen_WtoB(h_Weight,1);
 
 	{// Draw Marker //}
 	IF PTYPE<>' ' THEN BEGIN
@@ -212,6 +207,5 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Hide/Show in 3D Views //}
 	IF PSHOW3D=FALSE THEN Locus3D(0,0,0);
-
 
 END; END; Run(LS_Schedule_Label);
