@@ -1,0 +1,173 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, (c) 2020. Please share freely.
+//
+//  LED Tape object draws a path and adds a series of text labels
+//  along the segment that show the Type, channel, and address.
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//	This program is free software: you can redistribute it and/or modify
+//	it under the terms of the GNU General Public License as published by
+//	the Free Software Foundation, either version 3 of the License, or
+//	(at your option) any later version.
+//
+//	This program is distributed in the hope that it will be useful,
+//	but WITHOUT ANY WARRANTY; without even the implied warranty of
+//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//	GNU General Public License for more details.
+//	<https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE LEDTape;
+
+CONST
+	RGBmax =  65535; {Max value for setting RGB colors in VS fuctions}
+
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	s_Label                                                 : STRING;
+	i_NumPathPoints                                         : INTEGER;
+	r_LabelWidth                                            : REAL;
+	h_Path,h_Path2                                          : HANDLE;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+	SetRField(h_Obj,s_ObjName,'ver',s);
+END;
+
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+	SetObjectVariableBoolean(h,800,True);
+END;
+
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetFillBack(h, i, i, i);
+	SetFillFore(h, i, i, i);
+	SetFPat(h, 1); {Blank pattern}
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetPenFore(h, i, i, i);
+	SetPenBack(h, i, i, i);
+	SetLSN(h,2); {Solid pattern}
+END;
+
+PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
+BEGIN
+	SetObjectVariableBoolean(h,684,b);
+END;
+
+PROCEDURE Set_Text_HardBold (h : HANDLE);
+BEGIN
+	SetTextStyle(h,0,GetTextLength(h),0);
+	SetTextStyle(h,0,GetTextLength(h),1);
+END;
+
+{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
+PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
+VAR b     : BOOLEAN;
+    ActLS : REAL;
+BEGIN
+	ActLS := GetLScale(ActLayer);
+	IF sBeg = 'Dot' THEN {Dot}
+		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Arrow' THEN {Arrow}
+		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+	IF sEnd = 'Dot' THEN {Dot}
+		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Arrow' THEN {Arrow}
+		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+END;
+
+FUNCTION Setup_Text_Label (h : HANDLE;i : INTEGER) : BOOLEAN;
+VAR
+	p1,p2 : POINT;
+	v     : VECTOR;
+	angle : REAL;
+BEGIN
+	GetPolyPt(h,i,p2.X,p2.Y);
+	GetPolyPt(h,i-1,p1.X,p1.Y);
+	v.X := p2.X - p1.X;
+	v.Y := p2.Y - p1.Y;
+	IF Norm(v) > r_LabelWidth THEN BEGIN
+		angle := Vec2Ang(v);
+		{// Make text Right Reading //}
+		IF ((angle>90) AND (angle<180))
+			OR ((angle<-90) AND (angle>-1800))
+			THEN angle := angle-180;
+		TextRotate(angle);
+		TextOrigin((p2.X+p1.X)/2,(p2.Y+p1.Y)/2);
+		Setup_Text_Label := TRUE;
+	END ELSE Setup_Text_Label := FALSE;
+END;
+
+{===================================}
+{         -==<  MAIN  >==-          }
+{===================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Use_PIO_Text_Attributes(h_Obj);
+	Set_Version_Info('0 . 3');
+	{===== Parameter Limits =====}
+
+	{===== Duplicate PIO Path Object =====}
+	h_Path := GetCustomObjectPath(h_Obj);
+	h_Path2 := CreateDuplicateObject(h_Path,NIL);
+	SetFPat(h_Path2,0);
+
+	{===== Text Label Setup =====}
+	s_Label := Concat(PTYPE,' ');
+	IF (PCHAN<>'') AND (PCHAN<>'0') THEN
+		Insert(Concat(' (',PCHAN,')'),s_Label,Len(s_Label));
+	IF (PADDRS<>'') AND (PADDRS<>'0') AND (PADDRS<>'0/0') THEN
+		Insert(Concat(' [',PADDRS,']'),s_Label,Len(s_Label));
+	Insert(' ',s_Label,Len(s_Label));
+	{// Create and delete text for measurement //}
+	CreateText(s_Label);
+	HScale2D(LNewObj,0,0,2/HHeight(LNewObj),2/HHeight(LNewObj),TRUE);
+	PushAttrs;
+	TextSize(GetTextSize(LNewObj,0));
+	r_LabelWidth := GetTextWidth(LNewObj);
+	DelObject(LNewObj);
+	TextJust(2);
+	TextVerticalAlign(3);
+
+	{===== Draw Path =====}
+	h_Path := GetCustomObjectPath(h_Obj);
+	i_NumPathPoints := GetVertNum(h_Path);
+	FOR i_Counter:=2 TO i_NumPathPoints DO BEGIN
+		IF Setup_Text_Label(h_Path,i_Counter) THEN BEGIN
+			CreateText(s_Label);
+			Set_Pen_WtoB(LNewObj,1);
+			Set_Background_WtoB(LNewObj,0);
+			Set_Tight_TextFill(LNewObj,FALSE);
+		END;
+	END;
+
+	PopAttrs;
+
+END; END; Run(LEDTape);
