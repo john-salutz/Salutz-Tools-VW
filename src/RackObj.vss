@@ -151,13 +151,14 @@ BEGIN
 	TextSize(8*(12/GetLScale(Find_Layer(h_Obj))));
 	TextJust(2);
 	TextVerticalAlign(3);
+	TextFace([]);
+	FillPat(1);
+	FillBack(RGBmax,RGBmax,RGBmax);
+	PenFore(RGBmax/2,RGBmax/2,RGBmax/2);
+	PenSize(2);
 	FOR i:=1 TO i_NumSpaces DO BEGIN
 		CreateText(Num2Str(0,i));
-		SetTextStyle(LNewObj,0,GetTextLength(LNewObj),0);
-		Set_Background_WtoB(LNewObj,0);
-		Set_Pen_WtoB(LNewObj,0.5);
 		Line(-offsetX,0);
-		SetLW(LNewObj,2);
 		Set_Pen_WtoB(LNewObj,0.25);
 		HMoveBackward(LNewObj,TRUE);
 		Move(offsetX,k_RackU);
@@ -193,7 +194,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	h_InnerRect := LNewObj;
 	Set_Pen_WtoB(h_InnerRect,1);
 	Set_Background_WtoB(h_InnerRect,0.1);
-	IF PFRONTORBACK='Back' THEN Set_Background_WtoB(h_InnerRect,0.2);
+	IF PFRONTORBACK='Rear' THEN Set_Background_WtoB(h_InnerRect,0.2);
 	SetLW(h_InnerRect,2);
 	GetBBox(h_InnerRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 	Rect(p_Tmp1.X-PFRAME,p_Tmp1.Y+PFRAME,p_Tmp2.X+PFRAME,p_Tmp2.Y-PFRAME);

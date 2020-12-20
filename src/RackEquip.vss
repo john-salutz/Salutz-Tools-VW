@@ -32,9 +32,7 @@ VAR
 	b_Result                                                : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
-	i_NumSpaces,i_Dummy,i_NumPickObj                        : INTEGER;
-	h_FullRect,h_InnerRect,h_Purpose,h_MakeModel            : HANDLE;
-	h_Rack,h_Dummy                                          : HANDLE;
+	h_Rack,h_InnerRect,h_Purpose,h_MakeModel                : HANDLE;
 	r_Height,r_Width                                        : REAL;
 	p_Temp,p_EquipLoc,p_RackLoc                             : POINT;
 	s_RackID,s_PosiInRack                                   : STRING;
@@ -138,16 +136,16 @@ END;
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
 	Set_Version_Info('0 . 3');
-	i_NumSpaces := PNUMSPACES;
 	Use_PIO_Text_Attributes(h_Obj);
-	IF (i_NumSpaces<1) THEN BEGIN
+	IF (PNUMSPACES<1) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
-		i_NumSpaces := 1;
 		AlrtDialog(
 				'Out of Bounds, Number of spaces must be greater than zero.'
 				);
+		ResetObject(h_Obj);
 		END;
-	r_Height := k_RackU*i_NumSpaces;
+
+	r_Height := k_RackU*PNUMSPACES;
 	IF PHALFWIDTH THEN r_Width := k_RackWidth/2
 		ELSE r_Width := k_RackWidth;
 	IF PREFRESHER THEN SetRField(h_Obj,s_ObjName,'Refresher', 'FALSE');
@@ -175,8 +173,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{=== Draw Object ===}
 	Rect(-r_Width/2,0,r_Width/2,-r_Height);
-	h_FullRect := LNewObj;
-	Set_Pen_WtoB(h_FullRect,1);
+	Set_Pen_WtoB(LNewObj,1);
 	Rect(-r_Width/2+k_EarWidth,0,r_Width/2-k_EarWidth,-r_Height);
 	h_InnerRect := LNewObj;
 	Set_Pen_WtoB(h_InnerRect,1);
@@ -187,6 +184,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	PushAttrs;
 	TextJust(2);
 	TextVerticalAlign(3);
+	FillPat(0);
 
 	{Make and Model text}
 	IF ((PMAKE<>'') OR (PMODEL<>'')) THEN BEGIN
@@ -195,7 +193,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ELSE CreateText(Concat(PMAKE,PMODEL));
 		h_MakeModel := LNewObj;
 		SetTextJust(h_MakeModel,2);
-		SetFPat(h_MakeModel, 0);
 		IF (HHeight(h_MakeModel)>(r_Height*0.5))
 			THEN Scale_Fit_Height(h_MakeModel,h_InnerRect,0.5);
 		IF (HWidth(h_MakeModel)>(r_Width-2))
@@ -204,6 +201,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{Purpose text}
 	IF (PPURPOSE<>'') THEN BEGIN
+		TextFace([]);
 		Get2DPt(h_InnerRect,1,p_Temp.X,p_Temp.Y);
 		MoveTo(p_Temp.X,p_Temp.Y);
 		Relative;
@@ -216,12 +214,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			THEN Scale_Fit_Height(h_Purpose,h_InnerRect,0.25);
 		IF (HWidth(h_Purpose)>(r_Width-2))
 			THEN Scale_Fit_Width(h_Purpose,h_InnerRect,0.9);
-		SetFPat(h_Purpose, 0);
 		SetTextJust(h_Purpose,1);
 		SetTextVerticalAlign(h_Purpose,1);
-		SetTextStyle(h_Purpose,0,GetTextLength(h_Purpose),0);
 	END;
 
-PopAttrs;
+	PopAttrs;
 
 END; END; Run(Rack_Equip);

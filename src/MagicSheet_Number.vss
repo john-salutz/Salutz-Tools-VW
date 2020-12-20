@@ -77,6 +77,13 @@ VAR
 		SetObjectVariableBoolean(h,684,b);
 	END;
 
+	PROCEDURE Copy_Fill_Color (source,target : HANDLE);
+	VAR r,g,b : LONGINT;
+	BEGIN
+		GetFillBack(source,r,g,b);
+		SetFillBack(target,r,g,b);
+	END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -87,11 +94,15 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
-	IF (PMAGICNUMBER='') THEN SetRField(h_Obj,s_ObjName,'MagicNumber', '0');
+	IF (PMAGICNUMBER='') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'MagicNumber', '0');
+		ResetObject(h_Obj);
+	END;
 	TextOrigin(0,0);
 	PushAttrs;
 	TextJust(2);
 	TextVerticalAlign(3);
+	TextFace([]);
 
 	{===== Draw Text =====}
 	IF (Len(PPREFIX)+Len(PMAGICNUMBER)=1)
@@ -99,7 +110,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	ELSE CreateText(Concat(PPREFIX,PMAGICNUMBER,' '));
 	h_MagicText := LNewObj;
 	PopAttrs;
-	SetTextStyle(h_MagicText,0,GetTextLength(h_MagicText),0);
 	Set_Tight_TextFill(h_MagicText,FALSE);
 	IF (PSTYLE='Invert Bold') THEN BEGIN
 		SetTextStyle(h_MagicText,0,GetTextLength(h_MagicText),1);
@@ -145,7 +155,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 		Set_Pen_WtoB(h_Container,1);
 		SetLW(h_Container,7);
-		SetFPat(h_Container,0);
+		Copy_Fill_Color(h_MagicText,h_Container);
+		SetFPat(h_Container,1);
+		SetFPat(h_MagicText,0);
+		HMoveBackward(h_Container,TRUE);
 	END;
 
 END; END; Run(MagicSheet_Number);
