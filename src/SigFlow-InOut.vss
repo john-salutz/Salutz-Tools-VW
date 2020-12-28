@@ -1,7 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
 //
-//  AudioSys In-Out is a point based object for drawing input/output slots in
+//  SigFlow In-Out is a point based object for drawing input/output slots in
 //  an audio signal flow diagram.
 //////////////////////////////////////////////////////////////////////////////}
 
@@ -18,7 +18,7 @@
 //  <https://www.gnu.org/licenses/>
 //////////////////////////////////////////////////////////////////////////////}
 
-PROCEDURE SysFlow_InOut;
+PROCEDURE SigFlow_InOut;
 
 CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
@@ -30,7 +30,7 @@ VAR
 	b_Result                                                : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
-	h_Poly                                                  : HANDLE;
+	{ h_Poly                                                  : HANDLE; }
 	p_Origin,p_End,p_Leader,p_TextOffset                    : POINT;
 	r_TextScaler,r_TextLarge,r_TextSmall                    : REAL;
 
@@ -50,28 +50,26 @@ END;
 
 {// Sets Background Fore and Back as White to Black, percentage set by 'r',
 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+PROCEDURE Fill_WtoB (r : REAL);
 VAR i : LONGINT;
 BEGIN
 	IF r<0 THEN r:=0;
 	IF r>1 THEN r:=1;
 	i := Trunc(RGBmax*(1-r));
-	SetFillBack(h, i, i, i);
-	SetFillFore(h, i, i, i);
-	SetFPat(h, 1); {Blank pattern}
+	FillPat(1);
+	FillBack(i,i,i);
 END;
 
 {// Sets Pen Fore and Back as White to Black, percentage set by 'r',
 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+PROCEDURE Pen_WtoB (r : REAL);
 VAR i : LONGINT;
 BEGIN
 	IF r<0 THEN r:=0;
 	IF r>1 THEN r:=1;
 	i := Trunc(RGBmax*(1-r));
-	SetPenFore(h, i, i, i);
-	SetPenBack(h, i, i, i);
-	SetLSN(h,2); {Solid pattern}
+	PenPatN(2);
+	PenFore(i,i,i);
 END;
 
 PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
@@ -79,24 +77,10 @@ BEGIN
 	SetObjectVariableBoolean(h,684,b);
 END;
 
-PROCEDURE Set_Text_HardBold (h : HANDLE);
-BEGIN
-	SetTextStyle(h,0,GetTextLength(h),0);
-	SetTextStyle(h,0,GetTextLength(h),1);
-END;
-
 FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
 BEGIN
 	IF GetLayer(obj) = NIL THEN ResetObject(obj)
 	ELSE Find_Layer := GetLayer(obj);
-END;
-
-FUNCTION Get_Zcoor(h : HANDLE) : REAL;
-VAR
-	x,y,z : REAL;
-BEGIN
-	GetSymLoc3D(h_Obj,x,y,z);
-	Get_Zcoor := z;
 END;
 
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
@@ -115,13 +99,6 @@ BEGIN
 		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
 END;
 
-PROCEDURE From_Back_Set_Pen (source : HANDLE; target : HANDLE);
-VAR r,g,b : LONGINT;
-BEGIN
-	GetFillBack(source,r,g,b);
-	SetPenFore(target,r,g,b);
-END;
-
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -133,14 +110,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits =====}
 	{===== Variable Setup =====}
 	PushAttrs; {Attrs01}
-	FillPat(1);
-	FillBack(RGBmax,RGBmax,RGBmax);
-	PenPatN(2);
+	Fill_WtoB(0);
+	Pen_WtoB(1);
 	TextVerticalAlign(3);
 	TextFace([]);
 	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
-	PenFore(0,0,0);
-	PenBack(0,0,0);
 	p_Origin.X := 0;
 	p_Leader.Y := 0;
 	p_TextOffset.X := 5/8;
@@ -199,8 +173,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PTYPE = 'Input' THEN TextJust(3)
 	ELSE IF (PTYPE = 'Output') OR (PTYPE = 'Thru') THEN TextJust(1);
 	TextVerticalAlign(1);
-	PenFore(RGBmax/2,RGBmax/2,RGBmax/2);
-	PenBack(RGBmax/2,RGBmax/2,RGBmax/2);
+	Pen_WtoB(0.5);
 	TextOrigin(-p_TextOffset.X,-p_TextOffset.Y);
 	TextSize(r_TextSmall-1);
 	IF PROUTING <> '' THEN CreateText(Concat(UniChr(187),PROUTING));
@@ -236,4 +209,4 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	HMoveBackward(LNewObj,TRUE);
 
 	PopAttrs; {Attrs01}
-END; END; Run(SysFlow_InOut);
+END; END; Run(SigFlow_InOut);
