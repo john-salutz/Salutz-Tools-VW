@@ -1,7 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
 //
-//  SigFlow In-Out is a point based object for drawing input/output slots in
+//  SigFlow Equip is a point based object for drawing general equipment in
 //  an audio signal flow diagram.
 //////////////////////////////////////////////////////////////////////////////}
 
@@ -18,10 +18,13 @@
 //  <https://www.gnu.org/licenses/>
 //////////////////////////////////////////////////////////////////////////////}
 
-PROCEDURE SigFlow_InOut;
+PROCEDURE SigFlow_Equip;
 
 CONST
-	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+	RGBmax	 = 65535; {Max value for setting RGB colors in VS fuctions}
+	RegularH = 12;
+	SmallH	 = 9;
+	SmallerH = 6;
 
 VAR
 	{Standard variables}
@@ -31,8 +34,10 @@ VAR
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
 	{ h_Poly                                                  : HANDLE; }
-	p_Origin,p_End,p_Leader,p_TextOffset                    : POINT;
-	r_TextScaler,r_TextLarge,r_TextSmall                    : REAL;
+	p_Tmp1,p_Tmp2                                           : POINT;
+	r_TextScaler{,r_TextLarge,r_TextSmall}                  : REAL;
+	r_Height,r_Space                                        : REAL;
+
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -93,7 +98,7 @@ BEGIN
 		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
 		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
-	IF sEnd	 = 'Dot' THEN {Dot}
+	IF sEnd = 'Dot' THEN {Dot}
 		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
 		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
@@ -108,109 +113,95 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Set_Version_Info('0 . 3');
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
+	IF (PNUMSPACES<0) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'NumSpaces', '0');
+		ResetObject(h_Obj);
+	END;
 	{===== Variable Setup =====}
-	PushAttrs; {Attrs01}
-	Fill_WtoB(0);
+	PushAttrs; { Attrs01 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	Fill_WtoB(0.025);
 	Pen_WtoB(1);
-	TextVerticalAlign(3);
+
 	TextFace([]);
 	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
-	p_Origin.X := 0;
-	p_Leader.Y := 0;
-	p_TextOffset.X := 5/8;
+
 
 	{===== Setup Size =====}
 	IF PSIZE = 'Regular' THEN BEGIN
-		p_Origin.Y := 6;
-		r_TextLarge := 8*r_TextScaler;
-		r_TextSmall := 6*r_TextScaler;
-		p_TextOffset.Y := 5/8;
+		r_Height := RegularH;
 	END ELSE IF PSIZE = 'Small' THEN BEGIN
-		p_Origin.Y := 4.5;
-		r_TextLarge := 7*r_TextScaler;
-		r_TextSmall := 4*r_TextScaler;
-		p_TextOffset.Y := 5/16;
+		r_Height := SmallH;
 	END ELSE IF PSIZE = 'Smaller' THEN BEGIN
-		p_Origin.Y := 3;
-		r_TextLarge := 6*r_TextScaler;
-		r_TextSmall := 3.5*r_TextScaler;
-		p_TextOffset.Y := 5/32;
+		r_Height := SmallerH;
 	END;
-	p_End.Y := -p_Origin.Y;
+	IF PSPACESIZE = 'Regular' THEN BEGIN
+		r_Space := RegularH;
+	END ELSE IF PSPACESIZE = 'Small' THEN BEGIN
+		r_Space := SmallH;
+	END ELSE IF PSPACESIZE = 'Smaller' THEN BEGIN
+		r_Space := SmallerH;
+	END;
 
-	{===== Setup Type =====}
-	IF PTYPE = 'Input' THEN BEGIN
-		p_End.X := 23;
-		p_Leader.X := -9;
+	Rect(-24,r_Height,24,0);
+
+	TextSize(7*r_TextScaler);
+	Fill_WtoB(0);
+
+	IF PMANUFACTURER <> '' THEN BEGIN
+		TextVerticalAlign(5);
 		TextJust(1);
-		TextOrigin(1,0);
-	END ELSE IF PTYPE = 'Output' THEN BEGIN
-		p_End.X := -23;
-		p_Leader.X := 9;
-		TextJust(3);
-		TextOrigin(-1,0);
-		p_TextOffset.X := -p_TextOffset.X;
-	END ELSE IF PTYPE = 'Thru' THEN BEGIN
-		TextJust(2);
-		TextOrigin(0,0);
-		p_Leader.X := -21;
-		p_Origin.X := -12;
-		p_End.X := 12;
-		p_TextOffset.X := -p_TextOffset.X-12;
+		TextOrigin(-24,r_Height);
+		CreateText(PMANUFACTURER);
+		HMoveBackward(LNewObj,TRUE);
 	END;
 
-	{===== Draw Text =====}
-	{// Draw ID/Number Text //}
-	TextSize(r_TextLarge);
-	IF PPREFIX <> '' THEN CreateText(Concat(PPREFIX,' ',PIDNUM))
-	ELSE CreateText(PIDNUM);
-
-
-	{===== Draw Poly =====}
-	BeginPoly;
-	Add2DVertex(p_Leader.X,p_Leader.Y,0,0);
-	Add2DVertex(p_Origin.X,0,0,0);
-	Add2DVertex(p_Origin.X,p_Origin.Y,0,0);
-	Add2DVertex(p_End.X,p_Origin.Y,0,0);
-	IF PTYPE = 'Thru' THEN BEGIN
-		Add2DVertex(p_End.X,0,0,0);
-		Add2DVertex(-p_Leader.X,p_Leader.Y,0,0);
-		Add2DVertex(p_End.X,0,0,0);
-	END;
-	Add2DVertex(p_End.X,p_End.Y,0,0);
-	Add2DVertex(p_Origin.X,p_End.Y,0,0);
-	Add2DVertex(p_Origin.X,0,0,0);
-	EndPoly;
-	HMoveBackward(LNewObj,TRUE);
-
-
-	PushAttrs; {===== Attrs02 =====}
-
-	{// Draw Routing Text //}
-	NameClass(PCLASSROUT);
-	IF PTYPE = 'Input' THEN TextJust(3)
-	ELSE IF (PTYPE = 'Output') OR (PTYPE = 'Thru') THEN TextJust(1);
+	FillPat(0);
 	TextVerticalAlign(1);
-	Pen_WtoB(0.5);
-	TextOrigin(-p_TextOffset.X,-p_TextOffset.Y);
-	TextSize(r_TextSmall-1);
-	IF PROUTING <> '' THEN CreateText(Concat(UniChr(187),PROUTING));
-	HMoveBackward(LNewObj,TRUE);
+	TextJust(2);
+	TextOrigin(0,r_Height);
+	CreateText(PMODEL);
 
-	{// Draw Purpose Text //}
-	IF PTYPE = 'Thru' THEN TextJust(3);
-	TextVerticalAlign(5);
-	TextSize(r_TextSmall);
-	IF PTYPE = 'Thru' THEN TextOrigin(p_TextOffset.X,p_TextOffset.Y)
-	ELSE TextOrigin(-p_TextOffset.X,p_TextOffset.Y);
-	TextFace([Italic]);
-	NameClass(PCLASSPURP);
-	CreateText(PPURPOSE);
-	HMoveBackward(LNewObj,TRUE);
+	IF PSIZE <> 'Smaller' THEN BEGIN
+		TextFace([Italic]);
+		TextSize(4*r_TextScaler);
+		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		TextOrigin(0,p_Tmp2.Y);
+		CreateText(PLOCATION);
+		IF PSIZE <> 'Small' THEN BEGIN
+			TextFace([]);
+			Pen_WtoB(0.5);
+			TextSize(3*r_TextScaler);
+			GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			TextOrigin(0,p_Tmp2.Y);
+			IF PSHOWNOTE THEN CreateText(PNOTES);
 
-	PopAttrs; {===== Attrs02 =====}
+			TextSize(2*r_TextScaler);
+			TextOrigin(-23.75,0.25);
+			TextJust(1);
+			TextVerticalAlign(5);
+			IF PIDNUM <> '0' THEN CreateText(Concat(PTYPE,' ',PPREFIX,PIDNUM))
+			ELSE CreateText(PTYPE);
+			TextOrigin(23.75,0.25);
+			TextJust(3);
+			CreateText(PIP);
+		END;
+	END;
 
+	IF PNUMSPACES > 0 THEN BEGIN
+		Fill_WtoB(0.1);
+		Pen_WtoB(1);
+		Rect(-24,0,24,(-r_Space*PNUMSPACES));
+		HMoveBackward(LNewObj,TRUE);
+		MoveTo(-24,-r_Space);
+		{ Pen_WtoB(0.3); }
+		PenSize(0);
+		Relative;
+		FOR i_Counter:=2 TO PNUMSPACES DO BEGIN
+			LineTo(48,0);
+			MoveTo(-48,-r_Space);
+		END;
+		Absolute;
+	END;
 
-
-	PopAttrs; {Attrs01}
-END; END; Run(SigFlow_InOut);
+	PopAttrs; { Attrs01 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+END; END; Run(SigFlow_Equip);
