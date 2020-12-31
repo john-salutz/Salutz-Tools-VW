@@ -21,9 +21,9 @@
 PROCEDURE SigFlow_Equip;
 
 CONST
-	RGBmax	 = 65535; {Max value for setting RGB colors in VS fuctions}
+	RGBmax   = 65535; {Max value for setting RGB colors in VS fuctions}
 	RegularH = 12;
-	SmallH	 = 9;
+	SmallH   = 9;
 	SmallerH = 6;
 
 VAR
@@ -33,9 +33,8 @@ VAR
 	b_Result                                                : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
-	{ h_Poly                                                  : HANDLE; }
 	p_Tmp1,p_Tmp2                                           : POINT;
-	r_TextScaler{,r_TextLarge,r_TextSmall}                  : REAL;
+	r_TextScaler                                            : REAL;
 	r_Height,r_Space                                        : REAL;
 
 
@@ -104,62 +103,6 @@ BEGIN
 		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
 END;
 
-
-{ {\// Resets all 'RackEquip objects inside the RackObj's boundaries //!{\ }
-{ PROCEDURE Refresh_Gear_In_Rack(h : HANDLE); }
-{ VAR }
-{ 	pt1,pt2     : POINT; }
-{ 	criteria,n  : STRING; }
-{ 	c           : ARRAY [1..6] OF STRING; }
-{ BEGIN }
-{ 	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y); }
-{ 	pt1.X := (pt1.X/12)-1; }
-{ 	pt1.Y := (pt1.Y/12)+1; }
-{ 	pt2.X := (pt2.X/12)+1; }
-{ 	pt2.Y := (pt2.Y/12)-1; }
-{ 	n := ' & '; }
-{ 	c[1] := Concat('(T=PLUGINOBJECT)'); }
-{ 	c[2] := Concat('(R IN [','''','RackEquip (Salutz)','''','])'); }
-{ 	c[3] := Concat('(',pt2.Y,'<YCOORDINATE)'); }
-{ 	c[4] := Concat('(YCOORDINATE<',pt1.Y,')'); }
-{ 	c[5] := Concat('(',pt1.X,'<XCOORDINATE)'); }
-{ 	c[6] := Concat('(XCOORDINATE<',pt2.X,')'); }
-{ 	criteria := Concat(c[1],n,c[2],n,c[3],n,c[4],n,c[5],n,c[6]); }
-{ 	ForEachObject(ResetObject,criteria); }
-{ END; }
-
-FUNCTION Get_EquipHandle_At_Pt(p1 : POINT) : HANDLE;
-VAR
-	li_List                   : LONGINT;
-	i_ListCount,i_NumPickObj  : INTEGER;
-BEGIN
-	li_List := FindObjAtPt_Create(NIL,1, 0, p1.x, p1.y, 1);
-	i_NumPickObj := FindObjAtPt_GetCount(li_List);
-	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
-		IF (GetObjectVariableString(
-			FindObjAtPt_GetObj(li_List,i_ListCount),1166
-			) = 'SigFlow Equip (Salutz)')
-			THEN Get_EquipHandle_At_Pt := FindObjAtPt_GetObj(
-					li_List,i_ListCount
-					);
-	END;
-END;
-
-{// Returns a string of the RackID of Rack Obj found at point //}
-FUNCTION Get_RackName(h : HANDLE) : STRING;
-VAR	s1,s2 : STRING;
-BEGIN
-	s1 := GetRField(
-			h, GetName(GetRecord(h,NumRecords(h))), 'RackID'
-			);
-	s2 := GetRField(
-			h, GetName(GetRecord(h,NumRecords(h))), 'FrontOrBack'
-			);
-	IF (s2<>' ') THEN
-		Get_RackName := Concat(s1,' (',s2,')')
-	ELSE Get_RackName := s1;
-END;
-
 {// Resets all 'RackEquip objects inside the RackObj's boundaries //}
 PROCEDURE Refresh_Children (h : HANDLE;stype : STRING);
 VAR
@@ -168,10 +111,6 @@ VAR
 	c           : ARRAY [1..6] OF STRING;
 BEGIN
 	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y);
-	{ pt1.X := pt1.X/12; }
-	{ pt1.Y := pt1.Y/12; }
-	{ pt2.X := pt2.X/12; }
-	{ pt2.Y := pt2.Y/12; }
 	pt1.X := (pt1.X/12)-1;
 	pt1.Y := (pt1.Y/12)+1;
 	pt2.X := (pt2.X/12)+1;
@@ -179,7 +118,6 @@ BEGIN
 	n := ' & ';
 	c[1] := Concat('(T=PLUGINOBJECT)');
 	c[2] := Concat('(R IN [','''',stype,'''','])');
-	{ c[2] := Concat('(R IN [','''','SigFlow In-Out (Salutz)','''','])'); }
 	c[3] := Concat('(',pt2.Y,'<YCOORDINATE)');
 	c[4] := Concat('(YCOORDINATE<',pt1.Y,')');
 	c[5] := Concat('(',pt1.X,'<XCOORDINATE)');
@@ -207,7 +145,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Concat(PTYPE,' ',PPREFIX,PIDNUM,' (',PMANUFACTURER,' ',PMODEL,')')
 			);
 	PushAttrs; { Attrs01 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
-	Fill_WtoB(0.025);
+	Fill_WtoB(0.035);
 	Pen_WtoB(1);
 
 	TextFace([]);
@@ -276,12 +214,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	IF PNUMSPACES > 0 THEN BEGIN
-		Fill_WtoB(0.1);
+		Fill_WtoB(0.15);
 		Pen_WtoB(1);
 		Rect(-24,0,24,(-r_Space*PNUMSPACES));
 		HMoveBackward(LNewObj,TRUE);
 		MoveTo(-24,-r_Space);
-		{ Pen_WtoB(0.3); }
 		PenSize(0);
 		Relative;
 		FOR i_Counter:=2 TO PNUMSPACES DO BEGIN
