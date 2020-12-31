@@ -103,13 +103,14 @@ VAR
 	li_List                   : LONGINT;
 	i_ListCount,i_NumPickObj  : INTEGER;
 BEGIN
-	li_List := FindObjAtPt_Create(NIL,1, 0, p1.x, p1.y, 1);
+	li_List := FindObjAtPt_Create(NIL,1, 1, p1.x, p1.y, 1);
 	i_NumPickObj := FindObjAtPt_GetCount(li_List);
 	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
 		IF (GetObjectVariableString(
 			FindObjAtPt_GetObj(li_List,i_ListCount),1166
 			) = 'RackObject (Salutz)')
 			THEN Get_RackHandle_At_Pt :=FindObjAtPt_GetObj(li_List,i_ListCount);
+		{ ELSE Get_RackHandle_At_Pt := NIL; }
 	END;
 END;
 
@@ -117,15 +118,18 @@ END;
 FUNCTION Get_RackName(h : HANDLE) : STRING;
 VAR	s1,s2 : STRING;
 BEGIN
-	s1 := GetRField(
-			h, GetName(GetRecord(h,NumRecords(h))), 'RackID'
-			);
-	s2 := GetRField(
-			h, GetName(GetRecord(h,NumRecords(h))), 'FrontOrBack'
-			);
-	IF (s2<>' ') THEN
-		Get_RackName := Concat(s1,' (',s2,')')
-	ELSE Get_RackName := s1;
+	IF (h = NIL) THEN Get_RackName := ''
+		ELSE BEGIN
+			s1 := GetRField(
+					h, GetName(GetRecord(h,NumRecords(h))), 'RackID'
+					);
+			s2 := GetRField(
+					h, GetName(GetRecord(h,NumRecords(h))), 'FrontOrBack'
+					);
+			IF (s2<>' ') THEN
+				Get_RackName := Concat(s1,' (',s2,')')
+			ELSE Get_RackName := s1;
+		END;
 END;
 
 {====================================}
@@ -153,9 +157,25 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Get Rack Info =====}
 	GetSymLoc(h_Obj,p_EquipLoc.X,p_EquipLoc.Y);
 	h_Rack := Get_RackHandle_At_Pt(p_EquipLoc);
-	GetSymLoc(h_Rack,p_RackLoc.X,p_RackLoc.Y);
-	s_RackID := Get_RackName(h_Rack);
-	SetRField(h_Obj,s_ObjName,'RackID',s_RackID);
+
+	{ s_RackID := Get_RackName(h_Rack); }
+	{ IF (s_RackID<>'') THEN BEGIN }
+	{ 	GetSymLoc(h_Rack,p_RackLoc.X,p_RackLoc.Y); }
+	{ 	SetRField(h_Obj,s_ObjName,'RackID',s_RackID); }
+	{ END; }
+
+	{ GetSymLoc(h_Rack,p_RackLoc.X,p_RackLoc.Y); }
+	{ s_RackID := Get_RackName(h_Rack); }
+	{ SetRField(h_Obj,s_ObjName,'RackID',s_RackID); }
+
+	IF h_Rack <> NIL THEN BEGIN
+		GetSymLoc(h_Rack,p_RackLoc.X,p_RackLoc.Y);
+		s_RackID := Get_RackName(h_Rack);
+		SetRField(h_Obj,s_ObjName,'RackID',s_RackID);
+	END ELSE BEGIN
+		s_RackID := '';
+		SetRField(h_Obj,s_ObjName,'RackID',s_RackID);
+	END;
 
 	{=== Get vertical and horizontal position in rack ===}
 	IF (s_RackID<>'') THEN BEGIN

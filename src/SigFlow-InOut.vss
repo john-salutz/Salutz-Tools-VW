@@ -99,6 +99,38 @@ BEGIN
 		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
 END;
 
+FUNCTION Get_2D_Pt(h : HANDLE) : POINT;
+VAR p1 : POINT;
+BEGIN
+	GetSymLoc(h,p1.X,p1.Y);
+	Get_2D_Pt := p1;
+END;
+
+FUNCTION Get_Handle_At_Pt(p1 : POINT; stype : STRING) : HANDLE;
+VAR
+	li_List                   : LONGINT;
+	i_ListCount,i_NumPickObj  : INTEGER;
+BEGIN
+	li_List := FindObjAtPt_Create(NIL,1, 1, p1.x, p1.y, 1);
+	i_NumPickObj := FindObjAtPt_GetCount(li_List);
+	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
+		IF (GetObjectVariableString(
+			FindObjAtPt_GetObj(li_List,i_ListCount),1166
+			) = stype)
+			THEN Get_Handle_At_Pt := FindObjAtPt_GetObj(
+					li_List,i_ListCount
+					);
+	END;
+END;
+
+{// Returns a string of the RackID of Rack Obj found at point //}
+FUNCTION Get_EquipName(h : HANDLE) : STRING;
+BEGIN
+	Get_EquipName := GetRField(
+			h, GetName(GetRecord(h,NumRecords(h))), '__Parent'
+			);
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -118,6 +150,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	p_Origin.X := 0;
 	p_Leader.Y := 0;
 	p_TextOffset.X := 5/8;
+	SetRField(h_Obj,s_ObjName,'Parent',
+			Get_EquipName(
+					Get_Handle_At_Pt(Get_2D_Pt(h_Obj),'SigFlow Equip (Salutz)')
+					)
+			);
+
 
 	{===== Setup Size =====}
 	IF PSIZE = 'Regular' THEN BEGIN
