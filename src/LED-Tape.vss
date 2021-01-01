@@ -6,16 +6,16 @@
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
-//	This program is free software: you can redistribute it and/or modify
-//	it under the terms of the GNU General Public License as published by
-//	the Free Software Foundation, either version 3 of the License, or
-//	(at your option) any later version.
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
 //
-//	This program is distributed in the hope that it will be useful,
-//	but WITHOUT ANY WARRANTY; without even the implied warranty of
-//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//	GNU General Public License for more details.
-//	<https://www.gnu.org/licenses/>
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
 //////////////////////////////////////////////////////////////////////////////}
 
 PROCEDURE LEDTape;
@@ -51,39 +51,31 @@ END;
 
 {// Sets Background Fore and Back as White to Black, percentage set by 'r',
 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+PROCEDURE Fill_WtoB (r : REAL);
 VAR i : LONGINT;
 BEGIN
 	IF r<0 THEN r:=0;
 	IF r>1 THEN r:=1;
 	i := Trunc(RGBmax*(1-r));
-	SetFillBack(h, i, i, i);
-	SetFillFore(h, i, i, i);
-	SetFPat(h, 1); {Blank pattern}
+	FillPat(1);
+	FillBack(i,i,i);
 END;
 
 {// Sets Pen Fore and Back as White to Black, percentage set by 'r',
 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+PROCEDURE Pen_WtoB (r : REAL);
 VAR i : LONGINT;
 BEGIN
 	IF r<0 THEN r:=0;
 	IF r>1 THEN r:=1;
 	i := Trunc(RGBmax*(1-r));
-	SetPenFore(h, i, i, i);
-	SetPenBack(h, i, i, i);
-	SetLSN(h,2); {Solid pattern}
+	PenPatN(2);
+	PenFore(i,i,i);
 END;
 
 PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
 BEGIN
 	SetObjectVariableBoolean(h,684,b);
-END;
-
-PROCEDURE Set_Text_HardBold (h : HANDLE);
-BEGIN
-	SetTextStyle(h,0,GetTextLength(h),0);
-	SetTextStyle(h,0,GetTextLength(h),1);
 END;
 
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
@@ -159,15 +151,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Draw Path =====}
 	h_Path := GetCustomObjectPath(h_Obj);
 	i_NumPathPoints := GetVertNum(h_Path);
+	Pen_WtoB(1);
+	Fill_WtoB(0);
 	FOR i_Counter:=2 TO i_NumPathPoints DO BEGIN
 		IF Setup_Text_Label(h_Path,i_Counter) THEN BEGIN
 			CreateText(s_Label);
-			Set_Pen_WtoB(LNewObj,1);
-			Set_Background_WtoB(LNewObj,0);
 			Set_Tight_TextFill(LNewObj,FALSE);
 		END;
 	END;
-
 	PopAttrs;
 
 END; END; Run(LEDTape);

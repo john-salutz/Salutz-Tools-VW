@@ -1,20 +1,20 @@
 {//////////////////////////////////////////////////////////////////////////////
-//	Developed by John Salutz, 2020. Please share freely.
+//  Developed by John Salutz, 2020. Please share freely.
 //
-//	This script creates a dynamic rack for mounted equipment.
+//  This script creates a dynamic rack for mounted equipment.
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
-//	This program is free software: you can redistribute it and/or modify
-//	it under the terms of the GNU General Public License as published by
-//	the Free Software Foundation, either version 3 of the License, or
-//	(at your option) any later version.
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
 //
-//	This program is distributed in the hope that it will be useful,
-//	but WITHOUT ANY WARRANTY; without even the implied warranty of
-//	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//	GNU General Public License for more details.
-//	<https://www.gnu.org/licenses/>
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
 //////////////////////////////////////////////////////////////////////////////}
 
 PROCEDURE Rack_Obj;
@@ -51,34 +51,32 @@ BEGIN
 END;
 
 {// Sets Background Fore and Back as White to Black, percentage set by 'r',
-format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Fill_WtoB (r : REAL);
 VAR i : LONGINT;
 BEGIN
 	IF r<0 THEN r:=0;
 	IF r>1 THEN r:=1;
 	i := Trunc(RGBmax*(1-r));
-	SetFillBack(h, i, i, i);
-	SetFillFore(h, i, i, i);
-	SetFPat(h, 1); {Blank pattern}
+	FillPat(1);
+	FillBack(i,i,i);
 END;
 
 {// Sets Pen Fore and Back as White to Black, percentage set by 'r',
-format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Pen_WtoB (r : REAL);
 VAR i : LONGINT;
 BEGIN
 	IF r<0 THEN r:=0;
 	IF r>1 THEN r:=1;
 	i := Trunc(RGBmax*(1-r));
-	SetPenFore(h, i, i, i);
-	SetPenBack(h, i, i, i);
-	SetLSN(h,2); {Solid pattern}
+	PenPatN(2);
+	PenFore(i,i,i);
 END;
 
 {// Scales 'toScale' to fit to a percentage (scaleFactor) of 'fitTo' height //}
 PROCEDURE Scale_Fit_Height (toScale,fitTo : HANDLE; scaleFactor : REAL);
-VAR		p1 : POINT;
+VAR p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
@@ -152,14 +150,13 @@ BEGIN
 	TextJust(2);
 	TextVerticalAlign(3);
 	TextFace([]);
-	FillPat(1);
-	FillBack(RGBmax,RGBmax,RGBmax);
-	PenFore(RGBmax/2,RGBmax/2,RGBmax/2);
+	Fill_WtoB(0);
 	PenSize(2);
 	FOR i:=1 TO i_NumSpaces DO BEGIN
+		Pen_WtoB(0.5);
 		CreateText(Num2Str(0,i));
+		Pen_WtoB(0.25);
 		Line(-offsetX,0);
-		Set_Pen_WtoB(LNewObj,0.25);
 		HMoveBackward(LNewObj,TRUE);
 		Move(offsetX,k_RackU);
 	END;
@@ -190,49 +187,53 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Rectangle Creation //}
 	MoveTo(0,0);
+	PushAttrs;
+	PenSize(2);
+	Pen_WtoB(1);
+	IF PFRONTORBACK='Rear' THEN Fill_WtoB(0.2)
+	ELSE Fill_WtoB(0.1);
 	Rect(-r_Width/2,0,r_Width/2,r_Height);
-	h_InnerRect := LNewObj;
-	Set_Pen_WtoB(h_InnerRect,1);
-	Set_Background_WtoB(h_InnerRect,0.1);
-	IF PFRONTORBACK='Rear' THEN Set_Background_WtoB(h_InnerRect,0.2);
-	SetLW(h_InnerRect,2);
-	GetBBox(h_InnerRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+	PopAttrs;
+	GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 	Rect(p_Tmp1.X-PFRAME,p_Tmp1.Y+PFRAME,p_Tmp2.X+PFRAME,p_Tmp2.Y-PFRAME);
 	h_OuterRect := LNewObj;
 	HMoveBackward(h_OuterRect,TRUE);
 
 	{// Rack Spaces Line Guides //}
+	PushAttrs;
 	MoveTo(r_Width/2,0);
+	PenSize(1);
 	Relative;
+	Pen_WtoB(0.35);
 	FOR i_Counter := 2 TO i_NumSpaces DO BEGIN
 		Move(-r_Width,k_RackU);
 		Line(r_Width,0);
-		Set_Pen_WtoB(LNewObj,0.35);
-		SetLW(LNewObj,1);
+		{ SetLW(LNewObj,1); }
 	END;
 	Absolute;
+	PopAttrs;
 
 	{// Rack Ear Vertical Lines //}
+	PushAttrs;
+	PenSize(1);
+	Pen_WtoB(1);
+	Fill_WtoB(0.35);
 	Rect(p_Tmp1.X,p_Tmp1.Y,p_Tmp1.X+k_EarWidth,p_Tmp1.Y-r_Height);
-	Set_Pen_WtoB(LNewObj,1);
-	SetLW(LNewObj,1);
-	Set_Background_WtoB(LNewObj,0.35);
 	Rect(p_Tmp2.X,p_Tmp2.Y,p_Tmp2.X-k_EarWidth,p_Tmp2.Y+r_Height);
-	Set_Pen_WtoB(LNewObj,1);
-	SetLW(LNewObj,1);
-	Set_Background_WtoB(LNewObj,0.35);
+	PopAttrs;
 
 	{// Label Text Creation and Formating //}
+	PushAttrs;
 	MoveTo(0,0);
 	TextOrigin(0,r_Height+PFRAME+0.5);
+	Fill_WtoB(0);
+	TextJust(2);
+	TextVerticalAlign(5);
 	IF (PFRONTORBACK<>' ') THEN
 		CreateText(Concat(PRACKID,' (',PFRONTORBACK,')'))
 		ELSE CreateText(PRACKID);
-	h_RackID := LNewObj;
-	SetTextJust(h_RackID,2);
-	SetTextVerticalAlign(h_RackID,5);
-	Set_Background_WtoB(h_RackID,0);
-	HMoveBackward(h_RackID,TRUE);
+	HMoveBackward(LNewObj,TRUE);
+	PopAttrs;
 
 	{// Rack Space Number Creation //}
 	IF (PSHOWNUM='Left') OR (PSHOWNUM='Both') THEN Draw_RackSpace_Numbers('L');

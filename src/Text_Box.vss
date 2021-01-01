@@ -50,57 +50,55 @@ BEGIN
 END;
 
 {// Sets Background Fore and Back as White to Black, percentage set by 'r',
-format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Fill_WtoB (r : REAL);
 VAR i : LONGINT;
 BEGIN
 	IF r<0 THEN r:=0;
 	IF r>1 THEN r:=1;
 	i := Trunc(RGBmax*(1-r));
-	SetFillBack(h, i, i, i);
-	SetFillFore(h, i, i, i);
-	SetFPat(h, 1); {Blank pattern}
+	FillPat(1);
+	FillBack(i,i,i);
 END;
 
 {// Sets Pen Fore and Back as White to Black, percentage set by 'r',
-format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Pen_WtoB (r : REAL);
 VAR i : LONGINT;
 BEGIN
 	IF r<0 THEN r:=0;
 	IF r>1 THEN r:=1;
 	i := Trunc(RGBmax*(1-r));
-	SetPenFore(h, i, i, i);
-	SetPenBack(h, i, i, i);
-	SetLSN(h,2); {Solid pattern}
+	PenPatN(2);
+	PenFore(i,i,i);
 END;
 
-	{// Draws a rectangle or a rounded rectangle based on 'roundTrue' //}
-	FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
-	VAR r_RRectDiam : REAL;
-	BEGIN
-		IF roundTrue THEN BEGIN
-			r_RRectDiam := POFFSET_EDGE*2;
-			RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
-		END {IF roundTrue} ELSE BEGIN
-			r_RRectDiam := 0;
-			Rect(x1,y1,x2,y2);
-		END;
-		RectOrRRect := LNewObj;
+{// Draws a rectangle or a rounded rectangle based on 'roundTrue' //}
+FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
+VAR r_RRectDiam : REAL;
+BEGIN
+	IF roundTrue THEN BEGIN
+		r_RRectDiam := POFFSET_EDGE*2;
+		RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
+	END {IF roundTrue} ELSE BEGIN
+		r_RRectDiam := 0;
+		Rect(x1,y1,x2,y2);
 	END;
+	RectOrRRect := LNewObj;
+END;
 
-	{// Draws a rectangle offset from the passed obj //}
-	FUNCTION DrawOffsetRect(
-			offsetFrom : HANDLE; offset : REAL; roundTrue : BOOLEAN
-			) : HANDLE;
-	VAR Pt1,Pt2 : POINT;
-	BEGIN
-		GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
-		DrawOffsetRect := RectOrRRect(
-				Pt1.X-offset, Pt1.Y+offset,
-				Pt2.X+offset, Pt2.Y-offset, roundTrue
-				);
-	END;
+{// Draws a rectangle offset from the passed obj //}
+FUNCTION DrawOffsetRect(
+		offsetFrom : HANDLE; offset : REAL; roundTrue : BOOLEAN
+		) : HANDLE;
+VAR Pt1,Pt2 : POINT;
+BEGIN
+	GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
+	DrawOffsetRect := RectOrRRect(
+			Pt1.X-offset, Pt1.Y+offset,
+			Pt2.X+offset, Pt2.Y-offset, roundTrue
+			);
+END;
 
 {====================================}
 {------------- < MAIN > -------------}
@@ -155,63 +153,53 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextOrigin(0,0);
 
 	{===== Text creation and background =====}
+	PushAttrs;
+	FillPat(0);
+	IF (PTEXTCOLOR='Keep Text Black') THEN Pen_WtoB(1);
 	CreateText(PLABEL);
 	h_Text := LNewObj;
-	SetFPat(h_Text,0);
 	{// Underline //}
 	IF (PUNDERLINE=TRUE) THEN BEGIN
+		PenPatN(2);
+		PenSize(7);
 		GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 		MoveTo(p_Tmp1.X,p_Tmp2.Y);
 		LineTo(p_Tmp2.X,p_Tmp2.Y);
-		h_UnLine:=LNewObj;
-		SetLW(h_UnLine, 7);
-		SetLSN(h_UnLine,2);
-		MoveTo(0,0);
 	END;
-	{// Text Color //}
-	IF (PTEXTCOLOR='Keep Text Black') THEN BEGIN
-		Set_Pen_WtoB(h_Text,1);
-		Set_Pen_WtoB(h_UnLine,1);
-	END;
-	DSelectAll;
+	PopAttrs;
 
 	{===== Create foreground rectangle =====}
-	h_FrontRect := DrawOffsetRect(h_Text,PPAD,PISROUNDED);
+	PushAttrs;
 	{// Set front rectangle fill & pen to none based on PINRECOP parameter //}
 	IF (PINRECOP=TRUE) THEN BEGIN
-		Set_Background_WtoB(h_FrontRect,0);
-		SetLW(h_FrontRect, 7);
+		Fill_WtoB(0);
+		PenSize(7);
 		SetParameterVisibility(h_Obj,'Dash',TRUE);
 		{// Dashed Line Setup //}
-		IF PDASH = 'Solid' THEN SetLSN(h_FrontRect,2)
+		IF PDASH = 'Solid' THEN li_Dash := 2
 		ELSE IF PDASH='Dashed' THEN BEGIN
 			li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.03);
 			b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed');
-			SetLSN(h_FrontRect,li_Dash);
 		END
 		ELSE IF PDASH='Dashed Spaced' THEN BEGIN
 			li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.18);
 			b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed Spaced');
-			SetLSN(h_FrontRect,li_Dash);
 		END
 		ELSE IF PDASH='Dotted' THEN BEGIN
 			li_Dash := GetDashStyleIndexN(TRUE, 1, 0.005, 0.03);
 			b_Result := SetDashLineTypeName(li_Dash, 'ISO-07 Dotted');
-			SetLSN(h_FrontRect,li_Dash);
 		END
-		ELSE IF PDASH='None' THEN BEGIN
-			SetLSN(h_FrontRect,2);
-			SetLW(h_FrontRect,0);
-		END;
-
-		b_Result := SetOpacityN(h_FrontRect,100,100);
+		ELSE IF PDASH='None' THEN li_Dash := 0;
+		PenPatN(li_Dash);
 	END ELSE BEGIN
 		SetParameterVisibility(h_Obj,'Dash',FALSE);
-		SetFPat(h_FrontRect,0);
-		SetLSN(h_FrontRect,0);
-		SetLW(h_FrontRect,0);
+		FillPat(0);
+		PenSize(0);
+		PenPatN(0);
 	END;
+	h_FrontRect := DrawOffsetRect(h_Text,PPAD,PISROUNDED);
 	HMoveBackward(h_FrontRect,TRUE);
+	PopAttrs;
 
 	{===== Create background rectangle =====}
 	h_BackRect := DrawOffsetRect(h_FrontRect,POFFSET_EDGE,PISROUNDED);
