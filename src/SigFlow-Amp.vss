@@ -153,12 +153,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumChan', '1');
 		ResetObject(h_Obj);
 	END;
+
 	{===== Variable Setup =====}
 	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
-	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
-	TextFace([]);
 
 	{===== Draw RRectangles =====}
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((}
 	Pen_WtoB(1);
 	Fill_WtoB(0);
 	PenSize(7);
@@ -168,16 +168,16 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetFPat(h_Rect,0);
 	HCenter(h_Rect,p_Center.X,p_Center.Y);
 	IF (PNUMCHAN > 1) THEN p_Center.Y := p_Center.Y +(6*(PNUMCHAN MOD 2));
-	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}
 
-	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
 	{===== Draw Model Rectangle & Text =====}
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((}
 	PenPatN(0);
 	PenSize(0);
 	Rect(-12,p_Center.Y+4,12,p_Center.Y-2);
 	h_Model := LNewObj;
 
-	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	{// Model Text //}
 	TextFace([Bold]);
 	TextOrigin(p_Center.X,p_Center.Y+1);
 	TextJust(2);
@@ -185,19 +185,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextSize(7*r_TextScaler);
 	CreateText(PMODEL);
 	Scale_Fit_Width(LNewObj,h_Model,0.95);
-	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
-	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}
 
 	{===== Draw Text =====}
-	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
-	{// Draw Manufacturer Text //}
-	TextOrigin(-11,0);
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((}
+	TextFace([]);
 	FillPat(0);
 	Pen_WtoB(1);
-	TextJust(1);
-	TextVerticalAlign(1);
-	TextSize(4*r_TextScaler);
-	CreateText(PMANUFACTURER);
+
 
 	{// Draw ID Text //}
 	GetBBox(h_Model,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
@@ -207,13 +202,21 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextSize(5*r_TextScaler);
 	CreateText(Concat(PPREFIX,PIDNUM));
 
-	{// Draw Location Text //}
+	{// Draw Manufacturer Text //}
 	TextOrigin(0,p_Center.Y+6);
 	TextVerticalAlign(5);
 	TextSize(4*r_TextScaler);
+	CreateText(PMANUFACTURER);
+	Scale_Fit_Width(LNewObj,h_Rect,0.95);
+
+
+	{// Draw Location Text //}
+	TextOrigin(0,0);
+	TextVerticalAlign(1);
+	Pen_WtoB(0.75);
 	TextFace([Italic]);
 	CreateText(PLOCATION);
-	Scale_Fit_Width(LNewObj,h_Rect,0.95);
+	Scale_Fit_Width(LNewObj,h_Rect,0.9);
 
 	{// Draw Note Text //}
 	IF PSHOWNOTE THEN BEGIN
@@ -226,10 +229,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetTextWidth(LNewObj,24);
 		PopAttrs;
 	END;
-	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}
 
 	{===== Draw Poly Arrows =====}
-	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((}
 	MoveTo(-12,-6);
 	Pen_WtoB(1);
 	PenSize(7);
@@ -250,6 +253,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			DO h_TmpHandle := HDuplicate(h_TmpHandle,0,-12);
 	END;
 	HMoveForward(h_Rect,TRUE);
-	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}
 
 END; END; Run(SigFlow_Amp);
