@@ -1,0 +1,255 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, (c) 2020. Please share freely.
+//
+//  SigFlow Equip is a point based object for drawing general equipment in
+//  an audio signal flow diagram.
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE SigFlow_Amp;
+
+CONST
+	RGBmax   = 65535; {Max value for setting RGB colors in VS fuctions}
+	RegularH = 12;
+	SmallH   = 9;
+	SmallerH = 6;
+
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	p_Tmp1,p_Tmp2,p_Center                                  : POINT;
+	r_TextScaler                                            : REAL;
+	r_Height,r_Space                                        : REAL;
+	h_Rect,h_Model,h_TmpHandle                                : HANDLE;
+
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+	SetRField(h_Obj,s_ObjName,'ver',s);
+END;
+
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+	SetObjectVariableBoolean(h,800,True);
+END;
+
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Fill_WtoB (r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	FillPat(1);
+	FillBack(i,i,i);
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Pen_WtoB (r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	PenPatN(2);
+	PenFore(i,i,i);
+END;
+
+PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
+BEGIN
+	SetObjectVariableBoolean(h,684,b);
+END;
+
+FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
+BEGIN
+	IF GetLayer(obj) = NIL THEN ResetObject(obj)
+	ELSE Find_Layer := GetLayer(obj);
+END;
+
+PROCEDURE Scale_Fit_Width (toScale,fitTo : HANDLE; scaleFactor : REAL);
+VAR p1 : POINT;
+BEGIN
+	IF (HWidth(toScale) > HWidth(fitTo)) THEN BEGIN
+		HCenter(toScale,p1.X,p1.Y);
+		HScale2D(
+				toScale, p1.X, p1.Y, HWidth(fitTo)*scaleFactor/HWidth(toScale),
+				HWidth(fitTo)*scaleFactor/HWidth(toScale), TRUE
+				);
+	END;
+END;
+
+{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
+PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
+VAR b	  : BOOLEAN;
+	ActLS : REAL;
+BEGIN
+	ActLS := GetLScale(Find_Layer(h_Obj));
+	IF sBeg = 'Dot' THEN {Dot}
+		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Arrow' THEN {Arrow}
+		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+	IF sEnd = 'Dot' THEN {Dot}
+		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Arrow' THEN {Arrow}
+		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+END;
+
+{// Resets all 'RackEquip objects inside the RackObj's boundaries //}
+PROCEDURE Refresh_Children (h : HANDLE;stype : STRING);
+VAR
+	pt1,pt2     : POINT;
+	criteria,n  : STRING;
+	c           : ARRAY [1..6] OF STRING;
+BEGIN
+	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y);
+	pt1.X := (pt1.X/12)-1;
+	pt1.Y := (pt1.Y/12)+1;
+	pt2.X := (pt2.X/12)+1;
+	pt2.Y := (pt2.Y/12)-1;
+	n := ' & ';
+	c[1] := Concat('(T=PLUGINOBJECT)');
+	c[2] := Concat('(R IN [','''',stype,'''','])');
+	c[3] := Concat('(',pt2.Y,'<YCOORDINATE)');
+	c[4] := Concat('(YCOORDINATE<',pt1.Y,')');
+	c[5] := Concat('(',pt1.X,'<XCOORDINATE)');
+	c[6] := Concat('(XCOORDINATE<',pt2.X,')');
+	criteria := Concat(c[1],n,c[2],n,c[3],n,c[4],n,c[5],n,c[6]);
+	ForEachObject(ResetObject,criteria);
+END;
+
+
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 3');
+	Use_PIO_Text_Attributes(h_Obj);
+	{===== Parameter Limits =====}
+	IF (PNUMCHAN<1) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'NumChan', '1');
+		ResetObject(h_Obj);
+	END;
+	{===== Variable Setup =====}
+	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
+	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	TextFace([]);
+
+	{===== Draw RRectangles =====}
+	Pen_WtoB(1);
+	Fill_WtoB(0);
+	PenSize(7);
+	IF PNUMCHAN > 2 THEN RRect(-12,0,12,(-RegularH*PNUMCHAN),4,4)
+	ELSE RRect(-12,0,12,(-RegularH*2),4,4);
+	h_Rect := HDuplicate(LNewObj,0,0);
+	SetFPat(h_Rect,0);
+	HCenter(h_Rect,p_Center.X,p_Center.Y);
+	IF (PNUMCHAN > 1) THEN p_Center.Y := p_Center.Y +(6*(PNUMCHAN MOD 2));
+	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+
+	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	{===== Draw Model Rectangle & Text =====}
+	PenPatN(0);
+	PenSize(0);
+	Rect(-12,p_Center.Y+4,12,p_Center.Y-2);
+	h_Model := LNewObj;
+
+	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	TextFace([Bold]);
+	TextOrigin(p_Center.X,p_Center.Y+1);
+	TextJust(2);
+	TextVerticalAlign(3);
+	TextSize(7*r_TextScaler);
+	CreateText(PMODEL);
+	Scale_Fit_Width(LNewObj,h_Model,0.95);
+	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+
+	{===== Draw Text =====}
+	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	{// Draw Manufacturer Text //}
+	TextOrigin(-11,0);
+	FillPat(0);
+	Pen_WtoB(1);
+	TextJust(1);
+	TextVerticalAlign(1);
+	TextSize(4*r_TextScaler);
+	CreateText(PMANUFACTURER);
+
+	{// Draw ID Text //}
+	GetBBox(h_Model,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+	TextOrigin(0,p_Tmp2.Y);
+	TextJust(2);
+	TextVerticalAlign(1);
+	TextSize(5*r_TextScaler);
+	CreateText(Concat(PPREFIX,PIDNUM));
+
+	{// Draw Location Text //}
+	TextOrigin(0,p_Center.Y+6);
+	TextVerticalAlign(5);
+	TextSize(4*r_TextScaler);
+	TextFace([Italic]);
+	CreateText(PLOCATION);
+	Scale_Fit_Width(LNewObj,h_Rect,0.95);
+
+	{// Draw Note Text //}
+	IF PSHOWNOTE THEN BEGIN
+		PushAttrs;
+		TextVerticalAlign(1);
+		Pen_WtoB(0.5);
+		TextFace([]);
+		TextOrigin(0,p_Center.Y-6);
+		CreateText(PNOTES);
+		SetTextWidth(LNewObj,24);
+		PopAttrs;
+	END;
+	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+
+	{===== Draw Poly Arrows =====}
+	PushAttrs; {>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	MoveTo(-12,-6);
+	Pen_WtoB(1);
+	PenSize(7);
+	Fill_WtoB(0);
+	Relative;
+	BeginPoly;
+	Add2DVertex(24.5,0,0,0);
+	Add2DVertex(0,2,0,0);
+	Add2DVertex(4,-2,0,0);
+	Add2DVertex(-4,-2,0,0);
+	Add2DVertex(0,2,0,0);
+	Add2DVertex(-24.5,0,0,0);
+	EndPoly;
+	Absolute;
+	IF PNUMCHAN > 1 THEN BEGIN
+		h_TmpHandle := LNewObj;
+		FOR i_Counter:=2 TO PNUMCHAN
+			DO h_TmpHandle := HDuplicate(h_TmpHandle,0,-12);
+	END;
+	HMoveForward(h_Rect,TRUE);
+	PopAttrs; {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+
+END; END; Run(SigFlow_Amp);
