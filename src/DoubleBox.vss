@@ -36,77 +36,78 @@ VAR
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
-	{// Sets Version info parameter //}
-	PROCEDURE Set_Version_Info(s : STRING);
-	BEGIN
-		SetRField(h_Obj,s_ObjName,'ver',s);
-	END;
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+	SetRField(h_Obj,s_ObjName,'ver',s);
+END;
 
-	{// Sets the specified text object to use the attributes of PIO //}
-	PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
-	BEGIN
-		SetObjectVariableBoolean(h,800,True);
-	END;
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+	SetObjectVariableBoolean(h,800,True);
+END;
 
-	{// Sets Background Fore and Back as White to Black, percentage set by 'r',
-	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-	PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
-	VAR i : LONGINT;
-	BEGIN
-		IF r<0 THEN r:=0;
-		IF r>1 THEN r:=1;
-		i := Trunc(RGBmax*(1-r));
-		SetFillBack(h, i, i, i);
-		SetFillFore(h, i, i, i);
-		SetFPat(h, 1); {Blank pattern}
-	END;
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetFillBack(h, i, i, i);
+	SetFillFore(h, i, i, i);
+	SetFPat(h, 1); {Blank pattern}
+END;
 
-	{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
-	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-	PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
-	VAR i : LONGINT;
-	BEGIN
-		IF r<0 THEN r:=0;
-		IF r>1 THEN r:=1;
-		i := Trunc(RGBmax*(1-r));
-		SetPenFore(h, i, i, i);
-		SetPenBack(h, i, i, i);
-		SetLSN(h,2); {Solid pattern}
-	END;
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	SetPenFore(h, i, i, i);
+	SetPenBack(h, i, i, i);
+	SetLSN(h,2); {Solid pattern}
+END;
 
-	{// Dialog Handler for the "Edit Notes" section //}
-	PROCEDURE Dialog_Handler(VAR item :LONGINT; data :LONGINT);
-	BEGIN
-		message('Item: ', item, '  Data in that item: ', data);
-		GetMultilineText(dialog1,4,s_NoteTextTemp);
-	END;
+{// Dialog Handler for the "Edit Notes" section //}
+PROCEDURE Dialog_Handler(VAR item :LONGINT; data :LONGINT);
+BEGIN
+	message('Item: ', item, '  Data in that item: ', data);
+	GetMultilineText(dialog1,4,s_NoteTextTemp);
+END;
 
-	{// Draws a rectangle or a rounded rectangle based on 'roundTrue' //}
-	FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
-	VAR r_RRectDiam : REAL;
-	BEGIN
-		IF roundTrue THEN BEGIN
-			r_RRectDiam := POFFSET_EDGE*2;
-			RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
-		END {IF roundTrue} ELSE BEGIN
-			r_RRectDiam := 0;
-			Rect(x1,y1,x2,y2);
-		END;
-		RectOrRRect := LNewObj;
+{// Draws a rectangle or a rounded rectangle based on 'roundTrue' //}
+FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
+VAR r_RRectDiam : REAL;
+BEGIN
+	IF roundTrue THEN BEGIN
+		r_RRectDiam := POFFSET_EDGE*2;
+		RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
+	END {IF roundTrue} ELSE BEGIN
+		r_RRectDiam := 0;
+		Rect(x1,y1,x2,y2);
 	END;
+	RectOrRRect := LNewObj;
+END;
 
-	{// Draws a rectangle offset from the passed obj //}
-	FUNCTION DrawOffsetRect(
-			offsetFrom : HANDLE; offset : REAL; roundTrue : BOOLEAN
-			) : HANDLE;
-	VAR Pt1,Pt2 : POINT;
-	BEGIN
-		GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
-		DrawOffsetRect := RectOrRRect(
-				Pt1.X-offset, Pt1.Y+offset,
-				Pt2.X+offset, Pt2.Y-offset, roundTrue
-				);
-	END;
+{// Draws a rectangle offset from the passed obj //}
+FUNCTION DrawOffsetRect(
+		offsetFrom : HANDLE; offset : REAL; roundTrue : BOOLEAN
+		) : HANDLE;
+VAR Pt1,Pt2 : POINT;
+BEGIN
+	GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
+	DrawOffsetRect := RectOrRRect(
+			Pt1.X-offset, Pt1.Y+offset,
+			Pt2.X+offset, Pt2.Y-offset, roundTrue
+			);
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
