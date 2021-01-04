@@ -100,13 +100,33 @@ BEGIN
 			);
 END;
 
+FUNCTION DashStyle_Cust(style : STRING) : LONGINT;
+VAR li_Dash : LONGINT;
+BEGIN
+	IF style = 'Solid' THEN li_Dash := 2
+	ELSE IF style='Dashed' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.03);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed');
+	END
+	ELSE IF style='Dashed Spaced' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.18);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-03 Dashed Spaced');
+	END
+	ELSE IF style='Dotted' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.005, 0.03);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-07 Dotted');
+	END
+	ELSE IF style='None' THEN li_Dash := 0;
+	DashStyle_Cust := li_Dash;
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 3');
+	Set_Version_Info('0 . 4');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -146,14 +166,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	{===== Setup text creation =====}
-	PushAttrs;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	TextJust(2);
 	TextVerticalAlign(3);
 	TextRotate(0);
 	TextOrigin(0,0);
 
 	{===== Text creation and background =====}
-	PushAttrs;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	FillPat(0);
 	IF (PTEXTCOLOR='Keep Text Black') THEN Pen_WtoB(1);
 	CreateText(PLABEL);
@@ -166,31 +186,16 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		MoveTo(p_Tmp1.X,p_Tmp2.Y);
 		LineTo(p_Tmp2.X,p_Tmp2.Y);
 	END;
-	PopAttrs;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{===== Create foreground rectangle =====}
-	PushAttrs;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	{// Set front rectangle fill & pen to none based on PINRECOP parameter //}
 	IF (PINRECOP=TRUE) THEN BEGIN
 		Fill_WtoB(0);
 		PenSize(7);
 		SetParameterVisibility(h_Obj,'Dash',TRUE);
-		{// Dashed Line Setup //}
-		IF PDASH = 'Solid' THEN li_Dash := 2
-		ELSE IF PDASH='Dashed' THEN BEGIN
-			li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.03);
-			b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed');
-		END
-		ELSE IF PDASH='Dashed Spaced' THEN BEGIN
-			li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.18);
-			b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed Spaced');
-		END
-		ELSE IF PDASH='Dotted' THEN BEGIN
-			li_Dash := GetDashStyleIndexN(TRUE, 1, 0.005, 0.03);
-			b_Result := SetDashLineTypeName(li_Dash, 'ISO-07 Dotted');
-		END
-		ELSE IF PDASH='None' THEN li_Dash := 0;
-		PenPatN(li_Dash);
+		PenPatN(DashStyle_Cust(PDASH));
 	END ELSE BEGIN
 		SetParameterVisibility(h_Obj,'Dash',FALSE);
 		FillPat(0);
@@ -199,7 +204,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 	h_FrontRect := DrawOffsetRect(h_Text,PPAD,PISROUNDED);
 	HMoveBackward(h_FrontRect,TRUE);
-	PopAttrs;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{===== Create background rectangle =====}
 	h_BackRect := DrawOffsetRect(h_FrontRect,POFFSET_EDGE,PISROUNDED);
@@ -244,5 +249,5 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END; {Create Arrow}
 
 	{===== End sequence =====}
-	PopAttrs;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 END; END; Run(Text_Box);
