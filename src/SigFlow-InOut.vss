@@ -30,7 +30,6 @@ VAR
 	b_Result                                                : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
-	{ h_Poly                                                  : HANDLE; }
 	p_Origin,p_End,p_Leader,p_TextOffset                    : POINT;
 	r_TextScaler,r_TextLarge,r_TextSmall                    : REAL;
 
@@ -137,11 +136,11 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 3');
+	Set_Version_Info('0 . 4');
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
 	{===== Variable Setup =====}
-	PushAttrs; {Attrs01}
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	Fill_WtoB(0);
 	Pen_WtoB(1);
 	TextVerticalAlign(3);
@@ -200,9 +199,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Draw Text =====}
 	{// Draw ID/Number Text //}
 	TextSize(r_TextLarge);
-	IF PPREFIX <> '' THEN CreateText(Concat(PPREFIX,' ',PIDNUM))
-	ELSE CreateText(PIDNUM);
-
+	IF PPREFIX <> '' THEN BEGIN
+		CreateText(Concat(PPREFIX,' ',PIDNUM));
+		SetTextSize(LNewObj,0,Len(PPREFIX)+1,GetTextSize(LNewObj,0)-1);
+	END ELSE CreateText(PIDNUM);
 
 	{===== Draw Poly =====}
 	BeginPoly;
@@ -222,7 +222,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	HMoveBackward(LNewObj,TRUE);
 
 
-	PushAttrs; {===== Attrs02 =====}
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 
 	{// Draw Routing Text //}
 	NameClass(PCLASSROUT);
@@ -246,9 +246,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	CreateText(PPURPOSE);
 	HMoveBackward(LNewObj,TRUE);
 
-	PopAttrs; {===== Attrs02 =====}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 
 
-	PopAttrs; {Attrs01}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 END; END; Run(SigFlow_InOut);

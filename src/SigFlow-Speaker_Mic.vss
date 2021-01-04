@@ -1,8 +1,8 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
 //
-//  SigFlow In-Out is a point based object for drawing input/output slots in
-//  an audio signal flow diagram.
+//  SigFlow Speaker Mic is a point based object for drawing Speakers and
+//  Microphones in an audio signal flow diagram.
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,6 @@ PROCEDURE SigFlow_Speaker_Mic;
 
 CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
-	{ mm2in  = 25.4; }
 
 VAR
 	{Standard variables}
@@ -31,9 +30,7 @@ VAR
 	b_Result                                                : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
-	{ h_Poly                                                  : HANDLE; }
-	{ p_Origin,p_End,p_Leader,p_TextOffset                    : POINT; }
-	r_TextScaler{,r_TextLarge,r_TextSmall}                    : REAL;
+	r_TextScaler                                            : REAL;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -209,12 +206,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextVerticalAlign(3);
 		TextOrigin(8.5,0);
 		CreateText(Concat(PPREFIX,PIDNUM));
+		IF Len(PPREFIX)>0
+			THEN SetTextSize(LNewObj,0,Len(PPREFIX),GetTextSize(LNewObj,0)-1);
 		Scale_to_Width(LNewObj,4.75);
 		b_Result := SetOpacityN(LNewObj,100,90);
 
 		{Model}
 		Fill_WtoB(0);
-		{ TextSize(4*r_TextScaler); }
 		TextJust(1);
 		TextVerticalAlign(5);
 		TextOrigin(11.75,0.25);
@@ -255,6 +253,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextOrigin(-12,0);
 		FillPat(0);
 		CreateText(Concat(PPREFIX,PIDNUM));
+		IF Len(PPREFIX)>0
+			THEN SetTextSize(LNewObj,0,Len(PPREFIX),GetTextSize(LNewObj,0)-1);
 		Scale_to_Width(LNewObj,7.5);
 
 		{Model}
@@ -281,8 +281,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'Model',FALSE);
 		SetParameterVisibility(h_Obj,'ClassPurp',FALSE);
 
-
-
 		BeginPoly;
 		Add2DVertex(5.25,0,0,0);
 		Add2DVertex(2.625,4.5,0,0);
@@ -292,9 +290,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Add2DVertex(2.625,-4.5,0,0);
 		Add2DVertex(5.25,0,0,0);
 		EndPoly;
-
-		{ RegularPolygon(0,0,5.25*mm2in,6,1); }
-		{ HRotate(LNewObj,0,0,90); }
 
 		{ID}
 		TextSize(8*r_TextScaler);
