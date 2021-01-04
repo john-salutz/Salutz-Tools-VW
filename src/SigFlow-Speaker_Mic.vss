@@ -1,0 +1,310 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, (c) 2020. Please share freely.
+//
+//  SigFlow In-Out is a point based object for drawing input/output slots in
+//  an audio signal flow diagram.
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE SigFlow_Speaker_Mic;
+
+CONST
+	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+	{ mm2in  = 25.4; }
+
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	{ h_Poly                                                  : HANDLE; }
+	{ p_Origin,p_End,p_Leader,p_TextOffset                    : POINT; }
+	r_TextScaler{,r_TextLarge,r_TextSmall}                    : REAL;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// Sets Version info parameter //}
+PROCEDURE Set_Version_Info(s : STRING);
+BEGIN
+	SetRField(h_Obj,s_ObjName,'ver',s);
+END;
+
+{// Sets the specified text object to use the attributes of PIO //}
+PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
+BEGIN
+	SetObjectVariableBoolean(h,800,True);
+END;
+
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Fill_WtoB (r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	FillPat(1);
+	FillBack(i,i,i);
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Pen_WtoB (r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	PenPatN(2);
+	PenFore(i,i,i);
+END;
+
+PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
+BEGIN
+	SetObjectVariableBoolean(h,684,b);
+END;
+
+FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
+BEGIN
+	IF GetLayer(obj) = NIL THEN ResetObject(obj)
+	ELSE Find_Layer := GetLayer(obj);
+END;
+
+{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
+PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
+VAR b	  : BOOLEAN;
+	ActLS : REAL;
+BEGIN
+	ActLS := GetLScale(Find_Layer(h_Obj));
+	IF sBeg = 'Dot' THEN {Dot}
+		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Arrow' THEN {Arrow}
+		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+	IF sEnd	 = 'Dot' THEN {Dot}
+		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Arrow' THEN {Arrow}
+		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+END;
+
+FUNCTION Get_2D_Pt(h : HANDLE) : POINT;
+VAR p1 : POINT;
+BEGIN
+	GetSymLoc(h,p1.X,p1.Y);
+	Get_2D_Pt := p1;
+END;
+
+FUNCTION Get_Handle_At_Pt(p1 : POINT; stype : STRING) : HANDLE;
+VAR
+	li_List                   : LONGINT;
+	i_ListCount,i_NumPickObj  : INTEGER;
+BEGIN
+	li_List := FindObjAtPt_Create(NIL,1, 1, p1.x, p1.y, 1);
+	i_NumPickObj := FindObjAtPt_GetCount(li_List);
+	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
+		IF (GetObjectVariableString(
+			FindObjAtPt_GetObj(li_List,i_ListCount),1166
+			) = stype)
+			THEN Get_Handle_At_Pt := FindObjAtPt_GetObj(
+					li_List,i_ListCount
+					);
+	END;
+END;
+
+{// Returns a string of the RackID of Rack Obj found at point //}
+FUNCTION Get_EquipName(h : HANDLE) : STRING;
+BEGIN
+	Get_EquipName := GetRField(
+			h, GetName(GetRecord(h,NumRecords(h))), '__Parent'
+			);
+END;
+
+PROCEDURE Scale_to_Width (toScale, : HANDLE; widthSize : REAL);
+VAR p1 : POINT;
+BEGIN
+	IF (HWidth(toScale) > widthSize) THEN BEGIN
+		HCenter(toScale,p1.X,p1.Y);
+		HScale2D(
+				toScale, p1.X, p1.Y, widthSize/HWidth(toScale),
+				widthSize/HWidth(toScale), TRUE
+				);
+	END;
+END;
+
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 4');
+	Use_PIO_Text_Attributes(h_Obj);
+	{===== Parameter Limits =====}
+	{===== Variable Setup =====}
+
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+	Fill_WtoB(0);
+	Pen_WtoB(1);
+	TextFace([]);
+	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
+
+	IF PTYPE = 'Speaker' THEN BEGIN
+		SetParameterVisibility(h_Obj,'__ActiveOrPassive',TRUE);
+
+		MoveTo(0,0);
+		Relative;
+		BeginPoly;
+		Add2DVertex(0,0,0,0);
+		Add2DVertex(6,0,0,0);
+		Add2DVertex(0,3,0,0);
+		Add2DVertex(2.5,0,0,0);
+		Add2DVertex(0,-3,0,0);
+		Add2DVertex(0,3,0,0);
+		Add2DVertex(2.5,2.5,0,0);
+		Add2DVertex(0,-11,0,0);
+		Add2DVertex(-2.5,2.5,0,0);
+		Add2DVertex(0,3,0,0);
+		Add2DVertex(0,-3,0,0);
+		Add2DVertex(-2.5,0,0,0);
+		Add2DVertex(0,3,0,0);
+		Add2DVertex(-6,0,0,0);
+		EndPoly;
+		Absolute;
+
+		IF P__ACTIVEORPASSIVE = 'Active' THEN BEGIN
+			TextSize(3*r_TextScaler);
+			TextOrigin(5.625,-1.75);
+			TextJust(3);
+			TextVerticalAlign(1);
+			CreateText('PWR');
+
+			MoveTo(3,0);
+			Relative;
+			BeginPoly;
+			Add2DVertex(0,0,0,0);
+			Add2DVertex(0,1.875,0,0);
+			Add2DVertex(3,-1.875,0,0);
+			Add2DVertex(-3,-1.875,0,0);
+			Add2DVertex(0,1.875,0,0);
+			EndPoly;
+			Absolute;
+		END;
+
+		{ID}
+		TextSize(6*r_TextScaler);
+		TextJust(2);
+		TextVerticalAlign(3);
+		TextOrigin(8.5,0);
+		CreateText(Concat(PPREFIX,PIDNUM));
+		Scale_to_Width(LNewObj,4.75);
+		b_Result := SetOpacityN(LNewObj,100,90);
+
+		{Model}
+		Fill_WtoB(0);
+		{ TextSize(4*r_TextScaler); }
+		TextJust(1);
+		TextVerticalAlign(5);
+		TextOrigin(11.75,0.25);
+		CreateText(PMODEL);
+
+		{Purpose}
+		Pen_WtoB(0.5);
+		NameClass(PCLASSPURP);
+		TextFace([Italic]);
+		TextVerticalAlign(1);
+		TextOrigin(11.75,-0.25);
+		CreateText(PPURPOSE);
+
+
+	END ELSE
+
+	IF PTYPE = 'Microphone' THEN BEGIN
+		MoveTo(0,0);
+		Relative;
+		BeginPoly;
+		Add2DVertex(0,0,0,0);
+		Add2DVertex(-8,0,0,0);
+		Add2DVertex(-4,4,4,4);
+		Add2DVertex(-4,-4,0,4);
+		Add2DVertex(0,4,0,0);
+		Add2DVertex(0,-8,0,0);
+		Add2DVertex(0,4,0,0);
+		Add2DVertex(4,-4,4,4);
+		Add2DVertex(4,4,0,4);
+		Add2DVertex(8,0,0,0);
+		EndPoly;
+		Absolute;
+
+		{ID}
+		TextSize(6*r_TextScaler);
+		TextJust(2);
+		TextVerticalAlign(3);
+		TextOrigin(-12,0);
+		FillPat(0);
+		CreateText(Concat(PPREFIX,PIDNUM));
+		Scale_to_Width(LNewObj,7.5);
+
+		{Model}
+		Fill_WtoB(0);
+		TextSize(4*r_TextScaler);
+		TextJust(3);
+		TextVerticalAlign(5);
+		TextOrigin(-16.75,0);
+		CreateText(PMODEL);
+
+		{Purpose}
+		Pen_WtoB(0.5);
+		NameClass(PCLASSPURP);
+		TextFace([Italic]);
+		TextVerticalAlign(1);
+		TextOrigin(-17,0);
+		CreateText(PPURPOSE);
+
+	END ELSE
+
+	IF PTYPE = 'Fly Off' THEN BEGIN
+
+		SetParameterVisibility(h_Obj,'Manufacturer',FALSE);
+		SetParameterVisibility(h_Obj,'Model',FALSE);
+		SetParameterVisibility(h_Obj,'ClassPurp',FALSE);
+
+
+
+		BeginPoly;
+		Add2DVertex(5.25,0,0,0);
+		Add2DVertex(2.625,4.5,0,0);
+		Add2DVertex(-2.625,4.5,0,0);
+		Add2DVertex(-5.25,0,0,0);
+		Add2DVertex(-2.625,-4.5,0,0);
+		Add2DVertex(2.625,-4.5,0,0);
+		Add2DVertex(5.25,0,0,0);
+		EndPoly;
+
+		{ RegularPolygon(0,0,5.25*mm2in,6,1); }
+		{ HRotate(LNewObj,0,0,90); }
+
+		{ID}
+		TextSize(8*r_TextScaler);
+		TextJust(2);
+		TextVerticalAlign(3);
+		TextOrigin(0,0);
+		FillPat(0);
+		CreateText(Concat(PPREFIX,PIDNUM));
+		Scale_to_Width(LNewObj,8);
+	END;
+
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+END; END; Run(SigFlow_Speaker_Mic);
