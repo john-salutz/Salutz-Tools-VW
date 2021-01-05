@@ -108,7 +108,7 @@ BEGIN
 		angle := Vec2Ang(v);
 		{// Make text Right Reading //}
 		IF ((angle>90) AND (angle<180))
-			OR ((angle<-90) AND (angle>-1800))
+			OR ((angle<-90) AND (angle>-180))
 			THEN angle := angle-180;
 		TextRotate(angle);
 		TextOrigin((p2.X+p1.X)/2,(p2.Y+p1.Y)/2);
@@ -140,7 +140,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Insert(' ',s_Label,Len(s_Label));
 	{// Create and delete text for measurement //}
 	CreateText(s_Label);
-	HScale2D(LNewObj,0,0,2/HHeight(LNewObj),2/HHeight(LNewObj),TRUE);
+	HScale2D(
+			LNewObj,0,0,
+			PTEXTHEIGHT/HHeight(LNewObj),PTEXTHEIGHT/HHeight(LNewObj),TRUE
+			);
 	PushAttrs;
 	TextSize(GetTextSize(LNewObj,0));
 	r_LabelWidth := GetTextWidth(LNewObj);
