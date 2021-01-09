@@ -1,7 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
 //
-//  SigFlow Speaker Mic is a point based object for drawing Speakers and
+//  SBD Speaker Mic is a point based object for drawing Speakers and
 //  Microphones in an audio signal flow diagram.
 //////////////////////////////////////////////////////////////////////////////}
 
@@ -18,7 +18,7 @@
 //  <https://www.gnu.org/licenses/>
 //////////////////////////////////////////////////////////////////////////////}
 
-PROCEDURE SigFlow_Speaker_Mic;
+PROCEDURE SBD_Speaker_Mic;
 
 CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
@@ -302,4 +302,4 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
-END; END; Run(SigFlow_Speaker_Mic);
+END; END; Run(SBD_Speaker_Mic);

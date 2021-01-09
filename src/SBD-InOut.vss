@@ -1,7 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
 //
-//  SigFlow In-Out is a point based object for drawing input/output slots in
+//  SBD In-Out is a point based object for drawing input/output slots in
 //  an audio signal flow diagram.
 //////////////////////////////////////////////////////////////////////////////}
 
@@ -18,7 +18,7 @@
 //  <https://www.gnu.org/licenses/>
 //////////////////////////////////////////////////////////////////////////////}
 
-PROCEDURE SigFlow_InOut;
+PROCEDURE SBD_InOut;
 
 CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
@@ -151,7 +151,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	p_TextOffset.X := 5/8;
 	SetRField(h_Obj,s_ObjName,'Parent',
 			Get_EquipName(
-					Get_Handle_At_Pt(Get_2D_Pt(h_Obj),'SigFlow Equip (Salutz)')
+					Get_Handle_At_Pt(Get_2D_Pt(h_Obj),'SBD Device (Salutz)')
 					)
 			);
 
@@ -251,4 +251,4 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
-END; END; Run(SigFlow_InOut);
+END; END; Run(SBD_InOut);
