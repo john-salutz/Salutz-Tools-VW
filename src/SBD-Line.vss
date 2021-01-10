@@ -1,7 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
 //
-//  This script draws a dynamic polyline with midpoint control & markers.
+//  SBD Line draws a dynamic polyline with midpoint control & markers.
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -17,7 +17,7 @@
 //  <https://www.gnu.org/licenses/>
 //////////////////////////////////////////////////////////////////////////////}
 
-PROCEDURE SmartLine;
+PROCEDURE SBD_Line;
 
 CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
@@ -87,37 +87,12 @@ VAR
 	matchPoint,matchField : BOOLEAN;
 	correctValue          : STRING;
 BEGIN
-	matchPoint := (P__STOREMIDPOINTDIST=Num2StrF(PCONTROLPOINT01X));
-	matchField := (P__STOREMIDPOINTDIST=Num2StrF(PMIDPOINTDIST));
+	matchPoint := (P__STOREMIDPOINTDIST = Num2StrF(PCONTROLPOINT02X));
+	matchField := (P__STOREMIDPOINTDIST = Num2StrF(PMIDPOINTDIST));
 	correctValue := '';
 	IF matchPoint AND NOT matchField THEN BEGIN
 		{Field correct, set value from field}
 		correctValue := Num2StrF(PMIDPOINTDIST);
-	END ELSE IF NOT matchPoint AND matchField THEN BEGIN
-		{Point correct, set value from control point}
-		correctValue := Num2StrF(PCONTROLPOINT01X);
-	END ELSE IF NOT matchPoint AND NOT matchField THEN BEGIN
-		{Neither correct, set value from control point}
-		correctValue := Num2StrF(PCONTROLPOINT01X);
-	END;
-	IF correctValue<>'' THEN BEGIN
-		SetRField(h_Obj,s_ObjName,'ControlPoint01X',correctValue);
-		SetRField(h_Obj,s_ObjName,'MidpointDist',correctValue);
-		SetRField(h_Obj,s_ObjName,'__StoreMidpointDist',correctValue);
-	END;
-END; {PROCEDURE Resolve_MidPoint_Conflict}
-
-PROCEDURE Resolve_Endpoint_Conflict;
-VAR
-	matchPoint,matchField : BOOLEAN;
-	correctValue          : STRING;
-BEGIN
-	matchPoint := (P__STOREENDDIST=Num2StrF(PCONTROLPOINT02X));
-	matchField := (P__STOREENDDIST=Num2StrF(PENDDIST));
-	correctValue := '';
-	IF matchPoint AND NOT matchField THEN BEGIN
-		{Field correct, set value from field}
-		correctValue := Num2StrF(PENDDIST);
 	END ELSE IF NOT matchPoint AND matchField THEN BEGIN
 		{Point correct, set value from control point}
 		correctValue := Num2StrF(PCONTROLPOINT02X);
@@ -127,10 +102,62 @@ BEGIN
 	END;
 	IF correctValue<>'' THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'ControlPoint02X',correctValue);
+		SetRField(h_Obj,s_ObjName,'MidpointDist',correctValue);
+		SetRField(h_Obj,s_ObjName,'__StoreMidpointDist',correctValue);
+		ResetObject(h_Obj);
+	END;
+END; {PROCEDURE Resolve_MidPoint_Conflict}
+
+PROCEDURE Resolve_Endpoint_Conflict;
+VAR
+	matchPoint,matchField : BOOLEAN;
+	correctValue          : STRING;
+BEGIN
+	matchPoint := (P__STOREENDDIST = Num2StrF(PCONTROLPOINT03X));
+	matchField := (P__STOREENDDIST = Num2StrF(PENDDIST));
+	correctValue := '';
+	IF matchPoint AND NOT matchField THEN BEGIN
+		{Field correct, set value from field}
+		correctValue := Num2StrF(PENDDIST);
+	END ELSE IF NOT matchPoint AND matchField THEN BEGIN
+		{Point correct, set value from control point}
+		correctValue := Num2StrF(PCONTROLPOINT03X);
+	END ELSE IF NOT matchPoint AND NOT matchField THEN BEGIN
+		{Neither correct, set value from control point}
+		correctValue := Num2StrF(PCONTROLPOINT03X);
+	END;
+	IF correctValue<>'' THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'ControlPoint03X',correctValue);
 		SetRField(h_Obj,s_ObjName,'EndDist',correctValue);
 		SetRField(h_Obj,s_ObjName,'__StoreEndDist',correctValue);
+		ResetObject(h_Obj);
 	END;
 END; {PROCEDURE Resolve_Endpoint_Conflict}
+
+FUNCTION Resolve_Begin_Conflict : BOOLEAN;
+BEGIN
+	IF (PCONTROLPOINT01X <> 0) OR (PCONTROLPOINT01Y <> 0) THEN BEGIN
+		HMove(h_Obj,PCONTROLPOINT01X,PCONTROLPOINT01Y);
+		SetRField(h_Obj,s_ObjName,'ControlPoint01X','0');
+		SetRField(h_Obj,s_ObjName,'ControlPoint01Y','0');
+		SetRField(
+				h_Obj,s_ObjName,'ControlPoint02X',
+				Num2StrF(PCONTROLPOINT02X-PCONTROLPOINT01X)
+				);
+		SetRField(h_Obj,s_ObjName,'ControlPoint02Y',
+				Num2StrF(PCONTROLPOINT02Y-PCONTROLPOINT01Y)
+				);
+		SetRField(
+				h_Obj,s_ObjName,'ControlPoint03X',
+				Num2StrF(PCONTROLPOINT03X-PCONTROLPOINT01X)
+				);
+		SetRField(h_Obj,s_ObjName,'ControlPoint03Y',
+				Num2StrF(PCONTROLPOINT03Y-PCONTROLPOINT01Y)
+				);
+		ResetObject(h_Obj);
+		Resolve_Begin_Conflict := TRUE;
+	END ELSE Resolve_Begin_Conflict := FALSE;
+END;
 
 {====================================}
 {------------- < MAIN > -------------}
@@ -138,36 +165,47 @@ END; {PROCEDURE Resolve_Endpoint_Conflict}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 3');
+	Set_Version_Info('0 . 4');
 	Use_PIO_Text_Attributes(h_Obj);
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint02X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint02Y',FALSE);
+	SetParameterVisibility(h_Obj,'ControlPoint03X',FALSE);
+	SetParameterVisibility(h_Obj,'ControlPoint03Y',FALSE);
 
 	{===== Parameter checking =====}
-	Resolve_MidPoint_Conflict;
-	Resolve_Endpoint_Conflict;
+	IF NOT Resolve_Begin_Conflict THEN BEGIN
+		Resolve_MidPoint_Conflict;
+		Resolve_Endpoint_Conflict;
+	END;
 	ResetObject(h_Obj);
 
 	{===== Variable Assignment =====}
 	p_Start.X := 0;
 	p_Start.Y := 0;
-	p_Midpoint.X := PCONTROLPOINT01X;
-	p_Midpoint.Y := PCONTROLPOINT01Y;
-	p_End.X := PCONTROLPOINT02X;
-	p_End.Y := PCONTROLPOINT02Y;
-	IF PCORNERS='Square' THEN i_CornerStyle := 0;
-	IF PCORNERS='Rounded' THEN i_CornerStyle := 3;
+	p_Midpoint.X := PCONTROLPOINT02X;
+	p_Midpoint.Y := PCONTROLPOINT02Y;
+	p_End.X := PCONTROLPOINT03X;
+	p_End.Y := PCONTROLPOINT03Y;
+	IF PCORNERS='Square' THEN BEGIN
+		i_CornerStyle := 0;
+		SetParameterVisibility(h_Obj,'RoundRadius',FALSE);
+	END;
+	IF PCORNERS='Rounded' THEN BEGIN
+		i_CornerStyle := 3;
+		SetParameterVisibility(h_Obj,'RoundRadius',TRUE);
+	END;
 
 	{// Corner Sizing //}
-	r_CornerSize := 12;
+	r_CornerSize := PROUNDRADIUS;
 	IF Abs(p_End.Y)<(r_CornerSize*2)
 		THEN r_CornerSize := Abs(p_End.Y/2);
 	IF Abs(p_Midpoint.X)<(r_CornerSize)
 		THEN r_CornerSize := Abs(p_Midpoint.X/2);
 	IF Abs(p_End.X-p_Midpoint.X)<(r_CornerSize)
 		THEN r_CornerSize := Abs((p_End.X-p_Midpoint.X)/2);
+	
 	IF p_End.Y<p_Start.Y THEN r_CornerSize := -r_CornerSize;
 
 	{===== Draw Poly =====}
@@ -212,8 +250,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			);
 	SetFPat(h_Poly,0);
 	SetRField(
-			h_Obj, s_ObjName, 'ControlPoint01Y',
+			h_Obj, s_ObjName, 'ControlPoint02Y',
 			Num2StrF((p_End.Y-p_Start.Y)/2)
 			);
 
-END; END; Run(SmartLine);
+END; END; Run(SBD_Line);

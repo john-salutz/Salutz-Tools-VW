@@ -1,7 +1,7 @@
 {//////////////////////////////////////////////////////////////////////////////
 //  Developed by John Salutz, (c) 2020. Please share freely.
 //
-//  This script draws a dynamic polyline for use with system flow drawings.
+//  SBD Path draws a dynamic polyline for use with system flow drawings.
 //////////////////////////////////////////////////////////////////////////////}
 
 {//////////////////////////////////////////////////////////////////////////////
@@ -17,7 +17,7 @@
 //  <https://www.gnu.org/licenses/>
 //////////////////////////////////////////////////////////////////////////////}
 
-PROCEDURE SmartPath;
+PROCEDURE SBD_Path;
 
 CONST
 	k_DefaultCornerSize = 9;
@@ -119,4 +119,4 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			);
 	SetFPat(h_Poly,0);
 
-END; END; Run(SmartPath);
+END; END; Run(SBD_Path);

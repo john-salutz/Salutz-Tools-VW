@@ -240,7 +240,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextVerticalAlign(5);
 	TextSize(r_TextSmall);
 	IF PTYPE = 'Thru' THEN TextOrigin(p_TextOffset.X,p_TextOffset.Y)
-	ELSE TextOrigin(-p_TextOffset.X,p_TextOffset.Y);
+	ELSE TextOrigin(-p_TextOffset.X*1.5,p_TextOffset.Y);
 	TextFace([Italic]);
 	NameClass(PCLASSPURP);
 	CreateText(PPURPOSE);
