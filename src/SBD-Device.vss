@@ -35,7 +35,7 @@ VAR
 	{Script specific variables}
 	p_Tmp1,p_Tmp2                                           : POINT;
 	r_TextScaler                                            : REAL;
-	r_Height,r_Space                                        : REAL;
+	r_Height,r_Space,r_Width                                : REAL;
 
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
@@ -167,17 +167,19 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END ELSE IF PSPACESIZE = 'Smaller' THEN BEGIN
 		r_Space := SmallerH;
 	END;
+	IF PTYPE = 'Multi' THEN r_Width := 24
+	ELSE r_Width := 48;
 
-	Rect(-24,r_Height,24,0);
+	Rect(-r_Width/2,r_Height,r_Width/2,0);
 
 	TextSize(7*r_TextScaler);
 	Fill_WtoB(0);
 
-	IF PMANUFACTURER <> '' THEN BEGIN
+	IF (PMANUFACTURER <> '') OR (PMODEL <> '') THEN BEGIN
 		TextVerticalAlign(5);
 		TextJust(1);
-		TextOrigin(-24,r_Height);
-		CreateText(PMANUFACTURER);
+		TextOrigin(-r_Width/2,r_Height);
+		CreateText(Concat(PMANUFACTURER,' ',PMODEL));
 		HMoveBackward(LNewObj,TRUE);
 	END;
 
@@ -185,7 +187,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextVerticalAlign(1);
 	TextJust(2);
 	TextOrigin(0,r_Height);
-	CreateText(PMODEL);
+	CreateText(PPURPOSE);
 
 	IF PSIZE <> 'Smaller' THEN BEGIN
 		TextFace([Italic]);
@@ -202,12 +204,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			IF PSHOWNOTE THEN CreateText(PNOTES);
 
 			TextSize(2*r_TextScaler);
-			TextOrigin(-23.75,0.25);
+			TextOrigin((-r_Width/2)+0.25,0.25);
 			TextJust(1);
 			TextVerticalAlign(5);
 			IF PIDNUM <> '0' THEN CreateText(Concat(PTYPE,' ',PPREFIX,PIDNUM))
 			ELSE CreateText(PTYPE);
-			TextOrigin(23.75,0.25);
+			TextOrigin((r_Width/2)-0.25,0.25);
 			TextJust(3);
 			CreateText(PIP);
 		END;
@@ -216,14 +218,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PNUMSPACES > 0 THEN BEGIN
 		Fill_WtoB(0.15);
 		Pen_WtoB(1);
-		Rect(-24,0,24,(-r_Space*PNUMSPACES));
+		Rect(-r_Width/2,0,r_Width/2,(-r_Space*PNUMSPACES));
 		HMoveBackward(LNewObj,TRUE);
-		MoveTo(-24,-r_Space);
+		MoveTo(-r_Width/2,-3);
 		PenSize(0);
 		Relative;
-		FOR i_Counter:=2 TO PNUMSPACES DO BEGIN
-			LineTo(48,0);
-			MoveTo(-48,-r_Space);
+		FOR i_Counter:=2 TO (PNUMSPACES*(r_Space/3)) DO BEGIN
+			LineTo(r_Width,0);
+			MoveTo(-r_Width,-3);
 		END;
 		Absolute;
 	END;

@@ -167,15 +167,15 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Add2DVertex(0,0,0,0);
 		Add2DVertex(6,0,0,0);
 		Add2DVertex(0,3,0,0);
-		Add2DVertex(2.5,0,0,0);
+		Add2DVertex(5,0,0,0);
 		Add2DVertex(0,-3,0,0);
 		Add2DVertex(0,3,0,0);
-		Add2DVertex(2.5,2.5,0,0);
+		Add2DVertex(5,2.5,0,0);
 		Add2DVertex(0,-11,0,0);
-		Add2DVertex(-2.5,2.5,0,0);
+		Add2DVertex(-5,2.5,0,0);
 		Add2DVertex(0,3,0,0);
 		Add2DVertex(0,-3,0,0);
-		Add2DVertex(-2.5,0,0,0);
+		Add2DVertex(-5,0,0,0);
 		Add2DVertex(0,3,0,0);
 		Add2DVertex(-6,0,0,0);
 		EndPoly;
@@ -204,44 +204,51 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextSize(6*r_TextScaler);
 		TextJust(2);
 		TextVerticalAlign(3);
-		TextOrigin(8.5,0);
+		TextOrigin(11,0);
 		CreateText(Concat(PPREFIX,PIDNUM));
 		IF Len(PPREFIX)>0
 			THEN SetTextSize(LNewObj,0,Len(PPREFIX),GetTextSize(LNewObj,0)-1);
-		Scale_to_Width(LNewObj,4.75);
-		b_Result := SetOpacityN(LNewObj,100,90);
+		IF (PPREFIX <> '') OR (PIDNUM <> '') THEN BEGIN
+			Scale_to_Width(LNewObj,9.75);
+			b_Result := SetOpacityN(LNewObj,100,90);
+		END;
 
 		{Model}
 		Fill_WtoB(0);
 		TextJust(1);
 		TextVerticalAlign(5);
-		TextOrigin(11.75,0.25);
-		CreateText(PMODEL);
+		TextOrigin(16.75,0.25);
+		CreateText(Concat(PMANUFACTURER,' ',PMODEL));
 
 		{Purpose}
 		Pen_WtoB(0.5);
 		NameClass(PCLASSPURP);
 		TextFace([Italic]);
 		TextVerticalAlign(1);
-		TextOrigin(11.75,-0.25);
+		TextOrigin(16.75,-0.25);
 		CreateText(PPURPOSE);
 
 
 	END ELSE
 
 	IF PTYPE = 'Microphone' THEN BEGIN
+		SetParameterVisibility(h_Obj,'__ActiveOrPassive',TRUE);
 		MoveTo(0,0);
 		Relative;
 		BeginPoly;
 		Add2DVertex(0,0,0,0);
 		Add2DVertex(-8,0,0,0);
-		Add2DVertex(-4,4,4,4);
-		Add2DVertex(-4,-4,0,4);
-		Add2DVertex(0,4,0,0);
-		Add2DVertex(0,-8,0,0);
-		Add2DVertex(0,4,0,0);
-		Add2DVertex(4,-4,4,4);
-		Add2DVertex(4,4,0,4);
+		Add2DVertex(-3,3,4,4);
+		{ Add2DVertex(-0.5,0,0,0); }
+		{ Add2DVertex(-0.5,0,4,3); }
+		Add2DVertex(-3,-3,0,3);
+		Add2DVertex(0,3,0,0);
+		Add2DVertex(0,-6,0,0);
+		Add2DVertex(0,3,0,0);
+		Add2DVertex(3,-3,4,4);
+		{ Add2DVertex(0.5,0,0,0); }
+		{ Add2DVertex(0.5,0,4,3); }
+		Add2DVertex(3,3,0,3);
 		Add2DVertex(8,0,0,0);
 		EndPoly;
 		Absolute;
@@ -250,27 +257,28 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextSize(6*r_TextScaler);
 		TextJust(2);
 		TextVerticalAlign(3);
-		TextOrigin(-12,0);
+		TextOrigin(-11,0);
 		FillPat(0);
 		CreateText(Concat(PPREFIX,PIDNUM));
 		IF Len(PPREFIX)>0
 			THEN SetTextSize(LNewObj,0,Len(PPREFIX),GetTextSize(LNewObj,0)-1);
-		Scale_to_Width(LNewObj,7.5);
+		IF (PPREFIX <> '') OR (PIDNUM <> '') THEN Scale_to_Width(LNewObj,5.5);
 
 		{Model}
 		Fill_WtoB(0);
-		TextSize(4*r_TextScaler);
+		TextSize(3.5*r_TextScaler);
 		TextJust(3);
 		TextVerticalAlign(5);
-		TextOrigin(-16.75,0);
-		CreateText(PMODEL);
+		TextOrigin(-14.75,0);
+		CreateText(Concat(PMANUFACTURER,' ',PMODEL));
+		{ CreateText(PMODEL); }
 
 		{Purpose}
 		Pen_WtoB(0.5);
 		NameClass(PCLASSPURP);
 		TextFace([Italic]);
 		TextVerticalAlign(1);
-		TextOrigin(-17,0);
+		TextOrigin(-15,0);
 		CreateText(PPURPOSE);
 
 	END ELSE
