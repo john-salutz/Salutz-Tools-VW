@@ -187,7 +187,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextVerticalAlign(1);
 		{ TextFace([Bold]); }
 		TextOrigin(0,3);
-		CreateText('.........');
+		{ CreateText('.........'); }
+		{ CreateText(Concat(UniChr(65049),UniChr(65049),UniChr(65049))); }
+		{ CreateText(Concat(UniChr(08675),UniChr(08675),UniChr(15710361))); }
+		
+		CreateText(Concat(UniChr(8942),UniChr(8942),UniChr(8942)));
 		SetParameterVisibility(h_Obj,'Size',FALSE);
 		SetParameterVisibility(h_Obj,'Prefix',FALSE);
 		SetRField(h_Obj,s_ObjName,'Prefix','');
@@ -282,11 +286,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		{// Draw Routing Text //}
 		NameClass(PCLASSROUT);
 		FillPat(0);
-		IF PTYPE = 'Input' THEN TextJust(1)
-		ELSE IF (PTYPE = 'Output') OR (PTYPE = 'Thru') THEN TextJust(3);
+		IF PTYPE = 'Output' THEN TextJust(1)
+		ELSE IF (PTYPE = 'Input') OR (PTYPE = 'Thru') THEN TextJust(3);
 		TextVerticalAlign(5);
 		Pen_WtoB(0.5);
-		TextOrigin(p_TextOffset.X,p_End.Y+p_TextOffset.Y);
+		IF PTYPE = 'Input' THEN TextOrigin(23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
+		ELSE IF (PTYPE = 'Output') THEN TextOrigin(-23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
+		ELSE TextOrigin(p_TextOffset.X,p_End.Y+p_TextOffset.Y);
 		TextSize(r_TextSmall-1);
 		IF PROUTING <> '' THEN CreateText(Concat(UniChr(187),PROUTING));
 		{ HMoveBackward(LNewObj,TRUE); }

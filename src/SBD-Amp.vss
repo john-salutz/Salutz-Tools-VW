@@ -157,6 +157,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Variable Setup =====}
 	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
 
+	BeginGroup;
 	{===== Draw RRectangles =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((}
 	Pen_WtoB(1);
@@ -254,5 +255,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 	HMoveForward(h_Rect,TRUE);
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}
+
+	{Scale}
+	{ SelectAll; }
+	{ Group; }
+	EndGroup;
+	{ HScale2D(LNewObj,0,0,0.5,0.5,TRUE); }
 
 END; END; Run(SBD_Amp);
