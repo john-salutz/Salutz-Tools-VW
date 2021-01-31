@@ -21,6 +21,9 @@ PROCEDURE SBD_Line;
 
 CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+	RegularH = 12;
+	SmallH   = 9;
+	SmallerH = 6;
 
 VAR
 	{Standard variables}
@@ -34,6 +37,7 @@ VAR
 	h_Poly                                                  : HANDLE;
 	r_CornerSize,r_test                                     : REAL;
 	i_CornerStyle,i_FlipX1,i_FlipX2                         : INTEGER;
+	i_BegDupSize,i_EndDupSize                               : INTEGER;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -159,6 +163,39 @@ BEGIN
 	END ELSE Resolve_Begin_Conflict := FALSE;
 END;
 
+PROCEDURE Draw_Line(p1,p2,p3 : POINT; cstyle : INTEGER; csize : REAL);
+BEGIN
+	MoveTo(0,0);
+	BeginPoly;
+	{Start point}
+	Add2DVertex(p1.X,p1.Y,0,0);
+	{Corner1}
+	Add2DVertex(p2.X,p1.Y,cstyle,Abs(csize));
+	{ Add2DVertex(p2.X,p2.Y,cstyle,Abs(csize)); }
+	{Corner2}
+	Add2DVertex(p2.X,p3.Y,cstyle,Abs(csize));
+	{End point}
+	Add2DVertex(p3.X,p3.Y,0,0);
+	EndPoly;
+END;
+
+{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
+PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
+VAR b     : BOOLEAN;
+	ActLS : REAL;
+BEGIN
+	ActLS := GetLScale(Find_Layer(h_Obj));
+	IF sBeg = 'Dot' THEN {Dot}
+		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Arrow' THEN {Arrow}
+		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+	IF sEnd = 'Dot' THEN {Dot}
+		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Arrow' THEN {Arrow}
+		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+END;
+
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -184,10 +221,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Variable Assignment =====}
 	p_Start.X := 0;
 	p_Start.Y := 0;
-	p_Midpoint.X := PCONTROLPOINT02X;
-	p_Midpoint.Y := PCONTROLPOINT02Y;
 	p_End.X := PCONTROLPOINT03X;
 	p_End.Y := PCONTROLPOINT03Y;
+	p_Midpoint.X := PCONTROLPOINT02X;
+	p_Midpoint.Y := (p_End.Y-p_Start.Y)/2;
 	IF PCORNERS='Square' THEN BEGIN
 		i_CornerStyle := 0;
 		SetParameterVisibility(h_Obj,'RoundRadius',FALSE);
@@ -197,6 +234,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'RoundRadius',TRUE);
 	END;
 
+	IF PBEGDUPSIZE = 'Regular' THEN i_BegDupSize := RegularH
+	ELSE IF PBEGDUPSIZE = 'Small' THEN i_BegDupSize := SmallH
+	ELSE IF PBEGDUPSIZE = 'Smaller' THEN i_BegDupSize := SmallerH;
+
+	IF PENDDUPSIZE = 'Regular' THEN i_EndDupSize := RegularH
+	ELSE IF PENDDUPSIZE = 'Small' THEN i_EndDupSize := SmallH
+	ELSE IF PENDDUPSIZE = 'Smaller' THEN i_EndDupSize := SmallerH;
+
 	{// Corner Sizing //}
 	r_CornerSize := PROUNDRADIUS;
 	IF Abs(p_End.Y)<(r_CornerSize*2)
@@ -205,50 +250,97 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		THEN r_CornerSize := Abs(p_Midpoint.X/2);
 	IF Abs(p_End.X-p_Midpoint.X)<(r_CornerSize)
 		THEN r_CornerSize := Abs((p_End.X-p_Midpoint.X)/2);
-	
-	IF p_End.Y<p_Start.Y THEN r_CornerSize := -r_CornerSize;
+	{ IF p_End.Y<p_Start.Y THEN r_CornerSize := -r_CornerSize; }
 
 	{===== Draw Poly =====}
-	MoveTo(0,0);
-	BeginPoly;
-	{Start point}
-	Add2DVertex(p_Start.X,p_Start.Y,0,0);
-	IF PCORNERS='Angle' THEN BEGIN
-		{// Set Direction Flips //}
-		IF (p_Midpoint.X<p_Start.X) THEN i_FlipX1 := -1 ELSE i_FlipX1 := 1;
-		IF (p_End.X<p_Midpoint.X) THEN i_FlipX2 := -1 ELSE i_FlipX2 := 1;
-		{Pre offset}
-		Add2DVertex(p_Midpoint.X-(Abs(r_CornerSize)*i_FlipX1),p_Start.Y,0,0);
-		{Post offset}
-		Add2DVertex(p_Midpoint.X,p_Start.Y+r_CornerSize,0,0);
-		{Pre offset}
-		Add2DVertex(p_Midpoint.X,p_End.Y-r_CornerSize,0,0);
-		{Post offset}
-		Add2DVertex(p_Midpoint.X+(Abs(r_CornerSize)*i_FlipX2),p_End.Y,0,0);
-	END ELSE BEGIN
-		{Corner1}
-		Add2DVertex(p_Midpoint.X,p_Start.Y,i_CornerStyle,Abs(r_CornerSize));
-		{Corner2}
-		Add2DVertex(p_Midpoint.X,p_End.Y,i_CornerStyle,Abs(r_CornerSize));
-	END;
-	{End point}
-	Add2DVertex(p_End.X,p_End.Y,0,0);
-	EndPoly;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((}
+	FillPat(0);
+	Draw_Line(p_Start,p_Midpoint,p_End,i_CornerStyle,r_CornerSize);
 	h_Poly := LNewObj;
 
 	{===== Set poly markers =====}
-	IF PUSEBEGINMARK THEN
-	b_Result := SetObjBeginningMarker(
-			h_Poly, 2, 0, 1/GetLScale(Find_Layer(h_Obj)),
-			1/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE
-			);
+	IF PUSEBEGINMARK THEN Set_Markers_Cust(h_Poly,'Dot','NA');
+	IF PUSEENDMARK THEN Set_Markers_Cust(h_Poly,'NA','Arrow');
 
-	IF PUSEENDMARK THEN
-	b_Result := SetObjEndMarker(
-			h_Poly, 2176, 15, 3/GetLScale(Find_Layer(h_Obj)),
-			2/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE
-			);
-	SetFPat(h_Poly,0);
+	{ SetFPat(h_Poly,0); }
+
+	IF PNUMBEGINDUP > 0 THEN FOR i_Counter := 1 TO PNUMBEGINDUP DO BEGIN
+		BeginPoly;
+		{Start point}
+		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
+		{Corner1}
+		Add2DVertex(p_Start.X+6,p_Start.Y+(i_Counter*i_BegDupSize),
+				i_CornerStyle,3);
+		{Corner2}
+		Add2DVertex(p_Start.X+6,p_Start.Y,i_CornerStyle,3);
+		{End point}
+		IF p_Midpoint.X > (p_Start.X+6) THEN
+			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
+		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
+		EndPoly;
+
+		IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA');
+		{ SetFPat(LNewObj,0); }
+
+	END ELSE FOR i_Counter := -1 DOWNTO PNUMBEGINDUP DO BEGIN
+		BeginPoly;
+		{Start point}
+		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
+		{Corner1}
+		Add2DVertex(p_Start.X+6,p_Start.Y+(i_Counter*i_BegDupSize),
+					i_CornerStyle,3);
+		{Corner2}
+		Add2DVertex(p_Start.X+6,p_Start.Y,i_CornerStyle,3);
+		{End point}
+		IF p_Midpoint.X > (p_Start.X+6) THEN
+			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
+		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
+		EndPoly;
+		IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA');
+		{ SetFPat(LNewObj,0); }
+	END;
+
+
+
+	IF PNUMENDDUP > 0 THEN FOR i_Counter := 1 TO PNUMENDDUP DO BEGIN
+		BeginPoly;
+		{Start point}
+		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
+		{Corner1}
+		Add2DVertex(p_End.X-6,p_End.Y+(i_Counter*i_EndDupSize),
+				i_CornerStyle,3);
+		{Corner2}
+		Add2DVertex(p_End.X-6,p_End.Y,i_CornerStyle,3);
+		{End point}
+		IF p_Midpoint.X < (p_End.X+6) THEN
+			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
+		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
+		EndPoly;
+
+		IF PUSEENDMARK THEN Set_Markers_Cust(LNewObj,'Arrow','NA');
+
+	END ELSE FOR i_Counter := -1 DOWNTO PNUMENDDUP DO BEGIN
+		BeginPoly;
+		{Start point}
+		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
+		{Corner1}
+		Add2DVertex(p_End.X-6,p_End.Y+(i_Counter*i_EndDupSize),
+				i_CornerStyle,3);
+		{Corner2}
+		Add2DVertex(p_End.X-6,p_End.Y,i_CornerStyle,3);
+		{End point}
+		IF p_Midpoint.X < (p_End.X+6) THEN
+			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
+		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
+		EndPoly;
+		IF PUSEENDMARK THEN Set_Markers_Cust(LNewObj,'Arrow','NA');
+	END;
+
+
+
+
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}
+
 	SetRField(
 			h_Obj, s_ObjName, 'ControlPoint02Y',
 			Num2StrF((p_End.Y-p_Start.Y)/2)
