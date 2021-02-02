@@ -266,70 +266,48 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	IF PNUMBEGINDUP > 0 THEN FOR i_Counter := 1 TO PNUMBEGINDUP DO BEGIN
 		BeginPoly;
-		{Start point}
 		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
-		{Corner1}
-		Add2DVertex(p_Start.X+6,p_Start.Y+(i_Counter*i_BegDupSize),
-				i_CornerStyle,3);
-		{Corner2}
-		Add2DVertex(p_Start.X+6,p_Start.Y,i_CornerStyle,3);
-		{End point}
-		IF p_Midpoint.X > (p_Start.X+6) THEN
+		Add2DVertex(p_Start.X+3,p_Start.Y+(i_Counter*i_BegDupSize),
+					i_CornerStyle,3);
+		Add2DVertex(p_Start.X+3,p_Start.Y,i_CornerStyle,3);
+		IF p_Midpoint.X > (p_Start.X+3) THEN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
-
 		IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA');
-		{ SetFPat(LNewObj,0); }
 
 	END ELSE FOR i_Counter := -1 DOWNTO PNUMBEGINDUP DO BEGIN
 		BeginPoly;
-		{Start point}
 		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
-		{Corner1}
-		Add2DVertex(p_Start.X+6,p_Start.Y+(i_Counter*i_BegDupSize),
+		Add2DVertex(p_Start.X+3,p_Start.Y+(i_Counter*i_BegDupSize),
 					i_CornerStyle,3);
-		{Corner2}
-		Add2DVertex(p_Start.X+6,p_Start.Y,i_CornerStyle,3);
-		{End point}
-		IF p_Midpoint.X > (p_Start.X+6) THEN
+		Add2DVertex(p_Start.X+3,p_Start.Y,i_CornerStyle,3);
+		IF p_Midpoint.X > (p_Start.X+3) THEN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
 		IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA');
-		{ SetFPat(LNewObj,0); }
 	END;
-
-
 
 	IF PNUMENDDUP > 0 THEN FOR i_Counter := 1 TO PNUMENDDUP DO BEGIN
 		BeginPoly;
-		{Start point}
 		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
-		{Corner1}
-		Add2DVertex(p_End.X-6,p_End.Y+(i_Counter*i_EndDupSize),
+		Add2DVertex(p_End.X-3,p_End.Y+(i_Counter*i_EndDupSize),
 				i_CornerStyle,3);
-		{Corner2}
-		Add2DVertex(p_End.X-6,p_End.Y,i_CornerStyle,3);
-		{End point}
-		IF p_Midpoint.X < (p_End.X+6) THEN
+		Add2DVertex(p_End.X-3,p_End.Y,i_CornerStyle,3);
+		IF p_Midpoint.X < (p_End.X+3) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
-
 		IF PUSEENDMARK THEN Set_Markers_Cust(LNewObj,'Arrow','NA');
 
 	END ELSE FOR i_Counter := -1 DOWNTO PNUMENDDUP DO BEGIN
 		BeginPoly;
-		{Start point}
 		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
-		{Corner1}
-		Add2DVertex(p_End.X-6,p_End.Y+(i_Counter*i_EndDupSize),
+		Add2DVertex(p_End.X-3,p_End.Y+(i_Counter*i_EndDupSize),
 				i_CornerStyle,3);
-		{Corner2}
-		Add2DVertex(p_End.X-6,p_End.Y,i_CornerStyle,3);
-		{End point}
-		IF p_Midpoint.X < (p_End.X+6) THEN
+		Add2DVertex(p_End.X-3,p_End.Y,i_CornerStyle,3);
+		IF p_Midpoint.X < (p_End.X+3) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
