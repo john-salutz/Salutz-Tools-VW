@@ -24,7 +24,7 @@ CONST
 	RGBmax   = 65535; {Max value for setting RGB colors in VS fuctions}
 	RegularH = 12;
 	SmallH   = 9;
-	SmallerH = 6;
+	MicroH = 6;
 
 VAR
 	{Standard variables}

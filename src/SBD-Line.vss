@@ -23,7 +23,7 @@ CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
 	RegularH = 12;
 	SmallH   = 9;
-	SmallerH = 6;
+	MicroH = 6;
 
 VAR
 	{Standard variables}
@@ -110,7 +110,7 @@ BEGIN
 		SetRField(h_Obj,s_ObjName,'__StoreMidpointDist',correctValue);
 		ResetObject(h_Obj);
 	END;
-END; {PROCEDURE Resolve_MidPoint_Conflict}
+END;
 
 PROCEDURE Resolve_Endpoint_Conflict;
 VAR
@@ -136,7 +136,7 @@ BEGIN
 		SetRField(h_Obj,s_ObjName,'__StoreEndDist',correctValue);
 		ResetObject(h_Obj);
 	END;
-END; {PROCEDURE Resolve_Endpoint_Conflict}
+END;
 
 FUNCTION Resolve_Begin_Conflict : BOOLEAN;
 BEGIN
@@ -171,7 +171,6 @@ BEGIN
 	Add2DVertex(p1.X,p1.Y,0,0);
 	{Corner1}
 	Add2DVertex(p2.X,p1.Y,cstyle,Abs(csize));
-	{ Add2DVertex(p2.X,p2.Y,cstyle,Abs(csize)); }
 	{Corner2}
 	Add2DVertex(p2.X,p3.Y,cstyle,Abs(csize));
 	{End point}
@@ -216,7 +215,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Resolve_MidPoint_Conflict;
 		Resolve_Endpoint_Conflict;
 	END;
-	ResetObject(h_Obj);
 
 	{===== Variable Assignment =====}
 	p_Start.X := 0;
@@ -236,11 +234,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	IF PBEGDUPSIZE = 'Regular' THEN i_BegDupSize := RegularH
 	ELSE IF PBEGDUPSIZE = 'Small' THEN i_BegDupSize := SmallH
-	ELSE IF PBEGDUPSIZE = 'Smaller' THEN i_BegDupSize := SmallerH;
+	ELSE IF PBEGDUPSIZE = 'Micro' THEN i_BegDupSize := MicroH;
 
 	IF PENDDUPSIZE = 'Regular' THEN i_EndDupSize := RegularH
 	ELSE IF PENDDUPSIZE = 'Small' THEN i_EndDupSize := SmallH
-	ELSE IF PENDDUPSIZE = 'Smaller' THEN i_EndDupSize := SmallerH;
+	ELSE IF PENDDUPSIZE = 'Micro' THEN i_EndDupSize := MicroH;
 
 	{// Corner Sizing //}
 	r_CornerSize := PROUNDRADIUS;

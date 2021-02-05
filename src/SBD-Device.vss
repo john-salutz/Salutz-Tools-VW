@@ -24,7 +24,7 @@ CONST
 	RGBmax   = 65535; {Max value for setting RGB colors in VS fuctions}
 	RegularH = 12;
 	SmallH   = 9;
-	SmallerH = 6;
+	MicroH = 6;
 
 VAR
 	{Standard variables}
@@ -157,15 +157,15 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		r_Height := RegularH;
 	END ELSE IF PSIZE = 'Small' THEN BEGIN
 		r_Height := SmallH;
-	END ELSE IF PSIZE = 'Smaller' THEN BEGIN
-		r_Height := SmallerH;
+	END ELSE IF PSIZE = 'Micro' THEN BEGIN
+		r_Height := MicroH;
 	END;
 	IF PSPACESIZE = 'Regular' THEN BEGIN
 		r_Space := RegularH;
 	END ELSE IF PSPACESIZE = 'Small' THEN BEGIN
 		r_Space := SmallH;
-	END ELSE IF PSPACESIZE = 'Smaller' THEN BEGIN
-		r_Space := SmallerH;
+	END ELSE IF PSPACESIZE = 'Micro' THEN BEGIN
+		r_Space := MicroH;
 	END;
 	IF PTYPE = 'Multi' THEN r_Width := 24
 	ELSE r_Width := 48;
@@ -189,7 +189,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextOrigin(0,r_Height);
 	CreateText(PPURPOSE);
 
-	IF PSIZE <> 'Smaller' THEN BEGIN
+	IF PSIZE <> 'Micro' THEN BEGIN
 		TextFace([Italic]);
 		TextSize(4*r_TextScaler);
 		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);

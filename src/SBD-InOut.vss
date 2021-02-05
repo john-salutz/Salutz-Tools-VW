@@ -223,7 +223,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			r_TextLarge := 7*r_TextScaler;
 			r_TextSmall := 4*r_TextScaler;
 			p_TextOffset.Y := 5/16;
-		END ELSE IF PSIZE = 'Smaller' THEN BEGIN
+		END ELSE IF PSIZE = 'Micro' THEN BEGIN
 			p_Origin.Y := 3;
 			r_TextLarge := 6*r_TextScaler;
 			r_TextSmall := 3.5*r_TextScaler;
