@@ -20,7 +20,6 @@
 PROCEDURE SBD_Path;
 
 CONST
-	k_DefaultCornerSize = 9;
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
 
 VAR
@@ -75,7 +74,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 3');
+	Set_Version_Info('0 . 5');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter checking =====}
@@ -85,7 +84,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PCORNERS='Rounded' THEN i_CornerStyle := 3;
 	h_Poly := GetCustomObjectPath(h_Obj);
 	i_numVerts := GetVertNum(h_Poly);
-	r_CornerSize := k_DefaultCornerSize;
+	r_CornerSize := PROUNDRADIUS;
 
 	{===== Draw Poly =====}
 	BeginPoly;
@@ -97,7 +96,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		GetPolyPt(h_Poly,i_Counter,p_Current.X,p_Current.Y);
 		r_CornerSize := Set_Corner_Size(r_CornerSize,h_Poly,i_Counter);
 		Add2DVertex(p_Current.X,p_Current.Y,i_CornerStyle,r_CornerSize);
-		r_CornerSize := k_DefaultCornerSize;
+		r_CornerSize := PROUNDRADIUS;
 	END;
 	{End point}
 	GetPolyPt(h_Poly,i_numVerts,p_Current.X,p_Current.Y);

@@ -133,7 +133,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 3');
+	Set_Version_Info('0 . 5');
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
 	IF (PNUMSPACES<0) THEN BEGIN
@@ -175,26 +175,28 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextSize(7*r_TextScaler);
 	Fill_WtoB(0);
 
-	IF (PMANUFACTURER <> '') OR (PMODEL <> '') THEN BEGIN
+	{ IF (PMANUFACTURER <> '') OR (PMODEL <> '') THEN BEGIN }
 		TextVerticalAlign(5);
 		TextJust(1);
 		TextOrigin(-r_Width/2,r_Height);
 		CreateText(Concat(PMANUFACTURER,' ',PMODEL));
 		HMoveBackward(LNewObj,TRUE);
-	END;
+	{ END; }
 
 	FillPat(0);
 	TextVerticalAlign(1);
 	TextJust(2);
 	TextOrigin(0,r_Height);
-	CreateText(PPURPOSE);
+	IF (PPURPOSE <> '') THEN CreateText(PPURPOSE)
+	ELSE CreateText(' ');
 
 	IF PSIZE <> 'Micro' THEN BEGIN
 		TextFace([Italic]);
 		TextSize(4*r_TextScaler);
 		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 		TextOrigin(0,p_Tmp2.Y);
-		CreateText(PLOCATION);
+		IF (PLOCATION <> '') THEN CreateText(PLOCATION)
+		ELSE CreateText(' ');
 		IF PSIZE <> 'Small' THEN BEGIN
 			TextFace([]);
 			Pen_WtoB(0.5);
