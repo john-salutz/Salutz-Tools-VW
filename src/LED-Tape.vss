@@ -123,7 +123,7 @@ END;
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Use_PIO_Text_Attributes(h_Obj);
-	Set_Version_Info('0 . 3');
+	Set_Version_Info('0 . 5');
 	{===== Parameter Limits =====}
 
 	{===== Duplicate PIO Path Object =====}

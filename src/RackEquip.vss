@@ -139,7 +139,7 @@ END;
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
-	Set_Version_Info('0 . 3');
+	Set_Version_Info('0 . 5');
 	Use_PIO_Text_Attributes(h_Obj);
 	IF (PNUMSPACES<1) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
