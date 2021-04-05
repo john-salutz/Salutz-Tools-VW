@@ -20,10 +20,10 @@
 PROCEDURE SBD_Line;
 
 CONST
-	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+	RGBmax   = 65535; {Max value for setting RGB colors in VS fuctions}
 	RegularH = 12;
 	SmallH   = 9;
-	MicroH = 6;
+	MicroH   = 6;
 
 VAR
 	{Standard variables}
@@ -46,7 +46,6 @@ PROCEDURE Set_Version_Info(s : STRING);
 BEGIN
 	SetRField(h_Obj,s_ObjName,'ver',s);
 END;
-
 
 {// Sets the specified text object to use the attributes of PIO //}
 PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
@@ -139,25 +138,32 @@ BEGIN
 END;
 
 FUNCTION Resolve_Begin_Conflict : BOOLEAN;
+VAR
+	v1 : VECTOR;
 BEGIN
 	IF (PCONTROLPOINT01X <> 0) OR (PCONTROLPOINT01Y <> 0) THEN BEGIN
-		HMove(h_Obj,PCONTROLPOINT01X,PCONTROLPOINT01Y);
+		v1.X := PCONTROLPOINT01X;
+		v1.Y := PCONTROLPOINT01Y;
+		v1 := Ang2Vec(GetSymRot(h_Obj)+Vec2Ang(v1),Norm(v1));
+		HMove(h_Obj,v1.X,v1.Y);
 		SetRField(h_Obj,s_ObjName,'ControlPoint01X','0');
 		SetRField(h_Obj,s_ObjName,'ControlPoint01Y','0');
 		SetRField(
-				h_Obj,s_ObjName,'ControlPoint02X',
-				Num2StrF(PCONTROLPOINT02X-PCONTROLPOINT01X)
-				);
-		SetRField(h_Obj,s_ObjName,'ControlPoint02Y',
-				Num2StrF(PCONTROLPOINT02Y-PCONTROLPOINT01Y)
-				);
+		          h_Obj,s_ObjName,'ControlPoint02X',
+		          Num2StrF(PCONTROLPOINT02X-PCONTROLPOINT01X)
+		          );
 		SetRField(
-				h_Obj,s_ObjName,'ControlPoint03X',
-				Num2StrF(PCONTROLPOINT03X-PCONTROLPOINT01X)
-				);
-		SetRField(h_Obj,s_ObjName,'ControlPoint03Y',
-				Num2StrF(PCONTROLPOINT03Y-PCONTROLPOINT01Y)
-				);
+		          h_Obj,s_ObjName,'ControlPoint02Y',
+		          Num2StrF(PCONTROLPOINT02Y-PCONTROLPOINT01Y)
+		          );
+		SetRField(
+		          h_Obj,s_ObjName,'ControlPoint03X',
+		          Num2StrF(PCONTROLPOINT03X-PCONTROLPOINT01X)
+		          );
+		SetRField(
+		          h_Obj,s_ObjName,'ControlPoint03Y',
+		          Num2StrF(PCONTROLPOINT03Y-PCONTROLPOINT01Y)
+		          );
 		ResetObject(h_Obj);
 		Resolve_Begin_Conflict := TRUE;
 	END ELSE Resolve_Begin_Conflict := FALSE;
@@ -201,7 +207,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5');
+	Set_Version_Info('0 . 5 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
@@ -260,13 +266,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PUSEBEGINMARK THEN Set_Markers_Cust(h_Poly,'Dot','NA');
 	IF PUSEENDMARK THEN Set_Markers_Cust(h_Poly,'NA','Arrow');
 
-	{ SetFPat(h_Poly,0); }
-
+	{===== Draw Beginning Duplicates =====}
 	IF PNUMBEGINDUP > 0 THEN FOR i_Counter := 1 TO PNUMBEGINDUP DO BEGIN
 		BeginPoly;
 		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
 		Add2DVertex(p_Start.X+3,p_Start.Y+(i_Counter*i_BegDupSize),
-					i_CornerStyle,3);
+		            i_CornerStyle,3);
 		Add2DVertex(p_Start.X+3,p_Start.Y,i_CornerStyle,3);
 		IF p_Midpoint.X > (p_Start.X+3) THEN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
@@ -278,7 +283,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		BeginPoly;
 		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
 		Add2DVertex(p_Start.X+3,p_Start.Y+(i_Counter*i_BegDupSize),
-					i_CornerStyle,3);
+		            i_CornerStyle,3);
 		Add2DVertex(p_Start.X+3,p_Start.Y,i_CornerStyle,3);
 		IF p_Midpoint.X > (p_Start.X+3) THEN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
@@ -287,11 +292,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA');
 	END;
 
+	{===== Draw End Duplicates =====}
 	IF PNUMENDDUP > 0 THEN FOR i_Counter := 1 TO PNUMENDDUP DO BEGIN
 		BeginPoly;
 		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
 		Add2DVertex(p_End.X-3,p_End.Y+(i_Counter*i_EndDupSize),
-				i_CornerStyle,3);
+		        i_CornerStyle,3);
 		Add2DVertex(p_End.X-3,p_End.Y,i_CornerStyle,3);
 		IF p_Midpoint.X < (p_End.X+3) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
@@ -303,7 +309,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		BeginPoly;
 		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
 		Add2DVertex(p_End.X-3,p_End.Y+(i_Counter*i_EndDupSize),
-				i_CornerStyle,3);
+		        i_CornerStyle,3);
 		Add2DVertex(p_End.X-3,p_End.Y,i_CornerStyle,3);
 		IF p_Midpoint.X < (p_End.X+3) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
@@ -312,14 +318,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF PUSEENDMARK THEN Set_Markers_Cust(LNewObj,'Arrow','NA');
 	END;
 
-
-
-
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}
 
 	SetRField(
-			h_Obj, s_ObjName, 'ControlPoint02Y',
-			Num2StrF((p_End.Y-p_Start.Y)/2)
-			);
+	          h_Obj, s_ObjName, 'ControlPoint02Y',
+	          Num2StrF((p_End.Y-p_Start.Y)/2)
+	          );
 
 END; END; Run(SBD_Line);
