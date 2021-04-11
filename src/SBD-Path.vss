@@ -68,13 +68,30 @@ BEGIN
 	Set_Corner_Size := cs;
 END;
 
+{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
+PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
+VAR
+	b     : BOOLEAN;
+	ActLS : REAL;
+BEGIN
+	ActLS := GetLScale(Find_Layer(h_Obj));
+	IF sBeg = 'Dot' THEN {Dot}
+		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Arrow' THEN {Arrow}
+		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+	IF sEnd = 'Dot' THEN {Dot}
+		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Arrow' THEN {Arrow}
+		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5');
+	Set_Version_Info('0 . 5 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter checking =====}
@@ -105,17 +122,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	h_Poly := LNewObj;
 
 	{===== Set poly markers =====}
-		IF PUSEBEGINMARK THEN
-	b_Result := SetObjBeginningMarker(
-			h_Poly, 2, 0, 1/GetLScale(Find_Layer(h_Obj)),
-			1/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE
-			);
+	IF PUSEBEGINMARK THEN Set_Markers_Cust(h_Poly,'Dot','NA');
+	{ b_Result := SetObjBeginningMarker( }
+	{ 		h_Poly, 2, 0, 1/GetLScale(Find_Layer(h_Obj)), }
+	{ 		1/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE }
+	{ 		); }
 
-	IF PUSEENDMARK THEN
-	b_Result := SetObjEndMarker(
-			h_Poly, 2176, 15, 3/GetLScale(Find_Layer(h_Obj)),
-			2/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE
-			);
+	IF PUSEENDMARK THEN Set_Markers_Cust(h_Poly,'NA','Arrow');
+	{ b_Result := SetObjEndMarker( }
+	{ 		h_Poly, 2176, 15, 3/GetLScale(Find_Layer(h_Obj)), }
+	{ 		2/GetLScale(Find_Layer(h_Obj)), 0, 0, TRUE }
+	{ 		); }
 	SetFPat(h_Poly,0);
 
 END; END; Run(SBD_Path);

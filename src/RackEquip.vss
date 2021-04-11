@@ -20,10 +20,10 @@
 PROCEDURE Rack_Equip;
 
 CONST {Rack Related Constants}
-	k_RackU = 1.75; {1 rack unit height (1.75")}
-	k_RackWidth = 19; {19" rack width}
-	k_EarWidth = .625; {Rack ear width (5/8")}
-	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+	k_RackU     = 1.75;     {1 rack unit height (1.75")}
+	k_RackWidth = 19;       {19" rack width}
+	k_EarWidth  = .625;     {Rack ear width (5/8")}
+	RGBmax      = 65535;    {Max value for setting RGB colors in VS fuctions}
 
 VAR
 	{Standard variables}
@@ -78,14 +78,38 @@ BEGIN
 	SetLSN(h,2); {Solid pattern}
 END;
 
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Fill_WtoB (r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	FillPat(1);
+	FillBack(i,i,i);
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Pen_WtoB (r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	PenPatN(2);
+	PenFore(i,i,i);
+END;
+
 PROCEDURE Scale_Fit_Height (toScale,fitTo : HANDLE; scaleFactor : REAL);
 VAR p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
-			toScale, p1.X, p1.Y, (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
-			(HHeight(fitTo)*scaleFactor)/HHeight(toScale), TRUE
-			);
+	        toScale, p1.X, p1.Y, (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
+	        (HHeight(fitTo)*scaleFactor)/HHeight(toScale), TRUE
+	        );
 END;
 
 PROCEDURE Scale_Fit_Width (toScale,fitTo : HANDLE; scaleFactor : REAL);
@@ -93,9 +117,9 @@ VAR p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
-			toScale, p1.X, p1.Y, HWidth(fitTo)*scaleFactor/HWidth(toScale),
-			HWidth(fitTo)*scaleFactor/HWidth(toScale), TRUE
-			);
+	        toScale, p1.X, p1.Y, HWidth(fitTo)*scaleFactor/HWidth(toScale),
+	        HWidth(fitTo)*scaleFactor/HWidth(toScale), TRUE
+	        );
 END;
 
 FUNCTION Get_RackHandle_At_Pt(p1 : POINT) : HANDLE;
@@ -107,10 +131,10 @@ BEGIN
 	i_NumPickObj := FindObjAtPt_GetCount(li_List);
 	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
 		IF (GetObjectVariableString(
-			FindObjAtPt_GetObj(li_List,i_ListCount),1166
-			) = 'RackObject (Salutz)')
+		                            FindObjAtPt_GetObj(li_List,i_ListCount),1166
+		                            ) = 'RackObject (Salutz)'
+		    )
 			THEN Get_RackHandle_At_Pt :=FindObjAtPt_GetObj(li_List,i_ListCount);
-		{ ELSE Get_RackHandle_At_Pt := NIL; }
 	END;
 END;
 
@@ -121,11 +145,13 @@ BEGIN
 	IF (h = NIL) THEN Get_RackName := ''
 		ELSE BEGIN
 			s1 := GetRField(
-					h, GetName(GetRecord(h,NumRecords(h))), 'RackID'
-					);
+			                h, GetName(GetRecord(h,NumRecords(h))),
+			                'RackID'
+			                );
 			s2 := GetRField(
-					h, GetName(GetRecord(h,NumRecords(h))), 'FrontOrBack'
-					);
+			                h, GetName(GetRecord(h,NumRecords(h))),
+			                'FrontOrBack'
+			                );
 			IF (s2<>' ') THEN
 				Get_RackName := Concat(s1,' (',s2,')')
 			ELSE Get_RackName := s1;
@@ -139,13 +165,13 @@ END;
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
-	Set_Version_Info('0 . 5');
+	Set_Version_Info('0 . 5 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 	IF (PNUMSPACES<1) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
 		AlrtDialog(
-				'Out of Bounds, Number of spaces must be greater than zero.'
-				);
+		           'Out of Bounds, Number of spaces must be greater than zero.'
+		           );
 		ResetObject(h_Obj);
 		END;
 
@@ -157,16 +183,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Get Rack Info =====}
 	GetSymLoc(h_Obj,p_EquipLoc.X,p_EquipLoc.Y);
 	h_Rack := Get_RackHandle_At_Pt(p_EquipLoc);
-
-	{ s_RackID := Get_RackName(h_Rack); }
-	{ IF (s_RackID<>'') THEN BEGIN }
-	{ 	GetSymLoc(h_Rack,p_RackLoc.X,p_RackLoc.Y); }
-	{ 	SetRField(h_Obj,s_ObjName,'RackID',s_RackID); }
-	{ END; }
-
-	{ GetSymLoc(h_Rack,p_RackLoc.X,p_RackLoc.Y); }
-	{ s_RackID := Get_RackName(h_Rack); }
-	{ SetRField(h_Obj,s_ObjName,'RackID',s_RackID); }
 
 	IF h_Rack <> NIL THEN BEGIN
 		GetSymLoc(h_Rack,p_RackLoc.X,p_RackLoc.Y);
@@ -182,26 +198,32 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		s_PosiInRack := Num2Str(0,((p_EquipLoc.Y-p_RackLoc.Y)/k_RackU));
 		IF ((p_EquipLoc.X<p_RackLoc.X) AND PHALFWIDTH)
 			THEN SetRField(
-					h_Obj, s_ObjName, 'RackPosition', Concat(s_PosiInRack,'-L')
-					)
+			               h_Obj, s_ObjName, 'RackPosition',
+			               Concat(s_PosiInRack,'-L')
+			               )
 		ELSE IF ((p_EquipLoc.X>p_RackLoc.X) AND PHALFWIDTH)
 			THEN SetRField(
-					h_Obj, s_ObjName, 'RackPosition', Concat(s_PosiInRack,'-R')
-					)
+			               h_Obj, s_ObjName, 'RackPosition',
+			               Concat(s_PosiInRack,'-R')
+			               )
 		ELSE SetRField(h_Obj,s_ObjName,'RackPosition', s_PosiInRack);
 	END ELSE SetRField(h_Obj,s_ObjName,'RackPosition', Num2Str(0,0));
 
 	{=== Draw Object ===}
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+	Pen_WtoB(1);
 	Rect(-r_Width/2,0,r_Width/2,-r_Height);
-	Set_Pen_WtoB(LNewObj,1);
+	{ Set_Pen_WtoB(LNewObj,1); }
+	IF (PCOLOR = 'Rack Ears only') THEN Fill_WtoB(0);
 	Rect(-r_Width/2+k_EarWidth,0,r_Width/2-k_EarWidth,-r_Height);
 	h_InnerRect := LNewObj;
-	Set_Pen_WtoB(h_InnerRect,1);
-	IF (PCOLOR = 'Rack Ears only') THEN Set_Background_WtoB(h_InnerRect,0);
+	{ Set_Pen_WtoB(h_InnerRect,1); }
+	{ IF (PCOLOR = 'Rack Ears only') THEN Set_Background_WtoB(h_InnerRect,0); }
 	MoveTo(0,-r_Height/2);
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{=== Create text labels ===}
-	PushAttrs;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	TextJust(2);
 	TextVerticalAlign(3);
 	FillPat(0);
@@ -224,10 +246,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextFace([]);
 		Get2DPt(h_InnerRect,1,p_Temp.X,p_Temp.Y);
 		MoveTo(p_Temp.X,p_Temp.Y);
-		Relative;
-			MoveTo(0.25,0);
-			TextOrigin(0,0);
-		Absolute;
+		Relative; {````````````````````````````````````````}
+		MoveTo(0.25,0);
+		TextOrigin(0,0);
+		Absolute; {________________________________________}
 		CreateText(PPURPOSE);
 		h_Purpose := LNewObj;
 		IF (HHeight(h_Purpose)>(r_Height*0.25))
@@ -238,6 +260,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetTextVerticalAlign(h_Purpose,1);
 	END;
 
-	PopAttrs;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 END; END; Run(Rack_Equip);

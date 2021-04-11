@@ -114,11 +114,11 @@ BEGIN
 	i_NumPickObj := FindObjAtPt_GetCount(li_List);
 	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
 		IF (GetObjectVariableString(
-			FindObjAtPt_GetObj(li_List,i_ListCount),1166
-			) = stype)
+		    FindObjAtPt_GetObj(li_List,i_ListCount),1166
+		    ) = stype)
 			THEN Get_Handle_At_Pt := FindObjAtPt_GetObj(
-					li_List,i_ListCount
-					);
+			        li_List,i_ListCount
+			        );
 	END;
 END;
 
@@ -126,8 +126,8 @@ END;
 FUNCTION Get_EquipName(h : HANDLE) : STRING;
 BEGIN
 	Get_EquipName := GetRField(
-			h, GetName(GetRecord(h,NumRecords(h))), '__Parent'
-			);
+	        h, GetName(GetRecord(h,NumRecords(h))), '__Parent'
+	        );
 END;
 
 {====================================}
@@ -136,7 +136,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5');
+	Set_Version_Info('0 . 5 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
 	{===== Variable Setup =====}
@@ -149,11 +149,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	p_Origin.X := 0;
 	p_Leader.Y := 0;
 	p_TextOffset.X := 5/8;
-	SetRField(h_Obj,s_ObjName,'Parent',
-			Get_EquipName(
-					Get_Handle_At_Pt(Get_2D_Pt(h_Obj),'SBD Device (Salutz)')
-					)
-			);
+	SetRField(
+	          h_Obj,s_ObjName,'Parent',
+	          Get_EquipName(
+	                        Get_Handle_At_Pt(Get_2D_Pt(h_Obj),
+	                        'SBD Device (Salutz)')
+	                        )
+	          );
 
 	{===== Draw Header =====}
 	IF PTYPE = 'Header' THEN BEGIN
@@ -177,7 +179,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'ClassPurp',FALSE);
 		SetParameterVisibility(h_Obj,'Connector',FALSE);
 		SetRField(h_Obj,s_ObjName,'Connector','');
-		{ SetParameterVisibility(h_Obj,'',FALSE); }
 	END ELSE IF PTYPE = 'Spacer' THEN BEGIN
 		Fill_WtoB(0.05);
 		Rect(-11.5,3,11.5,-3);
@@ -185,12 +186,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextSize(6*r_TextScaler);
 		TextJust(2);
 		TextVerticalAlign(1);
-		{ TextFace([Bold]); }
 		TextOrigin(0,3);
-		{ CreateText('.........'); }
-		{ CreateText(Concat(UniChr(65049),UniChr(65049),UniChr(65049))); }
-		{ CreateText(Concat(UniChr(08675),UniChr(08675),UniChr(15710361))); }
-		
 		CreateText(Concat(UniChr(8942),UniChr(8942),UniChr(8942)));
 		SetParameterVisibility(h_Obj,'Size',FALSE);
 		SetParameterVisibility(h_Obj,'Prefix',FALSE);
@@ -205,11 +201,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'ClassPurp',FALSE);
 		SetParameterVisibility(h_Obj,'Connector',FALSE);
 		SetRField(h_Obj,s_ObjName,'Connector','');
-
-
-
-
-
 
 	END ELSE BEGIN
 		{===== Setup Size =====}
@@ -280,9 +271,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		EndPoly;
 		HMoveBackward(LNewObj,TRUE);
 
-
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-
 		{// Draw Routing Text //}
 		NameClass(PCLASSROUT);
 		FillPat(0);
@@ -290,12 +279,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ELSE IF (PTYPE = 'Input') OR (PTYPE = 'Thru') THEN TextJust(3);
 		TextVerticalAlign(5);
 		Pen_WtoB(0.5);
-		IF PTYPE = 'Input' THEN TextOrigin(23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
-		ELSE IF (PTYPE = 'Output') THEN TextOrigin(-23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
+		IF PTYPE = 'Input'
+			THEN TextOrigin(23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
+		ELSE IF (PTYPE = 'Output')
+			THEN TextOrigin(-23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
 		ELSE TextOrigin(p_TextOffset.X,p_End.Y+p_TextOffset.Y);
 		TextSize(r_TextSmall-1);
 		IF PROUTING <> '' THEN CreateText(Concat(UniChr(187),PROUTING));
-		{ HMoveBackward(LNewObj,TRUE); }
 
 		{// Draw Purpose Text //}
 		IF PTYPE = 'Input' THEN TextJust(3)
@@ -314,7 +304,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
-
 	END;
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}

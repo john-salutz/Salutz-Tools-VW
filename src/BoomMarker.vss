@@ -48,6 +48,30 @@ BEGIN
 END;
 
 {// Sets Background Fore and Back as White to Black, percentage set by 'r',
+    format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Fill_WtoB (r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	FillPat(1);
+	FillBack(i,i,i);
+END;
+
+{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
+    format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
+PROCEDURE Pen_WtoB (r : REAL);
+VAR i : LONGINT;
+BEGIN
+	IF r<0 THEN r:=0;
+	IF r>1 THEN r:=1;
+	i := Trunc(RGBmax*(1-r));
+	PenPatN(2);
+	PenFore(i,i,i);
+END;
+
+{// Sets Background Fore and Back as White to Black, percentage set by 'r',
 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
 PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
 VAR i : LONGINT;
@@ -100,7 +124,7 @@ BEGIN
 		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
 		b := SetObjBeginningMarker(h,2176-128,15,3/ActLS,2/ActLS,0,0,TRUE);
-	IF sEnd	 = 'Dot' THEN {Dot}
+	IF sEnd = 'Dot' THEN {Dot}
 		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
 		b := SetObjEndMarker(h,2176-128,15,3/ActLS,2/ActLS,0,0,TRUE);
@@ -112,7 +136,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5');
+	Set_Version_Info('0 . 5 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
@@ -121,9 +145,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	p_NoteStart.X := 0;
 	p_NoteStart.Y := -1.5;
 	{===== Attribute Setup =====}
-	PushAttrs;
-	FillPat(1);
-	FillBack(RGBmax,RGBmax,RGBmax);
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+	Fill_WtoB(0);
+	{ FillPat(1); }
+	{ FillBack(RGBmax,RGBmax,RGBmax); }
 	PenSize(7*r_TextScaler);
 
 	{// Label Text //}
@@ -162,6 +187,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{// Text Style 'Plain' //}
 	TextFace([]);
 	TextSize(9*r_TextScaler);
+	{ Pen_WtoB(1); }
 
 	{// East Text //}
 	TextOrigin(6.5,0);
@@ -201,8 +227,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextOrigin(p_NoteStart.X,p_NoteStart.Y);
 	TextVerticalAlign(1);
 	TextJust(2);
-	PenFore(0,0,0);
-	PenBack(0,0,0);
+	Pen_WtoB(1);
+	{ PenFore(0,0,0); }
+	{ PenBack(0,0,0); }
 	PenSize(2*r_TextScaler);
 
 	{// Dimension Text //}
@@ -247,5 +274,5 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	{===== End Sequence =====}
-	PopAttrs;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 END; END; Run(BoomMarker);

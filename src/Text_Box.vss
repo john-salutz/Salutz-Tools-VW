@@ -126,7 +126,7 @@ END;
 
 {// retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5');
+	Set_Version_Info('0 . 5 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -140,17 +140,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF (POFFSET_EDGE<0) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'Offset Edge', '0');
 		AlertInform(
-				'Offset Out of Bounds',
-				'Offset may not be less than 0 (zero).', FALSE
-				);
+		            'Offset Out of Bounds',
+		            'Offset may not be less than 0 (zero).', FALSE
+		            );
 		ResetObject(h_Obj);
 	END;
 	IF (PPAD<0) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'Pad', '0');
 		AlertInform(
-				'Pad Out of Bounds',
-				'Pad may not be less than 0 (zero).', FALSE
-				);
+		            'Pad Out of Bounds',
+		            'Pad may not be less than 0 (zero).', FALSE
+		            );
 		ResetObject(h_Obj);
 	END;
 

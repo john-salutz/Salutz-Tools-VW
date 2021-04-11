@@ -94,15 +94,16 @@ END;
 
 {// Draws a rectangle offset from the passed obj //}
 FUNCTION DrawOffsetRect(
-		offsetFrom : HANDLE; offset : REAL; roundTrue : BOOLEAN
-		) : HANDLE;
+                          offsetFrom : HANDLE; offset : REAL;
+                          roundTrue : BOOLEAN
+                          ) : HANDLE;
 VAR Pt1,Pt2 : POINT;
 BEGIN
 	GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
 	DrawOffsetRect := RectOrRRect(
-			Pt1.X-offset, Pt1.Y+offset,
-			Pt2.X+offset, Pt2.Y-offset, roundTrue
-			);
+	                              Pt1.X-offset, Pt1.Y+offset,
+	                              Pt2.X+offset, Pt2.Y-offset, roundTrue
+	                              );
 END;
 
 PROCEDURE Set_DashStyle_Cust(h : HANDLE; style : STRING);
@@ -172,14 +173,18 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{// Create background rectangle //}
 	IF PINOROUT='Inward'
 		THEN h_BackRect := RectOrRRect(
-				0, r_ObjHeight/2, r_ObjWidth, -r_ObjHeight/2, PISROUNDED
-				)
+		                               0, r_ObjHeight/2,
+		                               r_ObjWidth, -r_ObjHeight/2,
+		                               PISROUNDED
+		                               )
 	ELSE IF PINOROUT='Outward'
 		THEN h_BackRect := RectOrRRect(
-				-POFFSET_EDGE-PPAD, r_ObjHeight/2+POFFSET_EDGE+PPAD,
-				r_ObjWidth+POFFSET_EDGE+PPAD, -r_ObjHeight/2-POFFSET_EDGE-PPAD,
-				PISROUNDED
-				);
+		                               -POFFSET_EDGE-PPAD,
+		                               r_ObjHeight/2+POFFSET_EDGE+PPAD,
+		                               r_ObjWidth+POFFSET_EDGE+PPAD,
+		                               -r_ObjHeight/2-POFFSET_EDGE-PPAD,
+		                               PISROUNDED
+		                               );
 
 	{// Create foreground rectangle //}
 	Fill_WtoB(0);

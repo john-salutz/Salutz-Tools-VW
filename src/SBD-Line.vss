@@ -186,7 +186,8 @@ END;
 
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
 PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
-VAR b     : BOOLEAN;
+VAR
+	b     : BOOLEAN;
 	ActLS : REAL;
 BEGIN
 	ActLS := GetLScale(Find_Layer(h_Obj));
@@ -254,7 +255,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		THEN r_CornerSize := Abs(p_Midpoint.X/2);
 	IF Abs(p_End.X-p_Midpoint.X)<(r_CornerSize)
 		THEN r_CornerSize := Abs((p_End.X-p_Midpoint.X)/2);
-	{ IF p_End.Y<p_Start.Y THEN r_CornerSize := -r_CornerSize; }
 
 	{===== Draw Poly =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((}
@@ -297,7 +297,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		BeginPoly;
 		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
 		Add2DVertex(p_End.X-3,p_End.Y+(i_Counter*i_EndDupSize),
-		        i_CornerStyle,3);
+		            i_CornerStyle,3);
 		Add2DVertex(p_End.X-3,p_End.Y,i_CornerStyle,3);
 		IF p_Midpoint.X < (p_End.X+3) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
@@ -309,7 +309,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		BeginPoly;
 		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
 		Add2DVertex(p_End.X-3,p_End.Y+(i_Counter*i_EndDupSize),
-		        i_CornerStyle,3);
+		            i_CornerStyle,3);
 		Add2DVertex(p_End.X-3,p_End.Y,i_CornerStyle,3);
 		IF p_Midpoint.X < (p_End.X+3) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)

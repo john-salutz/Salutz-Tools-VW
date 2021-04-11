@@ -141,10 +141,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{// Create and delete text for measurement //}
 	CreateText(s_Label);
 	HScale2D(
-			LNewObj,0,0,
-			PTEXTHEIGHT/HHeight(LNewObj),PTEXTHEIGHT/HHeight(LNewObj),TRUE
-			);
-	PushAttrs;
+	         LNewObj,0,0,
+	         PTEXTHEIGHT/HHeight(LNewObj),PTEXTHEIGHT/HHeight(LNewObj),TRUE
+	         );
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	TextSize(GetTextSize(LNewObj,0));
 	r_LabelWidth := GetTextWidth(LNewObj);
 	DelObject(LNewObj);
@@ -162,6 +162,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Set_Tight_TextFill(LNewObj,FALSE);
 		END;
 	END;
-	PopAttrs;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 END; END; Run(LEDTape);

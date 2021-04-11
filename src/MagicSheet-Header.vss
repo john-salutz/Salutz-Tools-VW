@@ -78,15 +78,15 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Rect(pt1.X,pt1.Y,pt2.X,pt2.Y);
 	{Inner Rectangle}
 	RRect(
-			pt1.X+0.025*PSCALE,pt1.Y-0.05*PSCALE,
-			pt2.X-0.025*PSCALE,pt2.Y+0.025*PSCALE,0.125*PSCALE,0.125*PSCALE
-			);
+	      pt1.X+0.025*PSCALE,pt1.Y-0.05*PSCALE,
+	      pt2.X-0.025*PSCALE,pt2.Y+0.025*PSCALE,0.125*PSCALE,0.125*PSCALE
+	      );
 	Set_Background_WtoB(LNewObj,0);
 	SetLW(LNewObj,0);
 	SetLSN(LNewObj,0);
 	SetOpacity(LNewObj,85);
 	GetBBox(LNewObj,pt1.X,pt1.Y,pt2.X,pt2.Y);
-	PushAttrs;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 
 	{// Text Setup //}
 	TextVerticalAlign(3);
@@ -107,6 +107,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		CreateText(Concat(PCOLOR,' '));
 		SetTextJust(LNewObj,3);
 	END;
-	PopAttrs;
+	PopAttrs;{))))))))))))))))))))))))))))))))))))))))}
 
 END; END; Run(MagicSheet_Header);

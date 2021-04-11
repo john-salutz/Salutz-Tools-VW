@@ -24,7 +24,7 @@ CONST
 	RGBmax   = 65535; {Max value for setting RGB colors in VS fuctions}
 	RegularH = 12;
 	SmallH   = 9;
-	MicroH = 6;
+	MicroH   = 6;
 
 VAR
 	{Standard variables}
@@ -103,7 +103,7 @@ BEGIN
 		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
 END;
 
-{// Resets all 'RackEquip objects inside the RackObj's boundaries //}
+{// Resets all objects of the stype inside the object's boundaries //}
 PROCEDURE Refresh_Children (h : HANDLE;stype : STRING);
 VAR
 	pt1,pt2     : POINT;
@@ -141,10 +141,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ResetObject(h_Obj);
 	END;
 	{===== Variable Setup =====}
-	SetRField(h_Obj,s_ObjName,'__Parent',
-			Concat(PTYPE,' ',PPREFIX,PIDNUM,' (',PMANUFACTURER,' ',PMODEL,')')
-			);
-	PushAttrs; { Attrs01 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>}
+	SetRField(
+	          h_Obj,s_ObjName,'__Parent',
+	          Concat(PTYPE,' ',PPREFIX,PIDNUM,' (',PMANUFACTURER,' ',PMODEL,')')
+	          );
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	Fill_WtoB(0.035);
 	Pen_WtoB(1);
 
@@ -232,7 +233,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Absolute;
 	END;
 
-	PopAttrs; { Attrs01 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	Refresh_Children(h_Obj,'SBD In-Out (Salutz)');
 
 END; END; Run(SBD_Device);

@@ -113,11 +113,11 @@ BEGIN
 	i_NumPickObj := FindObjAtPt_GetCount(li_List);
 	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
 		IF (GetObjectVariableString(
-			FindObjAtPt_GetObj(li_List,i_ListCount),1166
-			) = stype)
+		    FindObjAtPt_GetObj(li_List,i_ListCount),1166
+		    ) = stype)
 			THEN Get_Handle_At_Pt := FindObjAtPt_GetObj(
-					li_List,i_ListCount
-					);
+			        li_List,i_ListCount
+			        );
 	END;
 END;
 
@@ -125,8 +125,8 @@ END;
 FUNCTION Get_EquipName(h : HANDLE) : STRING;
 BEGIN
 	Get_EquipName := GetRField(
-			h, GetName(GetRecord(h,NumRecords(h))), '__Parent'
-			);
+	        h, GetName(GetRecord(h,NumRecords(h))), '__Parent'
+	        );
 END;
 
 PROCEDURE Scale_to_Width (toScale, : HANDLE; widthSize : REAL);
@@ -135,9 +135,9 @@ BEGIN
 	IF (HWidth(toScale) > widthSize) THEN BEGIN
 		HCenter(toScale,p1.X,p1.Y);
 		HScale2D(
-				toScale, p1.X, p1.Y, widthSize/HWidth(toScale),
-				widthSize/HWidth(toScale), TRUE
-				);
+		         toScale, p1.X, p1.Y, widthSize/HWidth(toScale),
+		         widthSize/HWidth(toScale), TRUE
+		         );
 	END;
 END;
 
@@ -162,7 +162,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'__ActiveOrPassive',TRUE);
 
 		MoveTo(0,0);
-		Relative;
+		Relative; {````````````````````````````````````````}
 		BeginPoly;
 		Add2DVertex(0,0,0,0);
 		Add2DVertex(6,0,0,0);
@@ -179,7 +179,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Add2DVertex(0,3,0,0);
 		Add2DVertex(-6,0,0,0);
 		EndPoly;
-		Absolute;
+		Absolute; {________________________________________}
 
 		IF P__ACTIVEORPASSIVE = 'Active' THEN BEGIN
 			TextSize(3*r_TextScaler);
@@ -189,7 +189,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			CreateText('PWR');
 
 			MoveTo(3,0);
-			Relative;
+			Relative; {````````````````````````````````````````}
 			BeginPoly;
 			Add2DVertex(0,0,0,0);
 			Add2DVertex(0,1.875,0,0);
@@ -197,7 +197,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Add2DVertex(-3,-1.875,0,0);
 			Add2DVertex(0,1.875,0,0);
 			EndPoly;
-			Absolute;
+			Absolute; {________________________________________}
 		END;
 
 		{ID}
@@ -234,24 +234,20 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PTYPE = 'Microphone' THEN BEGIN
 		SetParameterVisibility(h_Obj,'__ActiveOrPassive',TRUE);
 		MoveTo(0,0);
-		Relative;
+		Relative; {````````````````````````````````````````}
 		BeginPoly;
 		Add2DVertex(0,0,0,0);
 		Add2DVertex(-8,0,0,0);
 		Add2DVertex(-3,3,4,4);
-		{ Add2DVertex(-0.5,0,0,0); }
-		{ Add2DVertex(-0.5,0,4,3); }
 		Add2DVertex(-3,-3,0,3);
 		Add2DVertex(0,3,0,0);
 		Add2DVertex(0,-6,0,0);
 		Add2DVertex(0,3,0,0);
 		Add2DVertex(3,-3,4,4);
-		{ Add2DVertex(0.5,0,0,0); }
-		{ Add2DVertex(0.5,0,4,3); }
 		Add2DVertex(3,3,0,3);
 		Add2DVertex(8,0,0,0);
 		EndPoly;
-		Absolute;
+		Absolute; {________________________________________}
 
 		{ID}
 		TextSize(6*r_TextScaler);
@@ -271,7 +267,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextVerticalAlign(5);
 		TextOrigin(-14.75,0);
 		CreateText(Concat(PMANUFACTURER,' ',PMODEL));
-		{ CreateText(PMODEL); }
 
 		{Purpose}
 		Pen_WtoB(0.5);
@@ -281,10 +276,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextOrigin(-15,0);
 		CreateText(PPURPOSE);
 
-	END ELSE
-
-	IF PTYPE = 'Fly Off' THEN BEGIN
-
+	END ELSE IF PTYPE = 'Fly Off' THEN BEGIN
 		SetParameterVisibility(h_Obj,'Manufacturer',FALSE);
 		SetParameterVisibility(h_Obj,'Model',FALSE);
 		SetParameterVisibility(h_Obj,'ClassPurp',FALSE);

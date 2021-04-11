@@ -30,8 +30,8 @@ VAR
 	s_ObjName                                             : STRING;
 	h_Obj,h_ObjRecord,h_ObjWall                           : HANDLE;
 	b_Result                                              : BOOLEAN;
+	i_Counter                                             : INTEGER;
 	{Script specific variables}
-	i_NumSpaces,i_Counter                                 : INTEGER;
 	h_OuterRect,h_InnerRect,h_RackID                      : HANDLE;
 	r_Height,r_Width                                      : REAL;
 	p_Tmp1,p_Tmp2                                         : POINT;
@@ -80,9 +80,9 @@ VAR p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
-			toScale, p1.X, p1.Y, (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
-			(HHeight(fitTo)*scaleFactor)/HHeight(toScale), TRUE
-			);
+	         toScale, p1.X, p1.Y, (HHeight(fitTo)*scaleFactor)/HHeight(toScale),
+	         (HHeight(fitTo)*scaleFactor)/HHeight(toScale), TRUE
+	         );
 END;
 
 {// Scales 'toScale' to fit to a percentage (scaleFactor) of 'fitTo' width //}
@@ -91,26 +91,49 @@ VAR p1 : POINT;
 BEGIN
 	HCenter(toScale,p1.X,p1.Y);
 	HScale2D(
-			toScale, p1.X, p1.Y, HWidth(fitTo)*scaleFactor/HWidth(toScale),
-			HWidth(fitTo)*scaleFactor/HWidth(toScale), TRUE
-			);
+	         toScale, p1.X, p1.Y, HWidth(fitTo)*scaleFactor/HWidth(toScale),
+	         HWidth(fitTo)*scaleFactor/HWidth(toScale), TRUE
+	         );
 END;
 
-{// Resets all 'RackEquip objects inside the RackObj's boundaries //}
-PROCEDURE Refresh_Gear_In_Rack(h : HANDLE);
+{ {\// Resets all 'RackEquip objects inside the RackObj's boundaries //!{\ }
+{ PROCEDURE Refresh_Gear_In_Rack(h : HANDLE); }
+{ VAR }
+{ 	pt1,pt2     : POINT; }
+{ 	criteria,n  : STRING; }
+{ 	c           : ARRAY [1..6] OF STRING; }
+{ BEGIN }
+{ 	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y); }
+{ 	pt1.X := pt1.X/12; }
+{ 	pt1.Y := pt1.Y/12; }
+{ 	pt2.X := pt2.X/12; }
+{ 	pt2.Y := pt2.Y/12; }
+{ 	n := ' & '; }
+{ 	c[1] := Concat('(T=PLUGINOBJECT)'); }
+{ 	c[2] := Concat('(R IN [','''','RackEquip (Salutz)','''','])'); }
+{ 	c[3] := Concat('(',pt2.Y,'<YCOORDINATE)'); }
+{ 	c[4] := Concat('(YCOORDINATE<',pt1.Y,')'); }
+{ 	c[5] := Concat('(',pt1.X,'<XCOORDINATE)'); }
+{ 	c[6] := Concat('(XCOORDINATE<',pt2.X,')'); }
+{ 	criteria := Concat(c[1],n,c[2],n,c[3],n,c[4],n,c[5],n,c[6]); }
+{ 	ForEachObject(ResetObject,criteria); }
+{ END; }
+
+{// Resets all objects of the stype inside the object's boundaries //}
+PROCEDURE Refresh_Children (h : HANDLE;stype : STRING);
 VAR
 	pt1,pt2     : POINT;
 	criteria,n  : STRING;
 	c           : ARRAY [1..6] OF STRING;
 BEGIN
 	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y);
-	pt1.X := pt1.X/12;
-	pt1.Y := pt1.Y/12;
-	pt2.X := pt2.X/12;
-	pt2.Y := pt2.Y/12;
+	pt1.X := (pt1.X/12)-1;
+	pt1.Y := (pt1.Y/12)+1;
+	pt2.X := (pt2.X/12)+1;
+	pt2.Y := (pt2.Y/12)-1;
 	n := ' & ';
 	c[1] := Concat('(T=PLUGINOBJECT)');
-	c[2] := Concat('(R IN [','''','RackEquip (Salutz)','''','])');
+	c[2] := Concat('(R IN [','''',stype,'''','])');
 	c[3] := Concat('(',pt2.Y,'<YCOORDINATE)');
 	c[4] := Concat('(YCOORDINATE<',pt1.Y,')');
 	c[5] := Concat('(',pt1.X,'<XCOORDINATE)');
@@ -144,15 +167,15 @@ BEGIN
 	start.Y := 0+(k_RackU/2);
 	TextOrigin(start.X,start.Y);
 	MoveTo(start.X,start.Y);
-	Relative;
-	PushAttrs;
+	Relative; {````````````````````````````````````````}
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	TextSize(8*(12/GetLScale(Find_Layer(h_Obj))));
 	TextJust(2);
 	TextVerticalAlign(3);
 	TextFace([]);
 	Fill_WtoB(0);
 	PenSize(2);
-	FOR i:=1 TO i_NumSpaces DO BEGIN
+	FOR i:=1 TO PNUMSPACES DO BEGIN
 		Pen_WtoB(0.5);
 		CreateText(Num2Str(0,i));
 		Pen_WtoB(0.25);
@@ -160,8 +183,8 @@ BEGIN
 		HMoveBackward(LNewObj,TRUE);
 		Move(offsetX,k_RackU);
 	END;
-	PopAttrs;
-	Absolute;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+	Absolute; {________________________________________}
 END;
 
 {====================================}
@@ -170,74 +193,77 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5');
-	i_NumSpaces := PNUMSPACES;
+	Set_Version_Info('0 . 5 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
-	IF (i_NumSpaces<1) THEN BEGIN
+	IF (PNUMSPACES<1) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
-		i_NumSpaces := 1;
 		AlrtDialog(
-				'Out of Bounds, Number of spaces must be greater than zero.'
-				);
+		           'Out of Bounds, Number of spaces must be greater than zero.'
+		           );
+		ResetObject(h_Obj);
 	END;
-	r_Height := k_RackU*i_NumSpaces;
+	r_Height := k_RackU*PNUMSPACES;
 	r_Width := k_RackWidth;
 
 	{// Rectangle Creation //}
 	MoveTo(0,0);
-	PushAttrs;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	PenSize(2);
 	Pen_WtoB(1);
 	IF PFRONTORBACK='Rear' THEN Fill_WtoB(0.2)
 	ELSE Fill_WtoB(0.1);
 	Rect(-r_Width/2,0,r_Width/2,r_Height);
-	PopAttrs;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 	Rect(p_Tmp1.X-PFRAME,p_Tmp1.Y+PFRAME,p_Tmp2.X+PFRAME,p_Tmp2.Y-PFRAME);
 	h_OuterRect := LNewObj;
 	HMoveBackward(h_OuterRect,TRUE);
 
 	{// Rack Spaces Line Guides //}
-	PushAttrs;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	MoveTo(r_Width/2,0);
 	PenSize(1);
-	Relative;
 	Pen_WtoB(0.35);
-	FOR i_Counter := 2 TO i_NumSpaces DO BEGIN
+	Relative; {````````````````````````````````````````}
+	FOR i_Counter := 2 TO PNUMSPACES DO BEGIN
 		Move(-r_Width,k_RackU);
 		Line(r_Width,0);
-		{ SetLW(LNewObj,1); }
 	END;
-	Absolute;
-	PopAttrs;
+	Absolute; {________________________________________}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{// Rack Ear Vertical Lines //}
-	PushAttrs;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	PenSize(1);
 	Pen_WtoB(1);
 	Fill_WtoB(0.35);
 	Rect(p_Tmp1.X,p_Tmp1.Y,p_Tmp1.X+k_EarWidth,p_Tmp1.Y-r_Height);
 	Rect(p_Tmp2.X,p_Tmp2.Y,p_Tmp2.X-k_EarWidth,p_Tmp2.Y+r_Height);
-	PopAttrs;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{// Label Text Creation and Formating //}
-	PushAttrs;
-	MoveTo(0,0);
-	TextOrigin(0,r_Height+PFRAME+0.5);
-	Fill_WtoB(0);
-	TextJust(2);
-	TextVerticalAlign(5);
-	IF (PFRONTORBACK<>' ') THEN
-		CreateText(Concat(PRACKID,' (',PFRONTORBACK,')'))
+	IF PRACKID <> '' THEN BEGIN
+		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+		MoveTo(0,0);
+		TextOrigin(0,r_Height+PFRAME+0.5);
+		Fill_WtoB(0);
+		TextJust(2);
+		TextVerticalAlign(5);
+		IF (PFRONTORBACK<>' ') THEN
+			CreateText(Concat(PRACKID,Chr(13),'(',PFRONTORBACK,')'))
 		ELSE CreateText(PRACKID);
-	HMoveBackward(LNewObj,TRUE);
-	PopAttrs;
+		HMoveBackward(LNewObj,TRUE);
+		SetTextWidth(LNewObj,k_RackWidth);
+		SetTextLeading(LNewObj,GetTextSize(LNewObj,0)*0.9);
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+	END;
 
 	{// Rack Space Number Creation //}
 	IF (PSHOWNUM='Left') OR (PSHOWNUM='Both') THEN Draw_RackSpace_Numbers('L');
 	IF (PSHOWNUM='Right') OR (PSHOWNUM='Both') THEN Draw_RackSpace_Numbers('R');
 
-	Refresh_Gear_In_Rack(h_Obj);
+	{ Refresh_Gear_In_Rack(h_Obj); }
+	Refresh_Children(h_Obj, 'RackEquip (Salutz)');
 END; END; Run(Rack_Obj);

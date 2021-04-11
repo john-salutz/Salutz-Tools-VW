@@ -393,9 +393,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetCntrlPtVis(h_Obj,1,PUSEPOINT);
 	IF PUSEPOINT THEN BEGIN
 		Draw_Squiggle(
-				p_LineOrig.X*PSCALE, p_LineOrig.Y*PSCALE,
-				PCONTROLPOINT01X, PCONTROLPOINT01Y
-				);
+		              p_LineOrig.X*PSCALE, p_LineOrig.Y*PSCALE,
+		              PCONTROLPOINT01X, PCONTROLPOINT01Y
+		              );
 		HMoveBackward(LNewObj,TRUE);
 		Set_Markers_Cust(LNewObj,'NA','Arrow');
 		SetLW(LNewObj,7);
