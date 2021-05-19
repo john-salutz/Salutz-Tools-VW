@@ -36,31 +36,6 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
-{ {\// Sets Version info parameter //!{\ }
-{ PROCEDURE Set_Version_Info(s : STRING); }
-{ BEGIN }
-{ 	SetRField(h_Obj,s_ObjName,'ver',s); }
-{ END; }
-
-{ {\// Sets the specified text object to use the attributes of PIO //!{\ }
-{ PROCEDURE Use_PIO_Text_Attributes (h : HANDLE); }
-{ BEGIN }
-{ 	SetObjectVariableBoolean(h,800,True); }
-{ END; }
-
-{ {\// Sets Background Fore and Back as White to Black, percentage set by 'r', }
-{ format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
-{ PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL); }
-{ VAR i : LONGINT; }
-{ BEGIN }
-{ 	IF r<0 THEN r:=0; }
-{ 	IF r>1 THEN r:=1; }
-{ 	i := Trunc(RGBmax*(1-r)); }
-{ 	SetFillBack(h, i, i, i); }
-{ 	SetFillFore(h, i, i, i); }
-{ 	SetFPat(h, 1); {\Blank pattern!{\ }
-{ END; }
-
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -95,8 +70,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextVerticalAlign(3);
 	TextSize(9*PSCALE);
 	FillPat(0);
-	PenFore(0,0,0);
-	PenBack(0,0,0);
+	Pen_WtoB(1);
 	TextFace([]);
 	{System Name}
 	IF PSYSTEMNAME <> '' THEN BEGIN
@@ -110,6 +84,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		CreateText(Concat(PCOLOR,' '));
 		SetTextJust(LNewObj,3);
 	END;
-	PopAttrs;{))))))))))))))))))))))))))))))))))))))))}
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 END; END; Run(MagicSheet_Header);

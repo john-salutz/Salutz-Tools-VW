@@ -37,53 +37,6 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
-{ {\// Sets Version info parameter //!{\ }
-{ PROCEDURE Set_Version_Info(s : STRING); }
-{ BEGIN }
-{ 	SetRField(h_Obj,s_ObjName,'ver',s); }
-{ END; }
-
-{ {\// Sets the specified text object to use the attributes of PIO //!{\ }
-{ PROCEDURE Use_PIO_Text_Attributes (h : HANDLE); }
-{ BEGIN }
-{ 	SetObjectVariableBoolean(h,800,True); }
-{ END; }
-
-{ {\// Sets Background Fore and Back as White to Black, percentage set by 'r', }
-{ 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
-{ PROCEDURE Fill_WtoB (r : REAL); }
-{ VAR i : LONGINT; }
-{ BEGIN }
-{ 	IF r<0 THEN r:=0; }
-{ 	IF r>1 THEN r:=1; }
-{ 	i := Trunc(RGBmax*(1-r)); }
-{ 	FillPat(1); }
-{ 	FillBack(i,i,i); }
-{ END; }
-
-{ {\// Sets Pen Fore and Back as White to Black, percentage set by 'r', }
-{ 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
-{ PROCEDURE Pen_WtoB (r : REAL); }
-{ VAR i : LONGINT; }
-{ BEGIN }
-{ 	IF r<0 THEN r:=0; }
-{ 	IF r>1 THEN r:=1; }
-{ 	i := Trunc(RGBmax*(1-r)); }
-{ 	PenPatN(2); }
-{ 	PenFore(i,i,i); }
-{ END; }
-
-{ PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN); }
-{ BEGIN }
-{ 	SetObjectVariableBoolean(h,684,b); }
-{ END; }
-
-{ FUNCTION Find_Layer (obj : HANDLE) : HANDLE; }
-{ BEGIN }
-{ 	IF GetLayer(obj) = NIL THEN ResetObject(obj) }
-{ 	ELSE Find_Layer := GetLayer(obj); }
-{ END; }
-
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
 PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
 VAR b	  : BOOLEAN;
@@ -99,38 +52,6 @@ BEGIN
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
 		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
 END;
-
-{ FUNCTION Get_2D_Pt(h : HANDLE) : POINT; }
-{ VAR p1 : POINT; }
-{ BEGIN }
-{ 	GetSymLoc(h,p1.X,p1.Y); }
-{ 	Get_2D_Pt := p1; }
-{ END; }
-
-{ FUNCTION Get_Handle_At_Pt(p1 : POINT; stype : STRING) : HANDLE; }
-{ VAR }
-{ 	li_List                   : LONGINT; }
-{ 	i_ListCount,i_NumPickObj  : INTEGER; }
-{ BEGIN }
-{ 	li_List := FindObjAtPt_Create(NIL,1, 1, p1.x, p1.y, 1); }
-{ 	i_NumPickObj := FindObjAtPt_GetCount(li_List); }
-{ 	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN }
-{ 		IF (GetObjectVariableString( }
-{ 		    FindObjAtPt_GetObj(li_List,i_ListCount),1166 }
-{ 		    ) = stype) }
-{ 			THEN Get_Handle_At_Pt := FindObjAtPt_GetObj( }
-{ 			        li_List,i_ListCount }
-{ 			        ); }
-{ 	END; }
-{ END; }
-
-{ {\// Returns a string of the RackID of Rack Obj found at point //!{\ }
-{ FUNCTION Get_EquipName(h : HANDLE) : STRING; }
-{ BEGIN }
-{ 	Get_EquipName := GetRField( }
-{ 	        h, GetName(GetRecord(h,NumRecords(h))), '__Parent' }
-{ 	        ); }
-{ END; }
 
 PROCEDURE Scale_to_Width (toScale, : HANDLE; widthSize : REAL);
 VAR p1 : POINT;
