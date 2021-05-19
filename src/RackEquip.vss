@@ -35,72 +35,75 @@ VAR
 	h_Rack,h_InnerRect,h_Purpose,h_MakeModel                : HANDLE;
 	r_Height,r_Width                                        : REAL;
 	p_Temp,p_EquipLoc,p_RackLoc                             : POINT;
-	s_RackID,s_PosiInRack                                   : STRING;
+	s_RackID                                                : STRING;
 	li_List                                                 : LONGINT;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
-{// Sets Version info parameter //}
-PROCEDURE Set_Version_Info(s : STRING);
-BEGIN
-	SetRField(h_Obj,s_ObjName,'ver',s);
-END;
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
 
-{// Sets the specified text object to use the attributes of PIO //}
-PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
-BEGIN
-	SetObjectVariableBoolean(h,800,True);
-END;
+{ {\// Sets Version info parameter //!{\ }
+{ PROCEDURE Set_Version_Info(s : STRING); }
+{ BEGIN }
+{ 	SetRField(h_Obj,s_ObjName,'ver',s); }
+{ END; }
 
-{// Sets Background Fore and Back as White to Black, percentage set by 'r',
-	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	SetFillBack(h, i, i, i);
-	SetFillFore(h, i, i, i);
-	SetFPat(h, 1); {Blank pattern}
-END;
+{ {\// Sets the specified text object to use the attributes of PIO //!{\ }
+{ PROCEDURE Use_PIO_Text_Attributes (h : HANDLE); }
+{ BEGIN }
+{ 	SetObjectVariableBoolean(h,800,True); }
+{ END; }
 
-{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
-	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	SetPenFore(h, i, i, i);
-	SetPenBack(h, i, i, i);
-	SetLSN(h,2); {Solid pattern}
-END;
+{ {\// Sets Background Fore and Back as White to Black, percentage set by 'r', }
+{ 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	SetFillBack(h, i, i, i); }
+{ 	SetFillFore(h, i, i, i); }
+{ 	SetFPat(h, 1); {\Blank pattern!{\ }
+{ END; }
 
-{// Sets Background Fore and Back as White to Black, percentage set by 'r',
-	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Fill_WtoB (r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	FillPat(1);
-	FillBack(i,i,i);
-END;
+{ {\// Sets Pen Fore and Back as White to Black, percentage set by 'r', }
+{ 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	SetPenFore(h, i, i, i); }
+{ 	SetPenBack(h, i, i, i); }
+{ 	SetLSN(h,2); {\Solid pattern!{\ }
+{ END; }
 
-{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
-	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Pen_WtoB (r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	PenPatN(2);
-	PenFore(i,i,i);
-END;
+{ {\// Sets Background Fore and Back as White to Black, percentage set by 'r', }
+{ 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Fill_WtoB (r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	FillPat(1); }
+{ 	FillBack(i,i,i); }
+{ END; }
+
+{ {\// Sets Pen Fore and Back as White to Black, percentage set by 'r', }
+{ 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Pen_WtoB (r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	PenPatN(2); }
+{ 	PenFore(i,i,i); }
+{ END; }
 
 PROCEDURE Scale_Fit_Height (toScale,fitTo : HANDLE; scaleFactor : REAL);
 VAR p1 : POINT;
@@ -138,24 +141,44 @@ BEGIN
 	END;
 END;
 
+
+
+{ FUNCTION STF_GetRField(h : HANDLE; s : STRING) : STRING; }
+{ BEGIN }
+{ 	STF_GetRField := GetRField(h, GetName(GetRecord(h,NumRecords(h))), s); }
+{ END; }
+
 {// Returns a string of the RackID of Rack Obj found at point //}
 FUNCTION Get_RackName(h : HANDLE) : STRING;
-VAR	s1,s2 : STRING;
+VAR s1,s2 : STRING;
+BEGIN IF (h = NIL) THEN Get_RackName := ''
+	ELSE BEGIN
+		s1 := STF_GetRField(h,'RackID');
+		s2 := STF_GetRField(h,'FrontOrBack');
+		IF (s2<>' ') THEN
+			Get_RackName := Concat(s1,' (',s2,')')
+		ELSE Get_RackName := s1;
+	END;
+END;
+
+FUNCTION Get_RackNumFrom(h : HANDLE) : STRING;
+BEGIN IF (h = NIL) THEN Get_RackNumFrom := ''
+	ELSE Get_RackNumFrom := STF_GetRField(h, 'NumFrom');
+END;
+
+FUNCTION Get_RackNumSpaces(h : HANDLE) : INTEGER;
+BEGIN IF (h = NIL) THEN Get_RackNumSpaces := 0
+	ELSE Get_RackNumSpaces := Str2Num(STF_GetRField(h, 'NumSpaces'));
+END;
+
+FUNCTION Get_PositionInRack(h : HANDLE) : STRING;
+VAR offset : REAL;
 BEGIN
-	IF (h = NIL) THEN Get_RackName := ''
-		ELSE BEGIN
-			s1 := GetRField(
-			                h, GetName(GetRecord(h,NumRecords(h))),
-			                'RackID'
-			                );
-			s2 := GetRField(
-			                h, GetName(GetRecord(h,NumRecords(h))),
-			                'FrontOrBack'
-			                );
-			IF (s2<>' ') THEN
-				Get_RackName := Concat(s1,' (',s2,')')
-			ELSE Get_RackName := s1;
-		END;
+	offset := ((p_EquipLoc.Y-p_RackLoc.Y)/k_RackU);
+	IF Get_RackNumFrom(h) = 'Bottom'
+		THEN Get_PositionInRack := Num2Str(0,offset)
+	ELSE IF Get_RackNumFrom(h) = 'Top'
+		THEN Get_PositionInRack := Num2Str(0, Get_RackNumSpaces(h)-offset+1);
 END;
 
 {====================================}
@@ -165,7 +188,7 @@ END;
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
-	Set_Version_Info('0 . 5 . 1');
+	Set_Version_Info('0 . 5 . 2');
 	Use_PIO_Text_Attributes(h_Obj);
 	IF (PNUMSPACES<1) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
@@ -195,30 +218,29 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{=== Get vertical and horizontal position in rack ===}
 	IF (s_RackID<>'') THEN BEGIN
-		s_PosiInRack := Num2Str(0,((p_EquipLoc.Y-p_RackLoc.Y)/k_RackU));
 		IF ((p_EquipLoc.X<p_RackLoc.X) AND PHALFWIDTH)
 			THEN SetRField(
 			               h_Obj, s_ObjName, 'RackPosition',
-			               Concat(s_PosiInRack,'-L')
+			               Concat(Get_PositionInRack(h_Rack),'-L')
 			               )
 		ELSE IF ((p_EquipLoc.X>p_RackLoc.X) AND PHALFWIDTH)
 			THEN SetRField(
 			               h_Obj, s_ObjName, 'RackPosition',
-			               Concat(s_PosiInRack,'-R')
+			               Concat(Get_PositionInRack(h_Rack),'-R')
 			               )
-		ELSE SetRField(h_Obj,s_ObjName,'RackPosition', s_PosiInRack);
+		ELSE SetRField(
+		               h_Obj,s_ObjName,'RackPosition',
+		               Get_PositionInRack(h_Rack)
+		               );
 	END ELSE SetRField(h_Obj,s_ObjName,'RackPosition', Num2Str(0,0));
 
 	{=== Draw Object ===}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	Pen_WtoB(1);
 	Rect(-r_Width/2,0,r_Width/2,-r_Height);
-	{ Set_Pen_WtoB(LNewObj,1); }
 	IF (PCOLOR = 'Rack Ears only') THEN Fill_WtoB(0);
 	Rect(-r_Width/2+k_EarWidth,0,r_Width/2-k_EarWidth,-r_Height);
 	h_InnerRect := LNewObj;
-	{ Set_Pen_WtoB(h_InnerRect,1); }
-	{ IF (PCOLOR = 'Rack Ears only') THEN Set_Background_WtoB(h_InnerRect,0); }
 	MoveTo(0,-r_Height/2);
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 

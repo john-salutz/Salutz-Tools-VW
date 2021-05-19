@@ -41,49 +41,52 @@ VAR
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
-{// Sets Version info parameter //}
-PROCEDURE Set_Version_Info(s : STRING);
-BEGIN
-	SetRField(h_Obj,s_ObjName,'ver',s);
-END;
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
 
-{// Sets the specified text object to use the attributes of PIO //}
-PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
-BEGIN
-	SetObjectVariableBoolean(h,800,True);
-END;
+{ {\// Sets Version info parameter //!{\ }
+{ PROCEDURE Set_Version_Info(s : STRING); }
+{ BEGIN }
+{ 	SetRField(h_Obj,s_ObjName,'ver',s); }
+{ END; }
 
-{// Sets Background Fore and Back as White to Black, percentage set by 'r',
-format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	SetFillBack(h, i, i, i);
-	SetFillFore(h, i, i, i);
-	SetFPat(h, 1); {Blank pattern}
-END;
+{ {\// Sets the specified text object to use the attributes of PIO //!{\ }
+{ PROCEDURE Use_PIO_Text_Attributes (h : HANDLE); }
+{ BEGIN }
+{ 	SetObjectVariableBoolean(h,800,True); }
+{ END; }
 
-{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
-format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	SetPenFore(h, i, i, i);
-	SetPenBack(h, i, i, i);
-	SetLSN(h,2); {Solid pattern}
-END;
+{ {\// Sets Background Fore and Back as White to Black, percentage set by 'r', }
+{ format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	SetFillBack(h, i, i, i); }
+{ 	SetFillFore(h, i, i, i); }
+{ 	SetFPat(h, 1); {\Blank pattern!{\ }
+{ END; }
 
-FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
-BEGIN
-	IF GetLayer(obj) = NIL THEN ResetObject(obj)
-	ELSE Find_Layer := GetLayer(obj);
-END;
+{ {\// Sets Pen Fore and Back as White to Black, percentage set by 'r', }
+{ format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Set_Pen_WtoB (h : HANDLE; r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	SetPenFore(h, i, i, i); }
+{ 	SetPenBack(h, i, i, i); }
+{ 	SetLSN(h,2); {\Solid pattern!{\ }
+{ END; }
+
+{ FUNCTION Find_Layer (obj : HANDLE) : HANDLE; }
+{ BEGIN }
+{ 	IF GetLayer(obj) = NIL THEN ResetObject(obj) }
+{ 	ELSE Find_Layer := GetLayer(obj); }
+{ END; }
 
 PROCEDURE Resolve_MidPoint_Conflict;
 VAR
@@ -194,11 +197,15 @@ BEGIN
 	IF sBeg = 'Dot' THEN {Dot}
 		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
-		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Box' THEN {Box}
+		b := SetObjBeginningMarker(h,11+128,0,2.5/ActLS,2/ActLS,0,0,TRUE);
 	IF sEnd = 'Dot' THEN {Dot}
 		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
-		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Box' THEN {Box}
+		b := SetObjEndMarker(h,11+128,0,2.5/ActLS,2/ActLS,0,0,TRUE);
 END;
 
 
@@ -208,7 +215,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5 . 1');
+	Set_Version_Info('0 . 5 . 2');
 	Use_PIO_Text_Attributes(h_Obj);
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
@@ -263,8 +270,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	h_Poly := LNewObj;
 
 	{===== Set poly markers =====}
-	IF PUSEBEGINMARK THEN Set_Markers_Cust(h_Poly,'Dot','NA');
-	IF PUSEENDMARK THEN Set_Markers_Cust(h_Poly,'NA','Arrow');
+	{ IF PUSEBEGINMARK THEN Set_Markers_Cust(h_Poly,'Dot','NA'); }
+	{ IF PUSEENDMARK THEN Set_Markers_Cust(h_Poly,'NA','Arrow'); }
+	Set_Markers_Cust(h_Poly,PBEGMARK,PENDMARK);
 
 	{===== Draw Beginning Duplicates =====}
 	IF PNUMBEGINDUP > 0 THEN FOR i_Counter := 1 TO PNUMBEGINDUP DO BEGIN
@@ -277,7 +285,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
-		IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA');
+		{ IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA'); }
+		Set_Markers_Cust(LNewObj,PBEGMARK,'NA');
 
 	END ELSE FOR i_Counter := -1 DOWNTO PNUMBEGINDUP DO BEGIN
 		BeginPoly;
@@ -289,7 +298,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
-		IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA');
+		{ IF PUSEBEGINMARK THEN Set_Markers_Cust(LNewObj,'Dot','NA'); }
+		Set_Markers_Cust(LNewObj,PBEGMARK,'NA');
 	END;
 
 	{===== Draw End Duplicates =====}
@@ -303,7 +313,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
-		IF PUSEENDMARK THEN Set_Markers_Cust(LNewObj,'Arrow','NA');
+		{ IF PUSEENDMARK THEN Set_Markers_Cust(LNewObj,'Arrow','NA'); }
+		Set_Markers_Cust(LNewObj,PENDMARK,'NA');
 
 	END ELSE FOR i_Counter := -1 DOWNTO PNUMENDDUP DO BEGIN
 		BeginPoly;
@@ -315,7 +326,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
-		IF PUSEENDMARK THEN Set_Markers_Cust(LNewObj,'Arrow','NA');
+		{ IF PUSEENDMARK THEN Set_Markers_Cust(LNewObj,'Arrow','NA'); }
+		Set_Markers_Cust(LNewObj,PENDMARK,'NA');
 	END;
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}

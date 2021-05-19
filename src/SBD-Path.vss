@@ -36,24 +36,27 @@ VAR
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
-{// Sets Version info parameter //}
-PROCEDURE Set_Version_Info(s : STRING);
-BEGIN
-	SetRField(h_Obj,s_ObjName,'ver',s);
-END;
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
+
+{ {\// Sets Version info parameter //!{\ }
+{ PROCEDURE Set_Version_Info(s : STRING); }
+{ BEGIN }
+{ 	SetRField(h_Obj,s_ObjName,'ver',s); }
+{ END; }
 
 
-{// Sets the specified text object to use the attributes of PIO //}
-PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
-BEGIN
-	SetObjectVariableBoolean(h,800,True);
-END;
+{ {\// Sets the specified text object to use the attributes of PIO //!{\ }
+{ PROCEDURE Use_PIO_Text_Attributes (h : HANDLE); }
+{ BEGIN }
+{ 	SetObjectVariableBoolean(h,800,True); }
+{ END; }
 
-FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
-BEGIN
-	IF GetLayer(obj) = NIL THEN ResetObject(obj)
-	ELSE Find_Layer := GetLayer(obj);
-END;
+{ FUNCTION Find_Layer (obj : HANDLE) : HANDLE; }
+{ BEGIN }
+{ 	IF GetLayer(obj) = NIL THEN ResetObject(obj) }
+{ 	ELSE Find_Layer := GetLayer(obj); }
+{ END; }
 
 {// Resizes 'cs' to half length of smaller segment
     adjacent to given point //}
@@ -91,7 +94,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5 . 1');
+	Set_Version_Info('0 . 5 . 2');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter checking =====}

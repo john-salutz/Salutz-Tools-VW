@@ -35,46 +35,49 @@ VAR
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
-{// Sets Version info parameter //}
-PROCEDURE Set_Version_Info(s : STRING);
-BEGIN
-	SetRField(h_Obj,s_ObjName,'ver',s);
-END;
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
 
-{// Sets the specified text object to use the attributes of PIO //}
-PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
-BEGIN
-	SetObjectVariableBoolean(h,800,True);
-END;
+{ {\// Sets Version info parameter //!{\ }
+{ PROCEDURE Set_Version_Info(s : STRING); }
+{ BEGIN }
+{ 	SetRField(h_Obj,s_ObjName,'ver',s); }
+{ END; }
 
-{// Sets Background Fore and Back as White to Black, percentage set by 'r',
-    format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Fill_WtoB (r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	FillPat(1);
-	FillBack(i,i,i);
-END;
+{ {\// Sets the specified text object to use the attributes of PIO //!{\ }
+{ PROCEDURE Use_PIO_Text_Attributes (h : HANDLE); }
+{ BEGIN }
+{ 	SetObjectVariableBoolean(h,800,True); }
+{ END; }
 
-{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
-    format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Pen_WtoB (r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	PenPatN(2);
-	PenFore(i,i,i);
-END;
+{ {\// Sets Background Fore and Back as White to Black, percentage set by 'r', }
+{     format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Fill_WtoB (r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	FillPat(1); }
+{ 	FillBack(i,i,i); }
+{ END; }
 
-PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
-BEGIN
-	SetObjectVariableBoolean(h,684,b);
-END;
+{ {\// Sets Pen Fore and Back as White to Black, percentage set by 'r', }
+{     format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Pen_WtoB (r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	PenPatN(2); }
+{ 	PenFore(i,i,i); }
+{ END; }
+
+{ PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN); }
+{ BEGIN }
+{ 	SetObjectVariableBoolean(h,684,b); }
+{ END; }
 
 FUNCTION Get_Zcoor(h : HANDLE) : REAL;
 VAR
@@ -84,11 +87,11 @@ BEGIN
 	Get_Zcoor := z;
 END;
 
-FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
-BEGIN
-	IF GetLayer(obj) = NIL THEN ResetObject(obj)
-	ELSE Find_Layer := GetLayer(obj);
-END;
+{ FUNCTION Find_Layer (obj : HANDLE) : HANDLE; }
+{ BEGIN }
+{ 	IF GetLayer(obj) = NIL THEN ResetObject(obj) }
+{ 	ELSE Find_Layer := GetLayer(obj); }
+{ END; }
 
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
 PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
@@ -136,7 +139,7 @@ END;
 {====================================}
 
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5');
+	Set_Version_Info('0 . 5 . 2');
 	Use_PIO_Text_Attributes(h_Obj);
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
@@ -264,6 +267,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		PenSize(5);
 		IF (PLABELDIRECTION<>'---') THEN
 		BEGIN {// Direction "<<" & ">>" //}
+			{ TextVerticalAlign(5); }
 			IF (PLABELDIRECTION='<<') THEN BEGIN
 				TextJust(1);
 				i_Flip := 1;
@@ -298,6 +302,23 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Add2DVertex(0,-4.5,0,0);
 			EndPoly;
 			h_Shape := LNewObj;
+
+			{// Create Background Poly Shape //}
+			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+			Fill_WtoB(0);
+			PenSize(0);
+			PenPatN(0);
+			BeginPoly;
+			Add2DVertex(0,-4.5,0,0);
+			Add2DVertex(-2.5*i_Flip,0,4,5.3);
+			Add2DVertex(0,4.5,0,0);
+			Add2DVertex((HWidth(h_PosiName)+1)*i_Flip,4.5,0,0);
+			Add2DVertex((HWidth(h_PosiName)+1)*i_Flip,-4.5,0,0);
+			Add2DVertex(0,-4.5,0,0);
+			EndPoly;
+			HMoveBackward(LNewObj,TRUE);
+			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+
 			p_OffsetLine1.X := 1*i_Flip;
 			p_OffsetLine1.Y := -6;
 			p_LineOrig.X := -6*i_Flip;

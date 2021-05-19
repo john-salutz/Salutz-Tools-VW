@@ -40,52 +40,55 @@ VAR
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
-{// Sets Version info parameter //}
-PROCEDURE Set_Version_Info(s : STRING);
-BEGIN
-	SetRField(h_Obj,s_ObjName,'ver',s);
-END;
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
 
-{// Sets the specified text object to use the attributes of PIO //}
-PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
-BEGIN
-	SetObjectVariableBoolean(h,800,True);
-END;
+{ {\// Sets Version info parameter //!{\ }
+{ PROCEDURE Set_Version_Info(s : STRING); }
+{ BEGIN }
+{ 	SetRField(h_Obj,s_ObjName,'ver',s); }
+{ END; }
 
-{// Sets Background Fore and Back as White to Black, percentage set by 'r',
-	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Fill_WtoB (r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	FillPat(1);
-	FillBack(i,i,i);
-END;
+{ {\// Sets the specified text object to use the attributes of PIO //!{\ }
+{ PROCEDURE Use_PIO_Text_Attributes (h : HANDLE); }
+{ BEGIN }
+{ 	SetObjectVariableBoolean(h,800,True); }
+{ END; }
 
-{// Sets Pen Fore and Back as White to Black, percentage set by 'r',
-	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Pen_WtoB (r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	PenPatN(2);
-	PenFore(i,i,i);
-END;
+{ {\// Sets Background Fore and Back as White to Black, percentage set by 'r', }
+{ 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Fill_WtoB (r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	FillPat(1); }
+{ 	FillBack(i,i,i); }
+{ END; }
 
-PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN);
-BEGIN
-	SetObjectVariableBoolean(h,684,b);
-END;
+{ {\// Sets Pen Fore and Back as White to Black, percentage set by 'r', }
+{ 	format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Pen_WtoB (r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	PenPatN(2); }
+{ 	PenFore(i,i,i); }
+{ END; }
 
-FUNCTION Find_Layer (obj : HANDLE) : HANDLE;
-BEGIN
-	IF GetLayer(obj) = NIL THEN ResetObject(obj)
-	ELSE Find_Layer := GetLayer(obj);
-END;
+{ PROCEDURE Set_Tight_TextFill (h : HANDLE;b : BOOLEAN); }
+{ BEGIN }
+{ 	SetObjectVariableBoolean(h,684,b); }
+{ END; }
+
+{ FUNCTION Find_Layer (obj : HANDLE) : HANDLE; }
+{ BEGIN }
+{ 	IF GetLayer(obj) = NIL THEN ResetObject(obj) }
+{ 	ELSE Find_Layer := GetLayer(obj); }
+{ END; }
 
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
 PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
@@ -103,28 +106,28 @@ BEGIN
 		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
 END;
 
-{// Resets all objects of the stype inside the object's boundaries //}
-PROCEDURE Refresh_Children (h : HANDLE;stype : STRING);
-VAR
-	pt1,pt2     : POINT;
-	criteria,n  : STRING;
-	c           : ARRAY [1..6] OF STRING;
-BEGIN
-	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y);
-	pt1.X := (pt1.X/12)-1;
-	pt1.Y := (pt1.Y/12)+1;
-	pt2.X := (pt2.X/12)+1;
-	pt2.Y := (pt2.Y/12)-1;
-	n := ' & ';
-	c[1] := Concat('(T=PLUGINOBJECT)');
-	c[2] := Concat('(R IN [','''',stype,'''','])');
-	c[3] := Concat('(',pt2.Y,'<YCOORDINATE)');
-	c[4] := Concat('(YCOORDINATE<',pt1.Y,')');
-	c[5] := Concat('(',pt1.X,'<XCOORDINATE)');
-	c[6] := Concat('(XCOORDINATE<',pt2.X,')');
-	criteria := Concat(c[1],n,c[2],n,c[3],n,c[4],n,c[5],n,c[6]);
-	ForEachObject(ResetObject,criteria);
-END;
+{ {\// Resets all objects of the stype inside the object's boundaries //!{\ }
+{ PROCEDURE Refresh_Children (h : HANDLE;stype : STRING); }
+{ VAR }
+{ 	pt1,pt2     : POINT; }
+{ 	criteria,n  : STRING; }
+{ 	c           : ARRAY [1..6] OF STRING; }
+{ BEGIN }
+{ 	GetBBox(h,pt1.X,pt1.Y,pt2.X,pt2.Y); }
+{ 	pt1.X := (pt1.X/12)-1; }
+{ 	pt1.Y := (pt1.Y/12)+1; }
+{ 	pt2.X := (pt2.X/12)+1; }
+{ 	pt2.Y := (pt2.Y/12)-1; }
+{ 	n := ' & '; }
+{ 	c[1] := Concat('(T=PLUGINOBJECT)'); }
+{ 	c[2] := Concat('(R IN [','''',stype,'''','])'); }
+{ 	c[3] := Concat('(',pt2.Y,'<YCOORDINATE)'); }
+{ 	c[4] := Concat('(YCOORDINATE<',pt1.Y,')'); }
+{ 	c[5] := Concat('(',pt1.X,'<XCOORDINATE)'); }
+{ 	c[6] := Concat('(XCOORDINATE<',pt2.X,')'); }
+{ 	criteria := Concat(c[1],n,c[2],n,c[3],n,c[4],n,c[5],n,c[6]); }
+{ 	ForEachObject(ResetObject,criteria); }
+{ END; }
 
 
 {====================================}

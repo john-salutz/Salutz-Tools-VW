@@ -33,30 +33,33 @@ VAR
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
-{// Sets Version info parameter //}
-PROCEDURE Set_Version_Info(s : STRING);
-BEGIN
-	SetRField(h_Obj,s_ObjName,'ver',s);
-END;
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
 
-{// Sets the specified text object to use the attributes of PIO //}
-PROCEDURE Use_PIO_Text_Attributes (h : HANDLE);
-BEGIN
-	SetObjectVariableBoolean(h,800,True);
-END;
+{ {\// Sets Version info parameter //!{\ }
+{ PROCEDURE Set_Version_Info(s : STRING); }
+{ BEGIN }
+{ 	SetRField(h_Obj,s_ObjName,'ver',s); }
+{ END; }
 
-{// Sets Background Fore and Back as White to Black, percentage set by 'r',
-format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //}
-PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL);
-VAR i : LONGINT;
-BEGIN
-	IF r<0 THEN r:=0;
-	IF r>1 THEN r:=1;
-	i := Trunc(RGBmax*(1-r));
-	SetFillBack(h, i, i, i);
-	SetFillFore(h, i, i, i);
-	SetFPat(h, 1); {Blank pattern}
-END;
+{ {\// Sets the specified text object to use the attributes of PIO //!{\ }
+{ PROCEDURE Use_PIO_Text_Attributes (h : HANDLE); }
+{ BEGIN }
+{ 	SetObjectVariableBoolean(h,800,True); }
+{ END; }
+
+{ {\// Sets Background Fore and Back as White to Black, percentage set by 'r', }
+{ format 0=White, 0.1 thru 0.9=10% to 90%, 1=Black //!{\ }
+{ PROCEDURE Set_Background_WtoB (h : HANDLE; r : REAL); }
+{ VAR i : LONGINT; }
+{ BEGIN }
+{ 	IF r<0 THEN r:=0; }
+{ 	IF r>1 THEN r:=1; }
+{ 	i := Trunc(RGBmax*(1-r)); }
+{ 	SetFillBack(h, i, i, i); }
+{ 	SetFillFore(h, i, i, i); }
+{ 	SetFPat(h, 1); {\Blank pattern!{\ }
+{ END; }
 
 {====================================}
 {------------- < MAIN > -------------}
@@ -64,7 +67,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5');
+	Set_Version_Info('0 . 5 . 2');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Boundary Setup =====}
