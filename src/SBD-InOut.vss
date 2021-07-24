@@ -163,7 +163,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			r_TextLarge := 7*r_TextScaler;
 			r_TextSmall := 4*r_TextScaler;
 			p_TextOffset.Y := 5/16;
-		END ELSE IF PSIZE = 'Micro' THEN BEGIN
+		END ELSE IF (PSIZE = 'Micro') OR (PSIZE = 'USITT') THEN BEGIN
 			p_Origin.Y := 3;
 			r_TextLarge := 6*r_TextScaler;
 			r_TextSmall := 3.5*r_TextScaler;
@@ -197,7 +197,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		TextSize(r_TextLarge);
 		FillPat(0);
-		IF PPREFIX <> '' THEN BEGIN
+		IF (PPREFIX <> '') AND (PSIZE <> 'USITT') THEN BEGIN
 			CreateText(Concat(PPREFIX,' ',PIDNUM));
 			SetTextSize(LNewObj,0,Len(PPREFIX)+1,GetTextSize(LNewObj,0)-1);
 		END ELSE CreateText(PIDNUM);
@@ -222,34 +222,59 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		{// Draw Routing Text //}
-		NameClass(PCLASSROUT);
-		FillPat(0);
-		IF PTYPE = 'Output' THEN TextJust(1)
-		ELSE IF (PTYPE = 'Input') OR (PTYPE = 'Thru') THEN TextJust(3);
-		TextVerticalAlign(5);
-		Pen_WtoB(0.5);
-		IF PTYPE = 'Input'
-			THEN TextOrigin(23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
-		ELSE IF (PTYPE = 'Output')
-			THEN TextOrigin(-23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
-		ELSE TextOrigin(p_TextOffset.X,p_End.Y+p_TextOffset.Y);
-		TextSize(r_TextSmall-1);
-		IF PROUTING <> '' THEN CreateText(Concat(UniChr(187),PROUTING));
+		IF PSIZE <> 'USITT' THEN BEGIN
+			NameClass(PCLASSROUT);
+			FillPat(0);
+			IF PTYPE = 'Output' THEN TextJust(1)
+			ELSE IF (PTYPE = 'Input') OR (PTYPE = 'Thru') THEN TextJust(3);
+			TextVerticalAlign(5);
+			Pen_WtoB(0.5);
+			IF PTYPE = 'Input'
+				THEN TextOrigin(23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
+			ELSE IF (PTYPE = 'Output')
+				THEN TextOrigin(-23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
+			ELSE TextOrigin(p_TextOffset.X,p_End.Y+p_TextOffset.Y);
+			TextSize(r_TextSmall-1);
+			IF PROUTING <> '' THEN CreateText(Concat(UniChr(187),PROUTING));
+		END;
 
 		{// Draw Purpose Text //}
-		IF PTYPE = 'Input' THEN TextJust(3)
-		ELSE IF (PTYPE = 'Output') OR (PTYPE = 'Thru') THEN TextJust(1);
-		IF PTYPE = 'Thru' THEN TextJust(3);
-		TextVerticalAlign(5);
-		TextSize(r_TextSmall);
-		IF PTYPE = 'Thru' THEN TextOrigin(p_TextOffset.X-24,p_TextOffset.Y)
-		ELSE TextOrigin(-p_TextOffset.X*1.5,p_TextOffset.Y);
+		IF PSIZE <> 'USITT' THEN BEGIN
+			{// Regular,Small, & Micro //}
+
+			IF (PTYPE = 'Input') OR (PTYPE = 'Thru') THEN TextJust(3)
+			ELSE IF (PTYPE = 'Output') THEN TextJust(1);
+			TextVerticalAlign(5);
+			Pen_WtoB(0.5);
+			TextSize(r_TextSmall);
+			FillPat(1);
+			IF PTYPE = 'Thru' THEN TextOrigin(p_TextOffset.X-24,p_TextOffset.Y)
+			ELSE TextOrigin(-p_TextOffset.X*1.5,p_TextOffset.Y);
+		END ELSE BEGIN
+			{// USITT //}
+
+			TextVerticalAlign(5);
+			FillPat(0);
+			IF PTYPE <> 'Thru' THEN BEGIN {In & Out}
+				MoveTo((p_End.X/4),p_Origin.Y);
+				LineTo((p_End.X/4),p_End.Y);
+				TextSize(r_TextLarge-3);
+				TextVerticalAlign(1);
+				TextOrigin((p_End.X/4),p_Origin.Y);
+			END ELSE BEGIN {Thru}
+				TextOrigin(0,p_End.Y);
+				TextJust(2);
+				TextSize(r_TextSmall);
+			END;
+			Pen_WtoB(0.5);
+		END;
+
 		TextFace([Italic]);
 		NameClass(PCLASSPURP);
-		FillPat(1);
 		IF PPURPOSE <> '' THEN BEGIN
-			CreateText(Concat(PPURPOSE,' '));
-			HMoveBackward(LNewObj,TRUE);
+			IF PSIZE = 'USITT' THEN CreateText(Concat(' ',PPURPOSE,' '))
+			ELSE CreateText(Concat(PPURPOSE,' '));
+			IF PSIZE <> 'USITT' THEN HMoveBackward(LNewObj,TRUE);
 			Set_Tight_TextFill(LNewObj,FALSE);
 		END;
 

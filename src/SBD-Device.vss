@@ -100,8 +100,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END ELSE IF PSPACESIZE = 'Micro' THEN BEGIN
 		r_Space := MicroH;
 	END;
-	IF PTYPE = 'Multi' THEN r_Width := 24
-	ELSE r_Width := 48;
+	IF PCOLWIDTH = 'Single' THEN r_Width := 24
+	ELSE IF (PCOLWIDTH = 'Double')
+		OR (PCOLWIDTH = 'Break Bottom') THEN r_Width := 48
+	ELSE r_Width := 36;
 
 	Rect(-r_Width/2,r_Height,r_Width/2,0);
 
@@ -149,7 +151,42 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PNUMSPACES > 0 THEN BEGIN
 		Fill_WtoB(0.15);
 		Pen_WtoB(1);
-		Rect(-r_Width/2,0,r_Width/2,(-r_Space*PNUMSPACES));
+
+		IF (PCOLWIDTH = 'Double') OR (PCOLWIDTH = 'Single') THEN
+			Rect(-r_Width/2,0,r_Width/2,(-r_Space*PNUMSPACES))
+		ELSE BEGIN
+			MoveTo(-r_Width/2,0);
+			Relative; {````````````````````````````````````````}
+			BeginPoly;
+			Add2DVertex(0,0,0,0);
+
+			IF PCOLWIDTH = 'Break Left' THEN BEGIN
+				Add2DVertex(4.5,-(r_Space*PNUMSPACES)/4,2,0);
+				Add2DVertex(-3,-(r_Space*PNUMSPACES)/2,2,0);
+				Add2DVertex(1.5,-(r_Space*PNUMSPACES)/4,0,0);
+				Add2DVertex(3,0,0,0);
+				Add2DVertex(r_Width-6,0,0,0);
+				Add2DVertex(0,(r_Space*PNUMSPACES),0,0);
+
+			END ELSE IF PCOLWIDTH = 'Break Bottom' THEN BEGIN
+				Add2DVertex(0,-(r_Space*PNUMSPACES)-3,0,0);
+				Add2DVertex(r_Width/4,1.5,2,0);
+				Add2DVertex(r_Width/2,-3,2,0);
+				Add2DVertex(r_Width/4,4.5,0,0);
+				Add2DVertex(0,(r_Space*PNUMSPACES),0,0);
+
+			END ELSE IF PCOLWIDTH = 'Break Right' THEN BEGIN
+				Add2DVertex(0,-(r_Space*PNUMSPACES),0,0);
+				Add2DVertex(r_Width+3,0,0,0);
+				Add2DVertex(-1.5,(r_Space*PNUMSPACES)/4,2,0);
+				Add2DVertex(3,(r_Space*PNUMSPACES)/2,2,0);
+				Add2DVertex(-4.5,(r_Space*PNUMSPACES)/4,0,0);
+			END;
+			Add2DVertex(-r_Width,0,0,0);
+			EndPoly;
+			Absolute; {________________________________________}
+		END;
+
 		HMoveBackward(LNewObj,TRUE);
 		MoveTo(-r_Width/2,-3);
 		PenSize(0);
