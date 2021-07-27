@@ -60,14 +60,19 @@ VAR
 BEGIN
 	ActLS := GetLScale(Find_Layer(h_Obj));
 	IF sBeg = 'Dot' THEN {Dot}
-		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+		b := SetObjBeginningMarker(h,2,0,1in/ActLS,1in/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
-		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+		b := SetObjBeginningMarker(h,2176,15,3in/ActLS,2in/ActLS,0,0,TRUE)
+	ELSE IF sBeg = 'Box' THEN {Box}
+		b := SetObjBeginningMarker(h,11+128,0,2.5in/ActLS,2in/ActLS,0,0,TRUE);
 	IF sEnd = 'Dot' THEN {Dot}
-		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+		b := SetObjEndMarker(h,2,0,1in/ActLS,1in/ActLS,0,0,TRUE)
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
-		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
+		b := SetObjEndMarker(h,2176,15,3in/ActLS,2in/ActLS,0,0,TRUE)
+	ELSE IF sEnd = 'Box' THEN {Box}
+		b := SetObjEndMarker(h,11+128,0,2.5in/ActLS,2in/ActLS,0,0,TRUE);
 END;
+
 
 {====================================}
 {------------- < MAIN > -------------}
@@ -106,8 +111,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	h_Poly := LNewObj;
 
 	{===== Set poly markers =====}
-	IF PUSEBEGINMARK THEN Set_Markers_Cust(h_Poly,'Dot','NA');
-	IF PUSEENDMARK THEN Set_Markers_Cust(h_Poly,'NA','Arrow');
+	Set_Markers_Cust(h_Poly,PBEGMARK,PENDMARK);
+	{ IF PUSEBEGINMARK THEN Set_Markers_Cust(h_Poly,'Dot','NA'); }
+	{ IF PUSEENDMARK THEN Set_Markers_Cust(h_Poly,'NA','Arrow'); }
 	SetFPat(h_Poly,0);
 
 END; END; Run(SBD_Path);

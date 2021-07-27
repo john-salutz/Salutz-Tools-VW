@@ -37,22 +37,6 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
-{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
-PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
-VAR b	  : BOOLEAN;
-	ActLS : REAL;
-BEGIN
-	ActLS := GetLScale(Find_Layer(h_Obj));
-	IF sBeg = 'Dot' THEN {Dot}
-		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
-	ELSE IF sBeg = 'Arrow' THEN {Arrow}
-		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
-	IF sEnd	 = 'Dot' THEN {Dot}
-		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
-	ELSE IF sEnd = 'Arrow' THEN {Arrow}
-		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
-END;
-
 PROCEDURE Scale_to_Width (toScale, : HANDLE; widthSize : REAL);
 VAR p1 : POINT;
 BEGIN
@@ -89,25 +73,25 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Relative; {````````````````````````````````````````}
 		BeginPoly;
 		Add2DVertex(0,0,0,0);
-		Add2DVertex(6,0,0,0);
-		Add2DVertex(0,3,0,0);
-		Add2DVertex(5,0,0,0);
-		Add2DVertex(0,-3,0,0);
-		Add2DVertex(0,3,0,0);
-		Add2DVertex(5,2.5,0,0);
-		Add2DVertex(0,-11,0,0);
-		Add2DVertex(-5,2.5,0,0);
-		Add2DVertex(0,3,0,0);
-		Add2DVertex(0,-3,0,0);
-		Add2DVertex(-5,0,0,0);
-		Add2DVertex(0,3,0,0);
-		Add2DVertex(-6,0,0,0);
+		Add2DVertex(6in,0,0,0);
+		Add2DVertex(0,3in,0,0);
+		Add2DVertex(5in,0,0,0);
+		Add2DVertex(0,-3in,0,0);
+		Add2DVertex(0,3in,0,0);
+		Add2DVertex(5in,2.5in,0,0);
+		Add2DVertex(0,-11in,0,0);
+		Add2DVertex(-5in,2.5in,0,0);
+		Add2DVertex(0,3in,0,0);
+		Add2DVertex(0,-3in,0,0);
+		Add2DVertex(-5in,0,0,0);
+		Add2DVertex(0,3in,0,0);
+		Add2DVertex(-6in,0,0,0);
 		EndPoly;
 		Absolute; {________________________________________}
 
 		IF P__ACTIVEORPASSIVE = 'Active' THEN BEGIN
 			TextSize(3*r_TextScaler);
-			TextOrigin(5.625,-1.75);
+			TextOrigin(5.625in,-1.75in);
 			TextJust(3);
 			TextVerticalAlign(1);
 			CreateText('PWR');
@@ -116,10 +100,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Relative; {````````````````````````````````````````}
 			BeginPoly;
 			Add2DVertex(0,0,0,0);
-			Add2DVertex(0,1.875,0,0);
-			Add2DVertex(3,-1.875,0,0);
-			Add2DVertex(-3,-1.875,0,0);
-			Add2DVertex(0,1.875,0,0);
+			Add2DVertex(0,1.875in,0,0);
+			Add2DVertex(3in,-1.875in,0,0);
+			Add2DVertex(-3in,-1.875in,0,0);
+			Add2DVertex(0,1.875in,0,0);
 			EndPoly;
 			Absolute; {________________________________________}
 		END;
@@ -128,12 +112,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextSize(6*r_TextScaler);
 		TextJust(2);
 		TextVerticalAlign(3);
-		TextOrigin(11,0);
+		TextOrigin(11in,0);
 		CreateText(Concat(PPREFIX,PIDNUM));
 		IF Len(PPREFIX)>0
 			THEN SetTextSize(LNewObj,0,Len(PPREFIX),GetTextSize(LNewObj,0)-1);
 		IF (PPREFIX <> '') OR (PIDNUM <> '') THEN BEGIN
-			Scale_to_Width(LNewObj,9.75);
+			Scale_to_Width(LNewObj,9.75in);
 			b_Result := SetOpacityN(LNewObj,100,90);
 		END;
 
@@ -141,7 +125,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Fill_WtoB(0);
 		TextJust(1);
 		TextVerticalAlign(5);
-		TextOrigin(16.75,0.25);
+		TextOrigin(16.75in,0.25in);
 		CreateText(Concat(PMANUFACTURER,' ',PMODEL));
 
 		{Purpose}
@@ -149,7 +133,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		NameClass(PCLASSPURP);
 		TextFace([Italic]);
 		TextVerticalAlign(1);
-		TextOrigin(16.75,-0.25);
+		TextOrigin(16.75in,-0.25in);
 		CreateText(Concat(PPURPOSE,' '));
 		Set_Tight_TextFill(LNewObj,FALSE);
 
@@ -162,15 +146,15 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Relative; {````````````````````````````````````````}
 		BeginPoly;
 		Add2DVertex(0,0,0,0);
-		Add2DVertex(-8,0,0,0);
-		Add2DVertex(-3,3,4,4);
-		Add2DVertex(-3,-3,0,3);
-		Add2DVertex(0,3,0,0);
-		Add2DVertex(0,-6,0,0);
-		Add2DVertex(0,3,0,0);
-		Add2DVertex(3,-3,4,4);
-		Add2DVertex(3,3,0,3);
-		Add2DVertex(8,0,0,0);
+		Add2DVertex(-8in,0,0,0);
+		Add2DVertex(-3in,3in,4,4in);
+		Add2DVertex(-3in,-3in,0,3in);
+		Add2DVertex(0,3in,0,0);
+		Add2DVertex(0,-6in,0,0);
+		Add2DVertex(0,3in,0,0);
+		Add2DVertex(3in,-3in,4,4in);
+		Add2DVertex(3in,3in,0,3in);
+		Add2DVertex(8in,0,0,0);
 		EndPoly;
 		Absolute; {________________________________________}
 
@@ -178,19 +162,19 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextSize(6*r_TextScaler);
 		TextJust(2);
 		TextVerticalAlign(3);
-		TextOrigin(-11,0);
+		TextOrigin(-11in,0);
 		FillPat(0);
 		CreateText(Concat(PPREFIX,PIDNUM));
 		IF Len(PPREFIX)>0
 			THEN SetTextSize(LNewObj,0,Len(PPREFIX),GetTextSize(LNewObj,0)-1);
-		IF (PPREFIX <> '') OR (PIDNUM <> '') THEN Scale_to_Width(LNewObj,5.5);
+		IF (PPREFIX <> '') OR (PIDNUM <> '') THEN Scale_to_Width(LNewObj,5.5in);
 
 		{Model}
 		Fill_WtoB(0);
 		TextSize(3.5*r_TextScaler);
 		TextJust(3);
 		TextVerticalAlign(5);
-		TextOrigin(-14.75,0);
+		TextOrigin(-14.75in,0);
 		CreateText(Concat(PMANUFACTURER,' ',PMODEL));
 
 		{Purpose}
@@ -198,10 +182,60 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		NameClass(PCLASSPURP);
 		TextFace([Italic]);
 		TextVerticalAlign(1);
-		{ TextOrigin(-15,0); }
-		TextOrigin(-14.75,0);
+		TextOrigin(-14.75in,0);
 		CreateText(Concat(PPURPOSE,' '));
 		Set_Tight_TextFill(LNewObj,FALSE);
+	END ELSE IF PTYPE = 'Source' THEN BEGIN
+		SetParameterVisibility(h_Obj,'__ActiveOrPassive',TRUE);
+		MoveTo(0,0);
+		Relative; {````````````````````````````````````````}
+		BeginPoly;
+		Add2DVertex(0,0,0,0);
+		Add2DVertex(-7in,0,0,0);
+		Add2DVertex(0,3in,0,0);
+		Add2DVertex(-7in,0,0,0);
+		Add2DVertex(0,-6in,0,0);
+		Add2DVertex(7in,0,0,0);
+		Add2DVertex(0,3in,0,0);
+		{ Add2DVertex(-3in,3in,4,4in); }
+		{ Add2DVertex(-3in,-3in,0,3in); }
+		{ Add2DVertex(0,3in,0,0); }
+		{ Add2DVertex(0,-6in,0,0); }
+		{ Add2DVertex(0,3in,0,0); }
+		{ Add2DVertex(3in,-3in,4,4in); }
+		{ Add2DVertex(3in,3in,0,3in); }
+		Add2DVertex(7in,0,0,0);
+		EndPoly;
+		Absolute; {________________________________________}
+
+		{ID}
+		TextSize(6*r_TextScaler);
+		TextJust(2);
+		TextVerticalAlign(3);
+		TextOrigin(-10.5in,0);
+		FillPat(0);
+		CreateText(Concat(PPREFIX,PIDNUM));
+		IF Len(PPREFIX)>0
+			THEN SetTextSize(LNewObj,0,Len(PPREFIX),GetTextSize(LNewObj,0)-1);
+		IF (PPREFIX <> '') OR (PIDNUM <> '') THEN Scale_to_Width(LNewObj,5.5in);
+
+		{Model}
+		Fill_WtoB(0);
+		TextSize(3.5*r_TextScaler);
+		TextJust(3);
+		TextVerticalAlign(5);
+		TextOrigin(-14.75in,0);
+		CreateText(Concat(PMANUFACTURER,' ',PMODEL));
+
+		{Purpose}
+		Pen_WtoB(0.5);
+		NameClass(PCLASSPURP);
+		TextFace([Italic]);
+		TextVerticalAlign(1);
+		TextOrigin(-14.75in,0);
+		CreateText(Concat(PPURPOSE,' '));
+		Set_Tight_TextFill(LNewObj,FALSE);
+
 
 	END ELSE IF PTYPE = 'Fly Off' THEN BEGIN
 		SetParameterVisibility(h_Obj,'Manufacturer',FALSE);
@@ -209,13 +243,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'ClassPurp',FALSE);
 
 		BeginPoly;
-		Add2DVertex(5.25,0,0,0);
-		Add2DVertex(2.625,4.5,0,0);
-		Add2DVertex(-2.625,4.5,0,0);
-		Add2DVertex(-5.25,0,0,0);
-		Add2DVertex(-2.625,-4.5,0,0);
-		Add2DVertex(2.625,-4.5,0,0);
-		Add2DVertex(5.25,0,0,0);
+		Add2DVertex(5.25in,0,0,0);
+		Add2DVertex(2.625in,4.5in,0,0);
+		Add2DVertex(-2.625in,4.5in,0,0);
+		Add2DVertex(-5.25in,0,0,0);
+		Add2DVertex(-2.625in,-4.5in,0,0);
+		Add2DVertex(2.625in,-4.5in,0,0);
+		Add2DVertex(5.25in,0,0,0);
 		EndPoly;
 
 		{ID}
@@ -225,7 +259,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextOrigin(0,0);
 		FillPat(0);
 		CreateText(Concat(PPREFIX,PIDNUM));
-		Scale_to_Width(LNewObj,8);
+		Scale_to_Width(LNewObj,8in);
 	END;
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}

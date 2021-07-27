@@ -38,22 +38,6 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
-{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
-PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
-VAR b	  : BOOLEAN;
-	ActLS : REAL;
-BEGIN
-	ActLS := GetLScale(Find_Layer(h_Obj));
-	IF sBeg = 'Dot' THEN {Dot}
-		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
-	ELSE IF sBeg = 'Arrow' THEN {Arrow}
-		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
-	IF sEnd	 = 'Dot' THEN {Dot}
-		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
-	ELSE IF sEnd = 'Arrow' THEN {Arrow}
-		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
-END;
-
 FUNCTION Get_2D_Pt(h : HANDLE) : POINT;
 VAR p1 : POINT;
 BEGIN
@@ -96,7 +80,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
 	p_Origin.X := 0;
 	p_Leader.Y := 0;
-	p_TextOffset.X := 5/8;
+	p_TextOffset.X := 5/8in;
 	SetRField(
 	          h_Obj,s_ObjName,'Parent',
 	          STF_GetRField(
@@ -109,7 +93,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Draw Header =====}
 	IF PTYPE = 'Header' THEN BEGIN
 		Fill_WtoB(0.15);
-		Rect(-11.5,3,11.5,-3);
+		Rect(-11.5in,3in,11.5in,-3in);
 		FillPat(0);
 		TextSize(6*r_TextScaler);
 		TextJust(2);
@@ -130,12 +114,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'Connector','');
 	END ELSE IF PTYPE = 'Spacer' THEN BEGIN
 		Fill_WtoB(0.05);
-		Rect(-11.5,3,11.5,-3);
+		Rect(-11.5in,3in,11.5in,-3in);
 		FillPat(0);
 		TextSize(6*r_TextScaler);
 		TextJust(2);
 		TextVerticalAlign(1);
-		TextOrigin(0,3);
+		TextOrigin(0,3in);
 		CreateText(Concat(UniChr(8942),UniChr(8942),UniChr(8942)));
 		SetParameterVisibility(h_Obj,'Size',FALSE);
 		SetParameterVisibility(h_Obj,'Prefix',FALSE);
@@ -154,42 +138,42 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END ELSE BEGIN
 		{===== Setup Size =====}
 		IF PSIZE = 'Regular' THEN BEGIN
-			p_Origin.Y := 6;
+			p_Origin.Y := 6in;
 			r_TextLarge := 8*r_TextScaler;
 			r_TextSmall := 5*r_TextScaler;
-			p_TextOffset.Y := 5/8;
+			p_TextOffset.Y := 5/8in;
 		END ELSE IF PSIZE = 'Small' THEN BEGIN
-			p_Origin.Y := 4.5;
+			p_Origin.Y := 4.5in;
 			r_TextLarge := 7*r_TextScaler;
 			r_TextSmall := 4*r_TextScaler;
-			p_TextOffset.Y := 5/16;
+			p_TextOffset.Y := 5/16in;
 		END ELSE IF (PSIZE = 'Micro') OR (PSIZE = 'USITT') THEN BEGIN
-			p_Origin.Y := 3;
+			p_Origin.Y := 3in;
 			r_TextLarge := 6*r_TextScaler;
 			r_TextSmall := 3.5*r_TextScaler;
-			p_TextOffset.Y := 5/32;
+			p_TextOffset.Y := 5/32in;
 		END;
 		p_End.Y := -p_Origin.Y;
 
 		{===== Setup Type =====}
 		IF PTYPE = 'Input' THEN BEGIN
-			p_End.X := 23;
-			p_Leader.X := -9;
+			p_End.X := 23in;
+			p_Leader.X := -9in;
 			TextJust(1);
-			TextOrigin(1,p_Origin.Y);
+			TextOrigin(1in,p_Origin.Y);
 		END ELSE IF PTYPE = 'Output' THEN BEGIN
-			p_End.X := -23;
-			p_Leader.X := 9;
+			p_End.X := -23in;
+			p_Leader.X := 9in;
 			TextJust(3);
-			TextOrigin(-1,p_Origin.Y);
+			TextOrigin(-1in,p_Origin.Y);
 			p_TextOffset.X := -p_TextOffset.X;
 		END ELSE IF PTYPE = 'Thru' THEN BEGIN
 			TextJust(2);
 			TextOrigin(0,p_Origin.Y);
-			p_Leader.X := -21;
-			p_Origin.X := -12;
-			p_End.X := 12;
-			p_TextOffset.X := -p_TextOffset.X+12;
+			p_Leader.X := -21in;
+			p_Origin.X := -12in;
+			p_End.X := 12in;
+			p_TextOffset.X := -p_TextOffset.X+12in;
 		END;
 
 		{===== Draw Text =====}
@@ -230,9 +214,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			TextVerticalAlign(5);
 			Pen_WtoB(0.5);
 			IF PTYPE = 'Input'
-				THEN TextOrigin(23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
+				THEN TextOrigin(23in-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
 			ELSE IF (PTYPE = 'Output')
-				THEN TextOrigin(-23-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
+				THEN TextOrigin(-23in-p_TextOffset.X,p_End.Y+p_TextOffset.Y)
 			ELSE TextOrigin(p_TextOffset.X,p_End.Y+p_TextOffset.Y);
 			TextSize(r_TextSmall-1);
 			IF PROUTING <> '' THEN CreateText(Concat(UniChr(187),PROUTING));
@@ -248,7 +232,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Pen_WtoB(0.5);
 			TextSize(r_TextSmall);
 			FillPat(1);
-			IF PTYPE = 'Thru' THEN TextOrigin(p_TextOffset.X-24,p_TextOffset.Y)
+			IF PTYPE = 'Thru'
+				THEN TextOrigin(p_TextOffset.X-24in,p_TextOffset.Y)
 			ELSE TextOrigin(-p_TextOffset.X*1.5,p_TextOffset.Y);
 		END ELSE BEGIN
 			{// USITT //}

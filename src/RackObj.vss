@@ -20,9 +20,9 @@
 PROCEDURE Rack_Obj;
 
 CONST {Rack size constants}
-	k_RackU = 1.75; {1 rack unit height (1.75")}
-	k_RackWidth = 19; {19" rack width}
-	k_EarWidth = .625; {Rack ear width (5/8")}
+	k_RackU = 1.75in; {1 rack unit height (1.75")}
+	k_RackWidth = 19in; {19" rack width}
+	k_EarWidth = 5/8in; {Rack ear width (5/8")}
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
 
 VAR
@@ -73,11 +73,11 @@ BEGIN
 	GetBBox(h_OuterRect,pt1.X,pt1.Y,pt2.X,pt2.Y);
 	direction := 1;
 	IF leftOrRight='L' THEN BEGIN
-		offsetX := -1.25;
+		offsetX := -1.25in;
 		start.X := pt1.X+offsetX;
 	END;
 	IF leftOrRight='R' THEN BEGIN
-		offsetX := 1.25;
+		offsetX := 1.25in;
 		start.X := pt2.X+offsetX;
 	END;
 	IF PNUMFROM = 'Bottom' THEN BEGIN
@@ -115,7 +115,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5 . 2');
+	Set_Version_Info('0 . 5 . 3');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
@@ -169,7 +169,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PRACKID <> '' THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		MoveTo(0,0);
-		TextOrigin(0,r_Height+PFRAME+0.5);
+		TextOrigin(0,r_Height+PFRAME+0.5in);
 		Fill_WtoB(0);
 		TextJust(2);
 		TextVerticalAlign(5);

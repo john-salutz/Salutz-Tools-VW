@@ -20,9 +20,9 @@
 PROCEDURE Rack_Equip;
 
 CONST {Rack Related Constants}
-	k_RackU     = 1.75;     {1 rack unit height (1.75")}
-	k_RackWidth = 19;       {19" rack width}
-	k_EarWidth  = .625;     {Rack ear width (5/8")}
+	k_RackU     = 1.75in;     {1 rack unit height (1.75")}
+	k_RackWidth = 19in;       {19" rack width}
+	k_EarWidth  = 5/8in;    {Rack ear width (5/8")}
 	RGBmax      = 65535;    {Max value for setting RGB colors in VS fuctions}
 
 VAR
@@ -119,7 +119,7 @@ END;
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
-	Set_Version_Info('0 . 5 . 2');
+	Set_Version_Info('0 . 5 . 3');
 	Use_PIO_Text_Attributes(h_Obj);
 	IF (PNUMSPACES<1) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
@@ -190,7 +190,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetTextJust(h_MakeModel,2);
 		IF (HHeight(h_MakeModel)>(r_Height*0.5))
 			THEN Scale_Fit_Height(h_MakeModel,h_InnerRect,0.5);
-		IF (HWidth(h_MakeModel)>(r_Width-2))
+		IF (HWidth(h_MakeModel)>(r_Width-2in))
 			THEN Scale_Fit_Width(h_MakeModel,h_InnerRect,0.9);
 	END;
 
@@ -200,14 +200,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Get2DPt(h_InnerRect,1,p_Temp.X,p_Temp.Y);
 		MoveTo(p_Temp.X,p_Temp.Y);
 		Relative; {````````````````````````````````````````}
-		MoveTo(0.25,0);
+		MoveTo(0.25in,0);
 		TextOrigin(0,0);
 		Absolute; {________________________________________}
 		CreateText(PPURPOSE);
 		h_Purpose := LNewObj;
 		IF (HHeight(h_Purpose)>(r_Height*0.25))
 			THEN Scale_Fit_Height(h_Purpose,h_InnerRect,0.25);
-		IF (HWidth(h_Purpose)>(r_Width-2))
+		IF (HWidth(h_Purpose)>(r_Width-2in))
 			THEN Scale_Fit_Width(h_Purpose,h_InnerRect,0.9);
 		SetTextJust(h_Purpose,1);
 		SetTextVerticalAlign(h_Purpose,1);

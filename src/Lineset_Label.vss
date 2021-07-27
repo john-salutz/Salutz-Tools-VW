@@ -63,20 +63,20 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{// Draw Poly //}
 	BeginPoly;
 	Add2DVertex(0,0,0,0);
-	Add2DVertex(-2*i_Flip,0,0,0);
-	Add2DVertex(-5.464*i_Flip,2,0,0);
-	Add2DVertex(-60*i_Flip,2,0,0);
-	Add2DVertex(-60*i_Flip,-2,0,0);
-	Add2DVertex(-5.464*i_Flip,-2,0,0);
-	Add2DVertex(-2*i_Flip,0,0,0);
+	Add2DVertex(-2in*i_Flip,0,0,0);
+	Add2DVertex(-5.464in*i_Flip,2in,0,0);
+	Add2DVertex(-60in*i_Flip,2in,0,0);
+	Add2DVertex(-60in*i_Flip,-2in,0,0);
+	Add2DVertex(-5.464in*i_Flip,-2in,0,0);
+	Add2DVertex(-2in*i_Flip,0,0,0);
 	Add2DVertex(0,0,0,0);
 	EndPoly;
 	{// Draw Number rectangle //}
 	Fill_WtoB(0.25);
-	Rect(-19*i_Flip,2,-13*i_Flip,-2);
+	Rect(-19in*i_Flip,2in,-13in*i_Flip,-2in);
 	{// Draw division line //}
-	MoveTo(-31*i_Flip,2);
-	Line(0,-4);
+	MoveTo(-31in*i_Flip,2in);
+	Line(0,-4in);
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{===== Draw Text =====}
@@ -86,7 +86,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextJust(2);
 	TextSize(4*r_TextScaler);
 	{Lineset Name / Purpose}
-	TextOrigin(-32*i_Flip,0);
+	TextOrigin(-32in*i_Flip,0);
 	IF PPURPOSE <> '' THEN BEGIN
 		IF PTYPE='LX' THEN BEGIN
 			TextFace([Bold]);
@@ -102,7 +102,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{Plasterline distance}
 	Pen_WtoB(0.5);
 	TextSize(3.5*r_TextScaler);
-	TextOrigin(-9*i_Flip,0);
+	TextOrigin(-9in*i_Flip,0);
 	IF (PUSEOBJY) THEN BEGIN
 		CreateText(Num2StrF(y_coor));
 		SetParameterVisibility(h_Obj,'PLDist',FALSE);
@@ -111,12 +111,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextSize(5*r_TextScaler);
 	Pen_WtoB(1);
 	TextFace([Bold]);
-	TextOrigin(-16*i_Flip,0);
+	TextOrigin(-16in*i_Flip,0);
 	CreateText(PLSNUM);
 	{Trim}
 	TextSize(4*r_TextScaler);
 	TextFace([Italic]);
-	TextOrigin(-25*i_Flip,0);
+	TextOrigin(-25in*i_Flip,0);
 	IF PUSEOBJZ THEN BEGIN
 		SetParameterVisibility(h_Obj,'Trim',FALSE);
 		IF (z_coor <> 0) THEN BEGIN
@@ -130,7 +130,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PWEIGHT>0 THEN BEGIN
 		TextFace([]);
 		Fill_WtoB(0);
-		TextOrigin(1*i_Flip,0);
+		TextOrigin(1in*i_Flip,0);
 		CreateText(Concat(PWEIGHT,' ',PWEIGHTUNITS));
 		IF PDIRECTION = '>>' THEN SetTextJust(LNewObj,1)
 		ELSE SetTextJust(LNewObj,3);
@@ -152,7 +152,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		PenPatN(0);
 		PenSize(0);
-		Rect(-5.5*i_Flip,2,0*i_Flip,-2);
+		Rect(-5.5in*i_Flip,2in,0*i_Flip,-2in);
 		HMoveBackward(LNewObj,TRUE);
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;

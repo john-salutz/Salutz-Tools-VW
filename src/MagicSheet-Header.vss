@@ -42,22 +42,23 @@ VAR
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5 . 2');
+	Set_Version_Info('0 . 5 . 3');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Boundary Setup =====}
-	pt1.X := -1*PSCALE;
-	pt1.Y := 0*PSCALE;
-	pt2.X := 1*PSCALE;
-	pt2.Y := -0.25*PSCALE;
+	pt1.X := -1in*PSCALE;
+	pt1.Y := 0in*PSCALE;
+	pt2.X := 1in*PSCALE;
+	pt2.Y := -0.25in*PSCALE;
 
 	{===== Draw Objects =====}
 	{Outer Rectangle}
 	Rect(pt1.X,pt1.Y,pt2.X,pt2.Y);
 	{Inner Rectangle}
 	RRect(
-	      pt1.X+0.025*PSCALE,pt1.Y-0.05*PSCALE,
-	      pt2.X-0.025*PSCALE,pt2.Y+0.025*PSCALE,0.125*PSCALE,0.125*PSCALE
+	      pt1.X+0.025in*PSCALE,pt1.Y-0.05in*PSCALE,
+	      pt2.X-0.025in*PSCALE,pt2.Y+0.025in*PSCALE,
+	      0.125in*PSCALE,0.125in*PSCALE
 	      );
 	Set_Background_WtoB(LNewObj,0);
 	SetLW(LNewObj,0);

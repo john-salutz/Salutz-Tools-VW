@@ -73,7 +73,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Variable Setup =====}
 	r_TextScaler := 24/GetLScale(Find_Layer(h_Obj));
 	p_NoteStart.X := 0;
-	p_NoteStart.Y := -1.5;
+	p_NoteStart.Y := -1.5in;
 	{===== Attribute Setup =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	Fill_WtoB(0);
@@ -82,7 +82,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	PenSize(7*r_TextScaler);
 
 	{// Label Text //}
-	TextOrigin(0,2);
+	TextOrigin(0,2in);
 	TextJust(2);
 	TextVerticalAlign(5);
 	CreateText(PLABEL);
@@ -100,18 +100,18 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Draw Horz Lines //}
 	MoveTo(0,0);
-	LineTo(6,0);
+	LineTo(6in,0);
 	Set_Markers_Cust(LNewObj,'NA','Arrow');
 	MoveTo(0,0);
-	LineTo(-6,0);
+	LineTo(-6in,0);
 	Set_Markers_Cust(LNewObj,'NA','Arrow');
 
 	{// Draw Center Marker //}
-	Oval(-1,1,1,-1);
+	Oval(-1in,1in,1in,-1in);
 	Set_Background_WtoB(LNewObj,0.2);
-	ArcByCenter(0,0,1,0,90);
+	ArcByCenter(0,0,1in,0,90);
 	Set_Background_WtoB(LNewObj,1);
-	ArcByCenter(0,0,1,180,90);
+	ArcByCenter(0,0,1in,180,90);
 	Set_Background_WtoB(LNewObj,1);
 
 	{// Text Style 'Plain' //}
@@ -120,7 +120,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{ Pen_WtoB(1); }
 
 	{// East Text //}
-	TextOrigin(6.5,0);
+	TextOrigin(6.5in,0);
 	TextVerticalAlign(3);
 	TextJust(1);
 	IF PEAST <> '' THEN BEGIN
@@ -129,7 +129,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	{// West Text //}
-	TextOrigin(-6.5,0);
+	TextOrigin(-6.5in,0);
 	TextJust(3);
 	IF PWEST <> '' THEN BEGIN
 		CreateText(PWEST);
@@ -137,13 +137,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	{// South Text //}
-	TextOrigin(0,-4);
+	TextOrigin(0,-4in);
 	TextVerticalAlign(1);
 	TextJust(2);
 	IF PSOUTH <> '' THEN BEGIN
 		{Draw Vert Line}
 		MoveTo(0,0);
-		LineTo(0,-4);
+		LineTo(0,-4in);
 		Set_Markers_Cust(LNewObj,'NA','Arrow');
 		HMoveBackward(LNewObj,TRUE);
 		{Draw Text}
@@ -151,7 +151,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		HMoveBackward(LNewObj,TRUE);
 		Set_Pen_WtoB(LNewObj,1);
 		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_NoteStart.Y);
-	END ELSE p_Tmp2.Y := -4;
+	END ELSE p_Tmp2.Y := -4in;
 
 	{===== Start Dimension/Notes Text =====}
 	TextOrigin(p_NoteStart.X,p_NoteStart.Y);
@@ -176,7 +176,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextFace([]);
 		CreateText(PDIMFROM);
 		Set_Tight_TextFill(LNewObj,TRUE);
-		SetTextWidth(LNewObj,33);
+		SetTextWidth(LNewObj,33in);
 		HMoveBackward(LNewObj,TRUE);
 	END;
 
@@ -199,7 +199,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextFace([]);
 		CreateText(PNOTES);
 		Set_Tight_TextFill(LNewObj,TRUE);
-		SetTextWidth(LNewObj,33);
+		SetTextWidth(LNewObj,33in);
 		HMoveBackward(LNewObj,TRUE);
 	END;
 

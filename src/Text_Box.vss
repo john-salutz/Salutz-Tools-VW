@@ -72,15 +72,15 @@ VAR li_Dash : LONGINT;
 BEGIN
 	IF style = 'Solid' THEN li_Dash := 2
 	ELSE IF style='Dashed' THEN BEGIN
-		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.03);
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12in, 0.03in);
 		b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed');
 	END
 	ELSE IF style='Dashed Spaced' THEN BEGIN
-		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12, 0.18);
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12in, 0.18in);
 		b_Result := SetDashLineTypeName(li_Dash, 'ISO-03 Dashed Spaced');
 	END
 	ELSE IF style='Dotted' THEN BEGIN
-		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.005, 0.03);
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.005in, 0.03in);
 		b_Result := SetDashLineTypeName(li_Dash, 'ISO-07 Dotted');
 	END
 	ELSE IF style='None' THEN li_Dash := 0;

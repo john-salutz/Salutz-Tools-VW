@@ -40,22 +40,6 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
-{Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
-PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
-VAR b     : BOOLEAN;
-    ActLS : REAL;
-BEGIN
-	ActLS := GetLScale(ActLayer);
-	IF sBeg = 'Dot' THEN {Dot}
-		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
-	ELSE IF sBeg = 'Arrow' THEN {Arrow}
-		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
-	IF sEnd = 'Dot' THEN {Dot}
-		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
-	ELSE IF sEnd = 'Arrow' THEN {Arrow}
-		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE);
-END;
-
 FUNCTION Setup_Text_Label (h : HANDLE;i : INTEGER) : BOOLEAN;
 VAR
 	p1,p2 : POINT;

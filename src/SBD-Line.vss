@@ -21,9 +21,9 @@ PROCEDURE SBD_Line;
 
 CONST
 	RGBmax   = 65535; {Max value for setting RGB colors in VS fuctions}
-	RegularH = 12;
-	SmallH   = 9;
-	MicroH   = 6;
+	RegularH = 12in;
+	SmallH   = 9in;
+	MicroH   = 6in;
 
 VAR
 	{Standard variables}
@@ -151,17 +151,17 @@ VAR
 BEGIN
 	ActLS := GetLScale(Find_Layer(h_Obj));
 	IF sBeg = 'Dot' THEN {Dot}
-		b := SetObjBeginningMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+		b := SetObjBeginningMarker(h,2,0,1in/ActLS,1in/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
-		b := SetObjBeginningMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE)
+		b := SetObjBeginningMarker(h,2176,15,3in/ActLS,2in/ActLS,0,0,TRUE)
 	ELSE IF sBeg = 'Box' THEN {Box}
-		b := SetObjBeginningMarker(h,11+128,0,2.5/ActLS,2/ActLS,0,0,TRUE);
+		b := SetObjBeginningMarker(h,11+128,0,2.5in/ActLS,2in/ActLS,0,0,TRUE);
 	IF sEnd = 'Dot' THEN {Dot}
-		b := SetObjEndMarker(h,2,0,1/ActLS,1/ActLS,0,0,TRUE)
+		b := SetObjEndMarker(h,2,0,1in/ActLS,1in/ActLS,0,0,TRUE)
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
-		b := SetObjEndMarker(h,2176,15,3/ActLS,2/ActLS,0,0,TRUE)
+		b := SetObjEndMarker(h,2176,15,3in/ActLS,2in/ActLS,0,0,TRUE)
 	ELSE IF sEnd = 'Box' THEN {Box}
-		b := SetObjEndMarker(h,11+128,0,2.5/ActLS,2/ActLS,0,0,TRUE);
+		b := SetObjEndMarker(h,11+128,0,2.5in/ActLS,2in/ActLS,0,0,TRUE);
 END;
 
 
@@ -232,10 +232,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PNUMBEGINDUP > 0 THEN FOR i_Counter := 1 TO PNUMBEGINDUP DO BEGIN
 		BeginPoly;
 		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
-		Add2DVertex(p_Start.X+3,p_Start.Y+(i_Counter*i_BegDupSize),
-		            i_CornerStyle,3);
-		Add2DVertex(p_Start.X+3,p_Start.Y,i_CornerStyle,3);
-		IF p_Midpoint.X > (p_Start.X+3) THEN
+		Add2DVertex(p_Start.X+3in,p_Start.Y+(i_Counter*i_BegDupSize),
+		            i_CornerStyle,3in);
+		Add2DVertex(p_Start.X+3in,p_Start.Y,i_CornerStyle,3in);
+		IF p_Midpoint.X > (p_Start.X+3in) THEN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
@@ -244,10 +244,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END ELSE FOR i_Counter := -1 DOWNTO PNUMBEGINDUP DO BEGIN
 		BeginPoly;
 		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
-		Add2DVertex(p_Start.X+3,p_Start.Y+(i_Counter*i_BegDupSize),
-		            i_CornerStyle,3);
-		Add2DVertex(p_Start.X+3,p_Start.Y,i_CornerStyle,3);
-		IF p_Midpoint.X > (p_Start.X+3) THEN
+		Add2DVertex(p_Start.X+3in,p_Start.Y+(i_Counter*i_BegDupSize),
+		            i_CornerStyle,3in);
+		Add2DVertex(p_Start.X+3in,p_Start.Y,i_CornerStyle,3in);
+		IF p_Midpoint.X > (p_Start.X+3in) THEN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
@@ -258,10 +258,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PNUMENDDUP > 0 THEN FOR i_Counter := 1 TO PNUMENDDUP DO BEGIN
 		BeginPoly;
 		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
-		Add2DVertex(p_End.X-3,p_End.Y+(i_Counter*i_EndDupSize),
-		            i_CornerStyle,3);
-		Add2DVertex(p_End.X-3,p_End.Y,i_CornerStyle,3);
-		IF p_Midpoint.X < (p_End.X+3) THEN
+		Add2DVertex(p_End.X-3in,p_End.Y+(i_Counter*i_EndDupSize),
+		            i_CornerStyle,3in);
+		Add2DVertex(p_End.X-3in,p_End.Y,i_CornerStyle,3in);
+		IF p_Midpoint.X < (p_End.X+3in) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
@@ -270,10 +270,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END ELSE FOR i_Counter := -1 DOWNTO PNUMENDDUP DO BEGIN
 		BeginPoly;
 		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
-		Add2DVertex(p_End.X-3,p_End.Y+(i_Counter*i_EndDupSize),
-		            i_CornerStyle,3);
-		Add2DVertex(p_End.X-3,p_End.Y,i_CornerStyle,3);
-		IF p_Midpoint.X < (p_End.X+3) THEN
+		Add2DVertex(p_End.X-3in,p_End.Y+(i_Counter*i_EndDupSize),
+		            i_CornerStyle,3in);
+		Add2DVertex(p_End.X-3in,p_End.Y,i_CornerStyle,3in);
+		IF p_Midpoint.X < (p_End.X+3in) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
 		EndPoly;
