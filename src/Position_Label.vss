@@ -53,13 +53,13 @@ VAR b     : BOOLEAN;
 BEGIN
 	ActLS := GetLScale(Find_Layer(h_Obj));
 	IF sBeg = 'Dot' THEN {Dot}
-		b := SetObjBeginningMarker(h,2,0,1in/ActLS,1in/ActLS,0,0,TRUE)
+		b := SetObjBeginningMarker(h,2,0,1in/ActLS,1in/ActLS,2,7,TRUE)
 	ELSE IF sBeg = 'Arrow' THEN {Arrow}
-		b := SetObjBeginningMarker(h,2176,15,3in/ActLS,2in/ActLS,0,0,TRUE);
+		b := SetObjBeginningMarker(h,2176,15,3in/ActLS,2in/ActLS,2,7,TRUE);
 	IF sEnd = 'Dot' THEN {Dot}
-		b := SetObjEndMarker(h,2,0,1in/ActLS,1in/ActLS,0,0,TRUE)
+		b := SetObjEndMarker(h,2,0,1in/ActLS,1in/ActLS,2,7,TRUE)
 	ELSE IF sEnd = 'Arrow' THEN {Arrow}
-		b := SetObjEndMarker(h,2176,15,3in/ActLS,2in/ActLS,0,0,TRUE);
+		b := SetObjEndMarker(h,2176,15,3in/ActLS,2in/ActLS,2,7,TRUE);
 END;
 
 PROCEDURE From_Back_Set_Pen (source : HANDLE; target : HANDLE);
@@ -92,7 +92,7 @@ END;
 {====================================}
 
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5 . 2');
+	Set_Version_Info('0 . 5 . 3');
 	Use_PIO_Text_Attributes(h_Obj);
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
@@ -313,6 +313,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Add2DVertex(0,-4.5in,0,0);
 			EndPoly;
 			h_Shape := LNewObj;
+
+			IF (PCONTROLPOINT01X>(HWidth(h_Shape)/2)) THEN
+				p_LineOrig.X := HWidth(h_Shape)/2
+			ELSE IF (PCONTROLPOINT01X<(-HWidth(h_Shape)/2)) THEN
+				p_LineOrig.X := -HWidth(h_Shape)/2;
 		END; {Direction ---}
 
 		{// Setup Line 1&2 Attributes //}
@@ -372,7 +377,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		              );
 		HMoveBackward(LNewObj,TRUE);
 		Set_Markers_Cust(LNewObj,'NA','Arrow');
-		SetLW(LNewObj,7);
 		SetFPat(LNewObj,0);
 	END;
 
