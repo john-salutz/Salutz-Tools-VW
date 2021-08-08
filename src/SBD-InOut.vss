@@ -68,7 +68,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 5 . 2');
+	Set_Version_Info('0 . 6');
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
 	{===== Variable Setup =====}
@@ -147,7 +147,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			r_TextLarge := 7*r_TextScaler;
 			r_TextSmall := 4*r_TextScaler;
 			p_TextOffset.Y := 5/16in;
-		END ELSE IF (PSIZE = 'Micro') OR (PSIZE = 'USITT') THEN BEGIN
+		END ELSE IF (PSIZE = 'Micro') THEN BEGIN
+			p_Origin.Y := 3in;
+			r_TextLarge := 6*r_TextScaler;
+			r_TextSmall := 3.5*r_TextScaler;
+			p_TextOffset.Y := 5/32in;
+		END ELSE IF (PSIZE = 'USITT') THEN BEGIN
 			p_Origin.Y := 3in;
 			r_TextLarge := 6*r_TextScaler;
 			r_TextSmall := 3.5*r_TextScaler;
@@ -161,12 +166,20 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			p_Leader.X := -9in;
 			TextJust(1);
 			TextOrigin(1in,p_Origin.Y);
+			IF PSIZE = 'USITT' THEN BEGIN
+				TextVerticalAlign(3);
+				TextOrigin(1in,0);
+			END;
 		END ELSE IF PTYPE = 'Output' THEN BEGIN
 			p_End.X := -23in;
 			p_Leader.X := 9in;
 			TextJust(3);
 			TextOrigin(-1in,p_Origin.Y);
 			p_TextOffset.X := -p_TextOffset.X;
+			IF PSIZE = 'USITT' THEN BEGIN
+				TextVerticalAlign(3);
+				TextOrigin(-1in,0);
+			END;
 		END ELSE IF PTYPE = 'Thru' THEN BEGIN
 			TextJust(2);
 			TextOrigin(0,p_Origin.Y);
@@ -179,6 +192,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		{===== Draw Text =====}
 		{// Draw ID/Number Text //}
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+		
 		TextSize(r_TextLarge);
 		FillPat(0);
 		IF (PPREFIX <> '') AND (PSIZE <> 'USITT') THEN BEGIN
@@ -243,9 +257,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			IF PTYPE <> 'Thru' THEN BEGIN {In & Out}
 				MoveTo((p_End.X/4),p_Origin.Y);
 				LineTo((p_End.X/4),p_End.Y);
-				TextSize(r_TextLarge-3);
-				TextVerticalAlign(1);
-				TextOrigin((p_End.X/4),p_Origin.Y);
+				SetLW(LNewObj,2);
+				TextSize(r_TextLarge*0.8);
+				TextVerticalAlign(3);
+				{ TextOrigin((p_End.X/4),p_Origin.Y); }
+				TextOrigin((p_End.X/4),0);
 			END ELSE BEGIN {Thru}
 				TextOrigin(0,p_End.Y);
 				TextJust(2);
@@ -257,7 +273,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextFace([Italic]);
 		NameClass(PCLASSPURP);
 		IF PPURPOSE <> '' THEN BEGIN
-			IF PSIZE = 'USITT' THEN CreateText(Concat(' ',PPURPOSE,' '))
+			IF PSIZE = 'USITT' THEN CreateText(Concat('',PPURPOSE,' '))
 			ELSE CreateText(Concat(PPURPOSE,' '));
 			IF PSIZE <> 'USITT' THEN HMoveBackward(LNewObj,TRUE);
 			Set_Tight_TextFill(LNewObj,FALSE);

@@ -102,14 +102,19 @@ BEGIN IF (h = NIL) THEN Get_RackNumSpaces := 0
 	ELSE Get_RackNumSpaces := Str2Num(STF_GetRField(h, 'NumSpaces'));
 END;
 
-FUNCTION Get_PositionInRack(h : HANDLE) : STRING;
-VAR offset : REAL;
+FUNCTION Get_PositionInRack(rack,equip : HANDLE) : STRING;
+VAR
+	offset : REAL;
+	pRack,pEquip  : POINT;
 BEGIN
-	offset := ((p_EquipLoc.Y-p_RackLoc.Y)/k_RackU);
-	IF Get_RackNumFrom(h) = 'Bottom'
+	GetSymLoc(equip,pEquip.X,pEquip.Y);
+	GetSymLoc(rack,pRack.X,pRack.Y);
+	{ offset := ((p_EquipLoc.Y-p_RackLoc.Y)/k_RackU); }
+	offset := ((pEquip.Y-pRack.Y)/k_RackU);
+	IF Get_RackNumFrom(rack) = 'Bottom'
 		THEN Get_PositionInRack := Num2Str(0,offset)
-	ELSE IF Get_RackNumFrom(h) = 'Top'
-		THEN Get_PositionInRack := Num2Str(0, Get_RackNumSpaces(h)-offset+1);
+	ELSE IF Get_RackNumFrom(rack) = 'Top'
+		THEN Get_PositionInRack := Num2Str(0, Get_RackNumSpaces(rack)-offset+1);
 END;
 
 {====================================}
@@ -119,7 +124,7 @@ END;
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
-	Set_Version_Info('0 . 5 . 3');
+	Set_Version_Info('0 . 6');
 	Use_PIO_Text_Attributes(h_Obj);
 	IF (PNUMSPACES<1) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
@@ -152,16 +157,16 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF ((p_EquipLoc.X<p_RackLoc.X) AND PHALFWIDTH)
 			THEN SetRField(
 			               h_Obj, s_ObjName, 'RackPosition',
-			               Concat(Get_PositionInRack(h_Rack),'-L')
+			               Concat(Get_PositionInRack(h_Rack,h_Obj),'-L')
 			               )
 		ELSE IF ((p_EquipLoc.X>p_RackLoc.X) AND PHALFWIDTH)
 			THEN SetRField(
 			               h_Obj, s_ObjName, 'RackPosition',
-			               Concat(Get_PositionInRack(h_Rack),'-R')
+			               Concat(Get_PositionInRack(h_Rack,h_Obj),'-R')
 			               )
 		ELSE SetRField(
 		               h_Obj,s_ObjName,'RackPosition',
-		               Get_PositionInRack(h_Rack)
+		               Get_PositionInRack(h_Rack,h_Obj)
 		               );
 	END ELSE SetRField(h_Obj,s_ObjName,'RackPosition', Num2Str(0,0));
 
