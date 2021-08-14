@@ -36,6 +36,32 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
+PROCEDURE Copy_FillPoints (source, target : HANDLE);
+VAR
+	xO,yO,xI,yI,xJ,yJ : REAL;
+BEGIN
+	{ SetObjectVariableReal(source,110,0in); }
+	{ SetObjectVariableReal(source,111,0in); }
+
+	GetFillPoints(source,xO,yO,xI,yI,xJ,yJ);
+	SetFillOriginPoint(target,-1in,-1in);
+	SetFillIAxisEndPoint(target,xI,yI);
+	SetFillJAxisEndPoint(target,xJ,yJ);
+
+	SetObjectVariableLongint(target,78,GetObjectVariableLongint(source,78));
+	SetObjectVariableReal(target,74,GetObjectVariableReal(source,74));
+	SetObjectVariableBoolean(target,75,GetObjectVariableBoolean(source,75));
+	SetObjectVariableBoolean(target,76,GetObjectVariableBoolean(source,76));
+	SetObjectVariableBoolean(target,79,GetObjectVariableBoolean(source,79));
+	SetObjectVariableReal(target,110,GetObjectVariableReal(source,110));
+	SetObjectVariableReal(target,111,GetObjectVariableReal(source,111));
+	SetObjectVariableReal(target,110,-1in);
+	SetObjectVariableReal(target,111,-1in);
+	SetObjectVariableReal(target,112,GetObjectVariableReal(source,112));
+	SetObjectVariableReal(target,113,GetObjectVariableReal(source,113));
+
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -54,6 +80,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Draw Objects =====}
 	{Outer Rectangle}
 	Rect(pt1.X,pt1.Y,pt2.X,pt2.Y);
+	{ SetFPat(LNewObj,GetFPat(h_Obj)); }
+	Copy_FillPoints(h_Obj,LNewObj);
+
 	{Inner Rectangle}
 	RRect(
 	      pt1.X+0.025in*PSCALE,pt1.Y-0.05in*PSCALE,
