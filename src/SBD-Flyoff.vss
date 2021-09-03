@@ -109,7 +109,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		FillPat(0);
 		CreateText(Concat(PPREFIX,PIDNUM));
 		Scale_to_Height(LNewObj,r_ObjHeight);
-		Scale_to_Width(LNewObj,0.75*r_ObjWidth);
+		Scale_to_Width(LNewObj,0.7*r_ObjWidth);
 	END;
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
