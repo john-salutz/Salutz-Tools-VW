@@ -76,8 +76,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Set_Pen_WtoB(h_MagicText,0);
 		Set_Background_WtoB(h_MagicText,1);
 	END ELSE BEGIN
-		Set_Pen_WtoB(h_MagicText,1);
-		Set_Background_WtoB(h_MagicText,0);
+		{ Set_Pen_WtoB(h_MagicText,1); }
+		{ Set_Background_WtoB(h_MagicText,0); }
 		IF PSTYLE='Bold'
 			THEN SetTextStyle(h_MagicText,0,GetTextLength(h_MagicText),1);
 	END;
