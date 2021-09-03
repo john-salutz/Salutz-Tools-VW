@@ -40,24 +40,43 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
-FUNCTION Setup_Text_Label (h : HANDLE;i : INTEGER) : BOOLEAN;
+FUNCTION Setup_Text_Label (h : HANDLE;i1,i2 : INTEGER) : BOOLEAN;
 VAR
 	p1,p2 : POINT;
 	v     : VECTOR;
 	angle : REAL;
 BEGIN
-	GetPolyPt(h,i,p2.X,p2.Y);
-	GetPolyPt(h,i-1,p1.X,p1.Y);
+	GetPolyPt(h,i2,p2.X,p2.Y);
+	GetPolyPt(h,i1,p1.X,p1.Y);
 	v.X := p2.X - p1.X;
 	v.Y := p2.Y - p1.Y;
 	IF Norm(v) > r_LabelWidth THEN BEGIN
 		angle := Vec2Ang(v);
 		{// Make text Right Reading //}
-		IF ((angle>90) AND (angle<180))
-			OR ((angle<-90) AND (angle>-180))
+		IF (GetSymRot(h_Obj) = 180) THEN angle := angle-360;
+
+		IF ((angle>90) AND (angle<=180))
+			OR ((angle<=-90) AND (angle>-180))
 			THEN angle := angle-180;
+
+		IF (angle<-90) THEN angle := angle+360
+		ELSE IF (angle>90) THEN angle := angle-360;
+
 		TextRotate(angle);
 		TextOrigin((p2.X+p1.X)/2,(p2.Y+p1.Y)/2);
+
+
+		IF (IsObjectFlipped(h_Obj) AND ((Abs(angle) = 90)
+			OR (Abs(angle) = 270)))
+			THEN BEGIN
+				{ TextFlip(2); }
+				{ IF  }
+				TextRotate(angle+180);
+			{ END ELSE TextFlip(0); }
+			END {ELSE TextFlip(1)};
+		{ IF IsObjectFlipped(h_Obj) THEN TextFlip(1); }
+
+		{ CreateText(Concat(angle)); }
 		Setup_Text_Label := TRUE;
 	END ELSE Setup_Text_Label := FALSE;
 END;
@@ -91,6 +110,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	         LNewObj,0,0,
 	         PTEXTHEIGHT/HHeight(LNewObj),PTEXTHEIGHT/HHeight(LNewObj),TRUE
 	         );
+
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	TextSize(GetTextSize(LNewObj,0));
 	r_LabelWidth := GetTextWidth(LNewObj);
@@ -103,8 +123,16 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	i_NumPathPoints := GetVertNum(h_Path);
 	Pen_WtoB(1);
 	Fill_WtoB(0);
-	FOR i_Counter:=2 TO i_NumPathPoints DO BEGIN
-		IF Setup_Text_Label(h_Path,i_Counter) THEN BEGIN
+	IF IsObjectFlipped(h_Obj) THEN BEGIN
+		FOR i_Counter:=i_NumPathPoints DOWNTO 2 DO BEGIN
+			IF Setup_Text_Label(h_Path,i_Counter,i_Counter-1) THEN BEGIN
+				IF IsObjectFlipped(h_Obj) THEN TextFlip(2);
+				CreateText(s_Label);
+				Set_Tight_TextFill(LNewObj,FALSE);
+			END;
+		END;
+	END ELSE FOR i_Counter:=2 TO i_NumPathPoints DO BEGIN
+		IF Setup_Text_Label(h_Path,i_Counter-1,i_Counter) THEN BEGIN
 			CreateText(s_Label);
 			Set_Tight_TextFill(LNewObj,FALSE);
 		END;
