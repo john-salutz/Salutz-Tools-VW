@@ -110,7 +110,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextSize(4*r_TextScaler);
 		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 		TextOrigin(0,p_Tmp2.Y);
-		IF (PLOCATION <> '') THEN CreateText(PLOCATION)
+		IF (PLOCATION <> '') THEN CreateText(Concat('@',PLOCATION))
 		ELSE CreateText(' ');
 		IF PSIZE <> 'Small' THEN BEGIN
 			TextFace([]);

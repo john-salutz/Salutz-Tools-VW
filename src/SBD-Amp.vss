@@ -129,7 +129,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextVerticalAlign(1);
 	Pen_WtoB(0.75);
 	TextFace([Italic]);
-	CreateText(PLOCATION);
+	IF (PLOCATION <> '') THEN CreateText(Concat('@',PLOCATION))
+		ELSE CreateText(' ');
 	Scale_Fit_Width(LNewObj,h_Rect,0.9);
 
 	{// Draw Note Text //}
