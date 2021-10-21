@@ -166,13 +166,18 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{// Label Text Creation and Formating //}
-	IF PRACKID <> '' THEN BEGIN
+	IF ((PRACKID <> '') AND (PRACKIDPOSI <> 'None')) THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		MoveTo(0,0);
-		TextOrigin(0,r_Height+PFRAME+0.5in);
 		Fill_WtoB(0);
 		TextJust(2);
-		TextVerticalAlign(5);
+		IF PRACKIDPOSI = 'Top' THEN BEGIN
+			TextOrigin(0,r_Height+PFRAME+0.5in);
+			TextVerticalAlign(5);
+		END ELSE IF PRACKIDPOSI = 'Bottom' THEN BEGIN
+			TextOrigin(0,-PFRAME-0.5in);
+			TextVerticalAlign(1);
+		END;
 		IF (PFRONTORBACK<>' ') THEN BEGIN
 			CreateText(Concat(PRACKID,Chr(13),'(',PFRONTORBACK,')'));
 			SetTextSize(
