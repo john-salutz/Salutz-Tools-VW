@@ -126,17 +126,31 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
 	Set_Version_Info('0 . 6');
 	Use_PIO_Text_Attributes(h_Obj);
+	IF (PHALFWIDTH='TRUE') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'HalfWidth', 'Half');
+		ResetObject(h_Obj);
+	END;
+
+	IF (PHALFWIDTH='FALSE') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'HalfWidth', 'Full');
+		ResetObject(h_Obj);
+	END;
+
 	IF (PNUMSPACES<1) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'NumSpaces', '1');
 		AlrtDialog(
 		           'Out of Bounds, Number of spaces must be greater than zero.'
 		           );
 		ResetObject(h_Obj);
-		END;
+	END;
 
 	r_Height := k_RackU*PNUMSPACES;
-	IF PHALFWIDTH THEN r_Width := k_RackWidth/2
-		ELSE r_Width := k_RackWidth;
+	{== Set Width ==}
+	IF (PHALFWIDTH='Half') THEN r_Width := k_RackWidth/2
+	ELSE IF (PHALFWIDTH='Quarter')
+		THEN r_Width := (k_RackWidth-(2*k_EarWidth))/4
+	ELSE IF (PHALFWIDTH='Fifth') THEN r_Width := (k_RackWidth-(2*k_EarWidth))/5
+	ELSE r_Width := k_RackWidth;
 
 	{===== Get Rack Info =====}
 	GetSymLoc(h_Obj,p_EquipLoc.X,p_EquipLoc.Y);
@@ -153,28 +167,95 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{=== Get vertical and horizontal position in rack ===}
 	IF (s_RackID<>'') THEN BEGIN
-		IF ((p_EquipLoc.X<p_RackLoc.X) AND PHALFWIDTH)
-			THEN SetRField(
-			               h_Obj, s_ObjName, 'RackPosition',
-			               Concat(Get_PositionInRack(h_Rack,h_Obj),'-L')
-			               )
-		ELSE IF ((p_EquipLoc.X>p_RackLoc.X) AND PHALFWIDTH)
-			THEN SetRField(
-			               h_Obj, s_ObjName, 'RackPosition',
-			               Concat(Get_PositionInRack(h_Rack,h_Obj),'-R')
-			               )
-		ELSE SetRField(
-		               h_Obj,s_ObjName,'RackPosition',
-		               Get_PositionInRack(h_Rack,h_Obj)
-		               );
+		IF (PHALFWIDTH='Half') THEN BEGIN
+			IF (p_EquipLoc.X<p_RackLoc.X)
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'-L')
+				               )
+			ELSE IF (p_EquipLoc.X>p_RackLoc.X)
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'-R')
+				               )
+		END ELSE IF (PHALFWIDTH='Quarter') THEN BEGIN
+			IF (p_EquipLoc.X<(p_RackLoc.X-r_Width))
+				{Position 1}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.1')
+				               )
+			ELSE IF ((p_EquipLoc.X>(p_RackLoc.X-r_Width))
+			         AND (p_EquipLoc.X<p_RackLoc.X))
+				{Position 2}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.2')
+				               )
+			ELSE IF ((p_EquipLoc.X<(p_RackLoc.X+r_Width))
+			         AND (p_EquipLoc.X>p_RackLoc.X))
+				{Position 3}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.3')
+				               )
+			ELSE IF (p_EquipLoc.X>(p_RackLoc.X+r_Width))
+				{Position 4}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.4')
+				               )
+
+
+		END ELSE IF (PHALFWIDTH='Fifth') THEN BEGIN
+			IF (p_EquipLoc.X<(p_RackLoc.X-(r_Width*1.5)))
+				{Position 1}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.1')
+				               )
+			ELSE IF ((p_EquipLoc.X>(p_RackLoc.X-(r_Width*1.5)))
+			         AND (p_EquipLoc.X<(p_RackLoc.X-(r_Width/2))))
+				{Position 2}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.2')
+				               )
+			ELSE IF ((p_EquipLoc.X>(p_RackLoc.X-(r_Width/2)))
+			         AND (p_EquipLoc.X<(p_RackLoc.X+(r_Width/2))))
+				{Position 3}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.3')
+				               )
+			ELSE IF ((p_EquipLoc.X>(p_RackLoc.X+(r_Width/2)))
+					 AND (p_EquipLoc.X<(p_RackLoc.X+(r_Width*1.5))))
+				{Position 4}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.4')
+				               )
+			ELSE IF (p_EquipLoc.X>(p_RackLoc.X+(r_Width*1.5)))
+				{Position 5}
+				THEN SetRField(
+				               h_Obj, s_ObjName, 'RackPosition',
+				               Concat(Get_PositionInRack(h_Rack,h_Obj),'.5')
+				               )
+		END ELSE SetRField(
+		                   h_Obj,s_ObjName,'RackPosition',
+		                   Get_PositionInRack(h_Rack,h_Obj)
+		                   );
 	END ELSE SetRField(h_Obj,s_ObjName,'RackPosition', Num2Str(0,0));
 
 	{=== Draw Object ===}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	Pen_WtoB(1);
 	Rect(-r_Width/2,0,r_Width/2,-r_Height);
+	PenSize(2);
 	IF (PCOLOR = 'Rack Ears only') THEN Fill_WtoB(0);
-	Rect(-r_Width/2+k_EarWidth,0,r_Width/2-k_EarWidth,-r_Height);
+	IF (PHALFWIDTH='Full') OR (PHALFWIDTH='Half') THEN
+		Rect(-r_Width/2+k_EarWidth,0,r_Width/2-k_EarWidth,-r_Height)
+	ELSE Rect((-r_Width/2)+.125,-.125,(r_Width/2)-.125,-r_Height+.125);
 	h_InnerRect := LNewObj;
 	MoveTo(0,-r_Height/2);
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
@@ -194,7 +275,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetTextJust(h_MakeModel,2);
 		IF (HHeight(h_MakeModel)>(r_Height*0.5))
 			THEN Scale_Fit_Height(h_MakeModel,h_InnerRect,0.5);
-		IF (HWidth(h_MakeModel)>(r_Width-2in))
+		IF (HWidth(h_MakeModel)>(r_Width*0.9))
 			THEN Scale_Fit_Width(h_MakeModel,h_InnerRect,0.9);
 	END;
 
@@ -211,7 +292,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		h_Purpose := LNewObj;
 		IF (HHeight(h_Purpose)>(r_Height*0.25))
 			THEN Scale_Fit_Height(h_Purpose,h_InnerRect,0.25);
-		IF (HWidth(h_Purpose)>(r_Width-2in))
+		IF (HWidth(h_Purpose)>(r_Width*0.9))
 			THEN Scale_Fit_Width(h_Purpose,h_InnerRect,0.9);
 		SetTextJust(h_Purpose,1);
 		SetTextVerticalAlign(h_Purpose,1);
