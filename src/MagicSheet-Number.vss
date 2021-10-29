@@ -50,7 +50,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6');
+	Set_Version_Info('0 . 6 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
@@ -76,8 +76,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Set_Pen_WtoB(h_MagicText,0);
 		Set_Background_WtoB(h_MagicText,1);
 	END ELSE BEGIN
-		{ Set_Pen_WtoB(h_MagicText,1); }
-		{ Set_Background_WtoB(h_MagicText,0); }
 		IF PSTYLE='Bold'
 			THEN SetTextStyle(h_MagicText,0,GetTextLength(h_MagicText),1);
 	END;
@@ -86,9 +84,22 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF (PCONTAINER<>'None') THEN BEGIN
 		GetBBox(h_MagicText,pt1.X,pt1.Y,pt2.X,pt2.Y);
 		IF (PCONTAINER='Circle') THEN BEGIN
-			Oval(pt1.X,pt1.Y,pt2.X,pt2.Y);
+			ArcByCenter(0,0,pt2.X,0,360);
 			h_Container := LNewObj;
-			HScale2D(h_Container,0,0,1,1.2,FALSE);
+		END ELSE IF (PCONTAINER='Oval') THEN BEGIN
+			BeginPoly;
+			Add2DVertex(pt1.X,pt1.Y,0,0);
+			Add2DVertex(0,pt1.Y*1.2,4,pt1.Y*1.2);
+			Add2DVertex(pt2.X,pt1.Y,0,0);
+			Add2DVertex(pt2.X+(pt1.Y/2),0,4,pt1.Y/2);
+			Add2DVertex(pt2.X,pt2.Y,0,0);
+			Add2DVertex(0,pt2.Y*1.2,4,pt1.Y*1.2);
+			Add2DVertex(pt1.X,pt2.Y,0,0);
+			Add2DVertex(pt1.X-(pt1.Y/2),0,4,pt1.Y/2);
+			Add2DVertex(pt1.X,pt1.Y,0,0);
+			EndPoly;
+			h_Container := LNewObj;
+			HScale2D(h_Container,0,0,(pt2.X/(pt2.x+(pt1.Y/2))),(1/(1.2)),FALSE);
 		END ELSE IF (PCONTAINER='Rectangle') THEN BEGIN
 			Rect(pt1.X,pt1.Y,pt2.X,pt2.Y);
 			h_Container := LNewObj;
@@ -116,7 +127,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Set_Pen_WtoB(h_Container,1);
 		SetLW(h_Container,7);
 		Copy_Fill_Color(h_MagicText,h_Container);
-		SetFPat(h_Container,1);
 		SetFPat(h_MagicText,0);
 		HMoveBackward(h_Container,TRUE);
 	END;
