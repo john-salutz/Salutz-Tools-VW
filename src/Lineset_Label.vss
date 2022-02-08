@@ -45,7 +45,7 @@ VAR
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6');
+	Set_Version_Info('0 . 6 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
@@ -62,14 +62,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Fill_WtoB(0);
 	{// Draw Poly //}
 	BeginPoly;
-	Add2DVertex(0,0,0,0);
-	Add2DVertex(-2in*i_Flip,0,0,0);
-	Add2DVertex(-5.464in*i_Flip,2in,0,0);
-	Add2DVertex(-60in*i_Flip,2in,0,0);
 	Add2DVertex(-60in*i_Flip,-2in,0,0);
 	Add2DVertex(-5.464in*i_Flip,-2in,0,0);
 	Add2DVertex(-2in*i_Flip,0,0,0);
 	Add2DVertex(0,0,0,0);
+	Add2DVertex(-2in*i_Flip,0,0,0);
+	Add2DVertex(-5.464in*i_Flip,2in,0,0);
+	Add2DVertex(-60in*i_Flip,2in,0,0);
 	EndPoly;
 	{// Draw Number rectangle //}
 	Fill_WtoB(0.25);
