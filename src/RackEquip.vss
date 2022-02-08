@@ -124,7 +124,7 @@ END;
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
-	Set_Version_Info('0 . 6');
+	Set_Version_Info('0 . 6 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 	IF (PHALFWIDTH='TRUE') THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'HalfWidth', 'Half');
@@ -275,6 +275,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetTextJust(h_MakeModel,2);
 		IF (HHeight(h_MakeModel)>(r_Height*0.5))
 			THEN Scale_Fit_Height(h_MakeModel,h_InnerRect,0.5);
+		IF (HHeight(h_MakeModel)>(k_RackU*1.25))
+			THEN Scale_Fit_Height(h_MakeModel,h_MakeModel,
+								  (k_RackU*1.25)/HHeight(h_MakeModel));
 		IF (HWidth(h_MakeModel)>(r_Width*0.9))
 			THEN Scale_Fit_Width(h_MakeModel,h_InnerRect,0.9);
 	END;
@@ -292,6 +295,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		h_Purpose := LNewObj;
 		IF (HHeight(h_Purpose)>(r_Height*0.25))
 			THEN Scale_Fit_Height(h_Purpose,h_InnerRect,0.25);
+		IF (HHeight(h_Purpose)>(k_RackU*0.75))
+			THEN Scale_Fit_Height(h_Purpose,h_Purpose,
+								  (k_RackU*0.75)/HHeight(h_Purpose));
 		IF (HWidth(h_Purpose)>(r_Width*0.9))
 			THEN Scale_Fit_Width(h_Purpose,h_InnerRect,0.9);
 		SetTextJust(h_Purpose,1);
