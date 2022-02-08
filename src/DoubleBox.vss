@@ -27,8 +27,8 @@ VAR
 	b_Result                                                : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
-	r_ObjWidth,r_ObjHeight                                  : REAL;
-	h_BackRect,h_FrontRect,h_PadRect,h_Text                 : HANDLE;
+	r_ObjWidth,r_ObjHeight,r_HeightDiff                     : REAL;
+	h_BackRect,h_FrontRect,h_PadRect,h_Text,h_Note          : HANDLE;
 	s_NoteText,s_NoteTextTemp                               : STRING;
 	i_result,dialog1                                        : INTEGER;
 	p_Tmp1,p_Tmp2                                           : POINT;
@@ -104,7 +104,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6');
+	Set_Version_Info('0 . 6 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -157,13 +157,18 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Fill_WtoB(0);
 	PenSize(7);
 	h_FrontRect := DrawOffsetRect(h_BackRect,-POFFSET_EDGE,PISROUNDED);
-	Set_DashStyle_Cust(h_FrontRect,PDASH);
 
 	{// Create pad rectangle //}
 	FillPat(0);
 	PenPatN(2);
 	PenSize(0);
 	h_PadRect := DrawOffsetRect(h_FrontRect,-PPAD,PISROUNDED);
+
+	{// foreground rectangle style //}
+	IF PDASH = 'Cut-Out' THEN BEGIN
+		h_BackRect := ClipSurfaceN(h_BackRect,h_FrontRect);
+		DelObject(h_FrontRect);
+	END ELSE Set_DashStyle_Cust(h_FrontRect,PDASH);
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
@@ -203,6 +208,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF (PSHOWNOTES) THEN BEGIN
 		SetParameterVisibility(h_Obj,'EditNotes',TRUE);
 		SetParameterVisibility(h_Obj,'NoteSize',TRUE);
+		SetParameterVisibility(h_Obj,'NoteResize',TRUE);
+		SetParameterVisibility(h_Obj,'TabSize',TRUE);
 		SetTextVertAlignN(h_Text,1);
 		MoveTo(0,0);
 		IF (PLABEL_POSITION='Inside') THEN BEGIN
@@ -231,6 +238,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+
+
 		TextRotate(90);
 		TextSize(PNOTESIZE);
 		TextFace([]);
@@ -239,18 +248,36 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		FillPat(0);
 		IF (PTEXTCOLOR='Keep Text Black') THEN Pen_WtoB(1);
 		CreateText(s_NoteText);
+		IF s_NoteText <> '' THEN h_Note := LNewObj;
 		SetObjectVariableReal(
-		                      LNewObj,
+		                      h_Note,
 		                      682,
 		                      GetLScale(Find_Layer(h_Obj))*PTABSIZE
 		                      );
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
-		SetTextWidth(LNewObj,HHeight(h_PadRect));
-		SetTextJustN(LNewObj,1);
+		SetTextWidth(h_Note,HHeight(h_PadRect));
+		SetTextJustN(h_Note,1);
+
+		IF PNOTERESIZE <> 'None' THEN BEGIN
+			IF ((PLABEL_POSITION = 'Inside') AND PSHOWLABEL) THEN
+				r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note)-HWidth(h_Text)
+			ELSE r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note);
+			IF ((PNOTERESIZE = 'Box Expands to Note Height') AND
+				(r_HeightDiff < 0)) OR
+				(PNOTERESIZE = 'Box Follows Note Height') THEN BEGIN
+					SetRField(h_Obj,s_ObjName,'LineLength',
+					          Num2StrF(PLINELENGTH-r_HeightDiff));
+					ResetObject(h_Obj);
+				END;
+
+		END;
+
 	END ELSE BEGIN
 		SetParameterVisibility(h_Obj,'EditNotes',FALSE);
 		SetParameterVisibility(h_Obj,'NoteSize',FALSE);
+		SetParameterVisibility(h_Obj,'NoteResize',FALSE);
+		SetParameterVisibility(h_Obj,'TabSize',FALSE);
 	END;
 
 END; END; Run(DoubleBox_and_Notes);
