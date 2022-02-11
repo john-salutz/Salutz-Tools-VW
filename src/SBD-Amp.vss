@@ -62,7 +62,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6');
+	Set_Version_Info('0 . 6 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
 	IF (PNUMCHAN<1) THEN BEGIN
@@ -90,7 +90,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((}
 	PenPatN(0);
 	PenSize(0);
-	Rect(-12in,p_Center.Y+4in,12in,p_Center.Y-2in);
+	Rect(-12in,p_Center.Y+6in,12in,p_Center.Y-2in);
 	h_Model := LNewObj;
 
 	{// Model Text //}
@@ -119,14 +119,24 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Draw Manufacturer Text //}
 	TextOrigin(0,p_Center.Y+6in);
-	TextVerticalAlign(5);
+	TextVerticalAlign(1);
 	TextSize(4*r_TextScaler);
 	CreateText(PMANUFACTURER);
 	Scale_Fit_Width(LNewObj,h_Rect,0.95);
 
-	{// Draw Location Text //}
+	{// Draw Purpose Text //}
 	TextOrigin(0,0);
 	TextVerticalAlign(1);
+	Pen_WtoB(0.75);
+	{ TextFace([]); }
+	IF (PPURPOSE <> '') THEN CreateText(PPURPOSE)
+		ELSE CreateText(' ');
+	Scale_Fit_Width(LNewObj,h_Rect,0.9);
+
+	{// Draw Location Text //}
+	TextOrigin(0,-6in);
+	TextVerticalAlign(5);
+	TextSize(3*r_TextScaler);
 	Pen_WtoB(0.75);
 	TextFace([Italic]);
 	IF (PLOCATION <> '') THEN CreateText(Concat('@',PLOCATION))
