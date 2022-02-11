@@ -166,7 +166,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// foreground rectangle style //}
 	IF PDASH = 'Cut-Out' THEN BEGIN
-		h_BackRect := ClipSurfaceN(h_BackRect,h_FrontRect);
+		IF (POFFSET_EDGE > 0)
+			THEN h_BackRect := ClipSurfaceN(h_BackRect,h_FrontRect);
 		DelObject(h_FrontRect);
 	END ELSE Set_DashStyle_Cust(h_FrontRect,PDASH);
 
@@ -208,6 +209,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF (PSHOWNOTES) THEN BEGIN
 		SetParameterVisibility(h_Obj,'EditNotes',TRUE);
 		SetParameterVisibility(h_Obj,'NoteSize',TRUE);
+		SetParameterVisibility(h_Obj,'NoteHoriz',TRUE);
 		SetParameterVisibility(h_Obj,'NoteResize',TRUE);
 		SetParameterVisibility(h_Obj,'TabSize',TRUE);
 		SetTextVertAlignN(h_Text,1);
@@ -257,7 +259,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 		SetTextWidth(h_Note,HHeight(h_PadRect));
-		SetTextJustN(h_Note,1);
+		IF PNOTEHORIZ = 'Left' THEN SetTextJustN(h_Note,1)
+		ELSE IF PNOTEHORIZ = 'Center' THEN SetTextJustN(h_Note,2)
+		ELSE IF PNOTEHORIZ = 'Right' THEN SetTextJustN(h_Note,3)
+		ELSE IF PNOTEHORIZ = 'Justify' THEN SetTextJustN(h_Note,4);
 
 		IF PNOTERESIZE <> 'None' THEN BEGIN
 			IF ((PLABEL_POSITION = 'Inside') AND PSHOWLABEL) THEN
@@ -276,6 +281,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END ELSE BEGIN
 		SetParameterVisibility(h_Obj,'EditNotes',FALSE);
 		SetParameterVisibility(h_Obj,'NoteSize',FALSE);
+		SetParameterVisibility(h_Obj,'NoteHoriz',FALSE);
 		SetParameterVisibility(h_Obj,'NoteResize',FALSE);
 		SetParameterVisibility(h_Obj,'TabSize',FALSE);
 	END;
