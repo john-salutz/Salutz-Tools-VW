@@ -43,13 +43,23 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
+PROCEDURE Scale_Fit_Width_Real (toScale : HANDLE; fitTo,scaleFactor : REAL);
+VAR p1 : POINT;
+BEGIN
+	HCenter(toScale,p1.X,p1.Y);
+	HScale2D(
+	        toScale, p1.X, p1.Y, fitTo*scaleFactor/HWidth(toScale),
+	        fitTo*scaleFactor/HWidth(toScale), TRUE
+	        );
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6');
+	Set_Version_Info('0 . 6 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
 	IF (PNUMSPACES<0) THEN BEGIN
@@ -96,7 +106,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextVerticalAlign(5);
 	TextJust(1);
 	TextOrigin(-r_Width/2,r_Height);
-	CreateText(Concat(PMANUFACTURER,' ',PMODEL));
+	IF (PMANUFACTURER = '') THEN CreateText(PMODEL)
+	ELSE CreateText(Concat(PMANUFACTURER,' ',PMODEL));
 	HMoveBackward(LNewObj,TRUE);
 	FillPat(0);
 	TextVerticalAlign(1);
@@ -104,11 +115,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextOrigin(0,r_Height);
 	IF (PPURPOSE <> '') THEN CreateText(PPURPOSE)
 	ELSE CreateText(' ');
+	GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+	IF HWidth(LNewObj)>r_Width THEN Scale_Fit_Width_Real(LNewObj,r_Width,0.95);
 
 	IF PSIZE <> 'Micro' THEN BEGIN
 		TextFace([Italic]);
 		TextSize(4*r_TextScaler);
-		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 		TextOrigin(0,p_Tmp2.Y);
 		IF (PLOCATION <> '') THEN CreateText(Concat('@',PLOCATION))
 		ELSE CreateText(' ');
