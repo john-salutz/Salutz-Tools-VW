@@ -1,0 +1,222 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, (c) 2020. Please share freely.
+//
+//  Used to trilaterate a position in 3D space.
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE Survey3D;
+
+CONST
+	RGBmax	   = 65535; {Max value for setting RGB colors in VS fuctions}
+	kCR	   = Chr(13);
+	kTolerance = 0.99;
+
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	h_Tmp                                                   : HANDLE;
+	p_origin,p_m1,p_m2,p_m3,p_p1,p_p2                       : POINT3D;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
+
+FUNCTION CalcDist_2pt (p1,p2 : POINT3D; r1,r2 : REAL) : POINT3D;
+VAR result : POINT3D;
+BEGIN
+	result.X := p1.X;
+	result.Y := (Sqr(r1)-Sqr(r2)+Sqr(p2.Y))/(p2.Y*2);
+	result.Z := Abs(Sqrt(Abs(Sqr(r1)-Sqr(result.Y))));
+	CalcDist_2pt := result;
+END;
+
+FUNCTION CalcDist_3pt (p1,p2,p3 : POINT3D; r1,r2,r3 : REAL) : POINT3D;
+VAR result : POINT3D;
+BEGIN
+	result.X := Round((Sqr(r1)-Sqr(r3)+Sqr(p3.X))/(p3.X*2));
+	result.Y := Round(
+	    (Sqr(r1)-Sqr(r2)+Sqr(p2.X)+Sqr(p2.Y)-(p2.X*2*result.X))/(p2.Y*2));
+	result.Z := Round(Abs(Sqrt(Abs(Sqr(r1)-Sqr(result.X)-Sqr(result.Y)))));
+	CalcDist_3pt := result;
+END;
+
+FUNCTION Initialize_Pt (x,y,z : REAL) : POINT3D;
+VAR p1 : POINT3D;
+BEGIN
+	p1.X := x;
+	p1.Y := y;
+	p1.Z := z;
+	Initialize_Pt := p1;
+END;
+
+PROCEDURE Draw_Point (p1 : POINT3D; labelText : STRING);
+BEGIN
+	Locus(p1.X,p1.Y);
+	Locus3D(p1.X,p1.Y,p1.Z);
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+	TextOrigin(p1.X,p1.Y+2);
+	TextJust(2);
+	TextVerticalAlign(5);
+	CreateText(labelText);
+	IF PDRAWCOOR THEN BEGIN
+		TextSize(GetTextSize(LNewObj,0)*0.75);
+		TextOrigin(p1.X,p1.Y-2);
+		TextJust(2);
+		TextVerticalAlign(1);
+		IF (PMSTYLE = 'On Axis')
+			THEN CreateText(Concat(
+			                'y ',Num2StrF(p1.Y+p_origin.Y),kCR,
+			                'z ',Num2StrF(p1.Z+p_origin.Z)))
+		ELSE CreateText(Concat(
+		                { '(', }
+		                'x ',Num2StrF(p1.X+p_origin.X),kCR,
+		                'y ',Num2StrF(p1.Y+p_origin.Y),kCR,
+		                'z ',Num2StrF(p1.Z+p_origin.Z)));
+	END;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+END;
+
+FUNCTION NonNull_Point (p1 : POINT3D) : BOOLEAN;
+BEGIN
+	IF (p1.X <> 0) OR (p1.Y <> 0) OR (p1.Z <> 0)
+		THEN NonNull_Point := TRUE
+	ELSE NonNull_Point := FALSE;
+END;
+
+FUNCTION Check_Valid_Dist (p1,p2 : POINT3D; dist : REAL) : BOOLEAN;
+BEGIN
+	IF EqPercent(Distance3D(p2.X,p2.Y,p2.Z,p1.X,p1.Y,p1.Z),
+			    dist,kTolerance) THEN Check_Valid_Dist := TRUE
+	ELSE Check_Valid_Dist := FALSE;
+END;
+
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 6 . 2');
+	Use_PIO_Text_Attributes(h_Obj);
+
+	{===== Variable Assignment =====}
+	GetSymLoc3D(h_Obj,p_origin.X,p_origin.Y,p_origin.Z);
+	p_p1 := Initialize_Pt(0,0,0);
+	p_p2 := Initialize_Pt(0,0,0);
+	p_m1 := Initialize_Pt(0,0,0);
+	p_m2 := Initialize_Pt(0,PM2Y,0);
+	p_m3 := Initialize_Pt(PM3X,0,0);
+	b_Result := FALSE;
+
+	{===== Parameter Limits =====}
+	IF (PNUMPNT = '1') THEN BEGIN
+		SetParameterVisibility(h_Obj,'D1_2',FALSE);
+		SetParameterVisibility(h_Obj,'D2_2',FALSE);
+		SetParameterVisibility(h_Obj,'D3_2',FALSE);
+		SetParameterVisibility(h_Obj,'Result2',FALSE);
+	END;
+
+	IF (PMSTYLE = 'On Axis') THEN BEGIN
+		SetParameterVisibility(h_Obj,'M3Label',FALSE);
+		SetParameterVisibility(h_Obj,'M3X',FALSE);
+		SetParameterVisibility(h_Obj,'D3',FALSE);
+		SetParameterVisibility(h_Obj,'D3_2',FALSE);
+	END;
+
+	{// Draw Measurement Points 1 & 2 //}
+	Draw_Point(p_m1,'Measure 1, Origin');
+	Draw_Point(p_m2,'Measure 2');
+
+	{// Calculate Result Points & Draw Measurement 3 //}
+	IF (PMSTYLE = 'Off Axis') THEN BEGIN
+		Draw_Point(p_m3,'Measure 3');
+		IF (PD1 <> 0) AND (PD2 <> 0) AND (PD3 <> 0)
+			THEN p_p1 := CalcDist_3pt(p_m1,p_m2,p_m3,PD1,PD2,PD3);
+		IF (PD1_2 <> 0) AND (PD2_2 <> 0) AND (PD3_2 <> 0) AND (PNUMPNT = '2')
+			THEN p_p2 := CalcDist_3pt(p_m1,p_m2,p_m3,PD1_2,PD2_2,PD3_2);
+	END ELSE BEGIN
+		IF (PD1 <> 0) AND (PD2 <> 0)
+			THEN p_p1 := CalcDist_2pt(p_m1,p_m2,PD1,PD2);
+		IF (PD1_2 <> 0) AND (PD2_2 <> 0) AND (PNUMPNT = '2')
+			THEN p_p2 := CalcDist_2pt(p_m1,p_m2,PD1_2,PD2_2);
+	END;
+
+	{// Confirm and Draw Result Point 1 //}
+	IF NonNull_Point(p_p1) THEN BEGIN
+		Draw_Point(p_p1,Concat(PLABEL,kCR,'Point 1'));
+		IF PDRAWLINES THEN BEGIN
+			Poly3D(p_m1.X,p_m1.Y,p_m1.Z,p_p1.X,p_p1.Y,p_p1.Z);
+			Poly3D(p_m2.X,p_m2.Y,p_m2.Z,p_p1.X,p_p1.Y,p_p1.Z);
+			IF (PMSTYLE = 'Off Axis')
+				THEN Poly3D(p_m3.X,p_m3.Y,p_m3.Z,p_p1.X,p_p1.Y,p_p1.Z);
+		END;
+
+		IF (Check_Valid_Dist(p_m1,p_p1,PD1)
+			AND Check_Valid_Dist(p_m2,p_p1,PD2)
+			AND (Check_Valid_Dist(p_m3,p_p1,PD3) OR (PMSTYLE = 'On Axis')))
+			THEN SetRField(h_Obj,s_ObjName,'Result1',
+			               Concat('(',Num2StrF(p_p1.X+p_origin.X),
+			               ', ',Num2StrF(p_p1.Y+p_origin.Y),
+			               ', ',Num2StrF(p_p1.Z+p_origin.Z),')'))
+		ELSE BEGIN
+			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+			TextOrigin(p_p1.X,p_p1.Y);
+			PenPatN(2);
+			PenFore(RGBmax,0,0);
+			Fill_WtoB(1);
+			TextFace([Bold]);
+			CreateText('ERROR! Invalid Dimensions');
+			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+			SetRField(h_Obj,s_ObjName,'Result1','ERROR! Invalid Dimensions');
+		END;
+	END;
+
+	{// Confirm and Draw Result Point 2 //}
+	IF NonNull_Point(p_p2) THEN BEGIN
+		Draw_Point(p_p2,Concat(PLABEL,kCR,'Point 2'));
+		IF PDRAWLINES THEN BEGIN
+			Poly3D(p_m1.X,p_m1.Y,p_m1.Z,p_p2.X,p_p2.Y,p_p2.Z);
+			Poly3D(p_m2.X,p_m2.Y,p_m2.Z,p_p2.X,p_p2.Y,p_p2.Z);
+			IF (PMSTYLE = 'Off Axis') THEN
+				Poly3D(p_m3.X,p_m3.Y,p_m3.Z,p_p2.X,p_p2.Y,p_p2.Z);
+		END;
+
+		IF (Check_Valid_Dist(p_m1,p_p2,PD1_2)
+			AND Check_Valid_Dist(p_m2,p_p2,PD2_2)
+			AND (Check_Valid_Dist(p_m3,p_p2,PD3_2) OR (PMSTYLE = 'On Axis')))
+			THEN SetRField(h_Obj,s_ObjName,'Result2',
+			               Concat('(',Num2StrF(p_p2.X+p_origin.X),
+			               ', ',Num2StrF(p_p2.Y+p_origin.Y),
+			               ', ',Num2StrF(p_p2.Z+p_origin.Z),')'))
+		ELSE BEGIN
+			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+			TextOrigin(p_p2.X,p_p2.Y);
+			PenPatN(2);
+			PenFore(RGBmax,0,0);
+			Fill_WtoB(1);
+			TextFace([Bold]);
+			CreateText('ERROR! Invalid Dimensions');
+			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+			SetRField(h_Obj,s_ObjName,'Result2','ERROR! Invalid Dimensions');
+		END;
+	END;
+
+END; END; Run(Survey3D);
