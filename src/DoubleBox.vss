@@ -104,7 +104,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 1');
+	Set_Version_Info('0 . 6 . 2');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -192,14 +192,23 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			TextVerticalAlign(5);
 			Fill_WtoB(0);
 		END;
-		CreateText(PLABEL);
+		CreateText(Concat(PLABEL,'  '));
 		h_Text := LNewObj;
+		Set_Tight_TextFill(h_Text,FALSE);
+		IF (PLABEL_POSITION='Inside')
+			THEN SetTextWidth(h_Text,HHeight(h_PadRect));
 
 		{// Underline creation //}
-		IF (GetTextLength(h_Text)>0) AND PUNDERLINE THEN BEGIN
+		IF (GetTextLength(h_Text)>0) AND (PUNDERLINE<>'None') THEN BEGIN
 			GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			MoveTo(p_Tmp2.X,p_Tmp2.Y);
-			LineTo(p_Tmp2.X,p_Tmp1.Y);
+			IF PUNDERLINE = 'Underline' THEN LineTo(p_Tmp2.X,p_Tmp1.Y)
+			ELSE BEGIN
+				LineTo(p_Tmp2.X,p_Tmp1.Y);
+				LineTo(p_Tmp1.X,p_Tmp1.Y);
+				LineTo(p_Tmp1.X,p_Tmp2.Y);
+				LineTo(p_Tmp2.X,p_Tmp2.Y);
+			END;
 		END;
 
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
@@ -228,7 +237,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 		{=== Edit Notes Dialog ===}
 		IF PEDITNOTES THEN BEGIN
-			dialog1 := CreateLayout('Notes Dialog', FALSE, 'OK', 'Cancel');
+			dialog1 := CreateLayout(Concat(PLABEL,': Notes Dialog'),
+			                        FALSE, 'OK', 'Cancel');
 			CreateEditTextBox(dialog1, 4, s_NoteText, 80, 16);
 			SetFirstLayoutItem(dialog1, 4);
 			i_result := RunLayoutDialog(dialog1, Dialog_Handler);
