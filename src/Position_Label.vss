@@ -28,7 +28,7 @@ VAR
 	s_ObjName                                               : STRING;
 	b_Result                                                : BOOLEAN;
 	{Script specific variables}
-	h_PosiName,h_Shape                                      : HANDLE;
+	h_PosiName,h_Shape,h_Circle                             : HANDLE;
 	p_OffsetPosiName,p_OffsetLine1,p_LineOrig,p_Tmp1,p_Tmp2 : POINT;
 	r_Scale,r_TextScaler                                    : REAL;
 	i_Flip                                                  : INTEGER;
@@ -85,6 +85,16 @@ BEGIN
 	Add2DVertex(m1.X+v2.X,m1.Y+v2.Y,2,0);
 	Add2DVertex(p2X,p2Y,0,0);
 	EndPoly;
+END;
+
+PROCEDURE Scale_Fit_Width (toScale,fitTo : HANDLE; scaleFactor : REAL);
+VAR p1 : POINT;
+BEGIN
+	HCenter(toScale,p1.X,p1.Y);
+	HScale2D(
+	        toScale, p1.X, p1.Y, HWidth(fitTo)*scaleFactor/HWidth(toScale),
+	        HWidth(fitTo)*scaleFactor/HWidth(toScale), TRUE
+	        );
 END;
 
 {====================================}
@@ -152,6 +162,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			{// Create Circle Small //}
 			Fill_WtoB(0);
 			Oval(-5.5in,5.5in,5.5in,-5.5in);
+			h_Circle := LNewObj;
 			HMoveForward(LNewObj,TRUE);
 			From_Back_Set_Pen(h_Obj,LNewObj);
 		END {Small} ELSE
@@ -183,6 +194,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			{// Create Circle Micro //}
 			Fill_WtoB(0);
 			Oval(-3.5in,3.5in,3.5in,-3.5in);
+			h_Circle := LNewObj;
 			HMoveForward(LNewObj,TRUE);
 			From_Back_Set_Pen(h_Obj,LNewObj);
 		END; {Micro}
@@ -197,6 +209,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextVerticalAlign(3);
 		CreateText(PPOSINAME);
 		h_PosiName := LNewObj;
+		IF HWidth(h_PosiName)>HWidth(h_Circle)
+			THEN Scale_Fit_Width(h_PosiName,h_Circle,0.9);
+			
 
 		{// Create Trim Text Small/Micro //}
 		IF PSHOWTRIM THEN BEGIN
