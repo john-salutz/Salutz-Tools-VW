@@ -29,7 +29,7 @@ VAR
 	{Standard variables}
 	s_ObjName                                               : STRING;
 	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
-	b_Result                                                : BOOLEAN;
+	b_Result,b_ResetObj                                     : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
 	pt1,pt2                                                 : POINT;
@@ -66,7 +66,8 @@ BEGIN
 		SetRField(h_Obj,s_ObjName,'ControlPoint02X',correctValue);
 		SetRField(h_Obj,s_ObjName,'MidpointDist',correctValue);
 		SetRField(h_Obj,s_ObjName,'__StoreMidpointDist',correctValue);
-		ResetObject(h_Obj);
+		{ ResetObject(h_Obj); }
+		b_ResetObj := TRUE;
 	END;
 END;
 
@@ -92,7 +93,8 @@ BEGIN
 		SetRField(h_Obj,s_ObjName,'ControlPoint03X',correctValue);
 		SetRField(h_Obj,s_ObjName,'EndDist',correctValue);
 		SetRField(h_Obj,s_ObjName,'__StoreEndDist',correctValue);
-		ResetObject(h_Obj);
+		{ ResetObject(h_Obj); }
+		b_ResetObj := TRUE;
 	END;
 END;
 
@@ -123,7 +125,8 @@ BEGIN
 		          h_Obj,s_ObjName,'ControlPoint03Y',
 		          Num2StrF(PCONTROLPOINT03Y-PCONTROLPOINT01Y)
 		          );
-		ResetObject(h_Obj);
+		{ ResetObject(h_Obj); }
+		b_ResetObj := TRUE;
 		Resolve_Begin_Conflict := TRUE;
 	END ELSE Resolve_Begin_Conflict := FALSE;
 END;
@@ -171,7 +174,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6');
+	Set_Version_Info('0 . 6 . 1');
 	Use_PIO_Text_Attributes(h_Obj);
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
@@ -179,6 +182,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetParameterVisibility(h_Obj,'ControlPoint02Y',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint03X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint03Y',FALSE);
+	b_ResetObj := FALSE;
 
 	{===== Parameter checking =====}
 	IF NOT Resolve_Begin_Conflict THEN BEGIN
@@ -286,5 +290,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	          h_Obj, s_ObjName, 'ControlPoint02Y',
 	          Num2StrF((p_End.Y-p_Start.Y)/2)
 	          );
+
+	IF b_ResetObj THEN ResetObject(h_Obj);
 
 END; END; Run(SBD_Line);

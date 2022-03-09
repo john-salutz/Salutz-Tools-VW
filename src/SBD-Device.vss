@@ -30,7 +30,7 @@ VAR
 	{Standard variables}
 	s_ObjName                                               : STRING;
 	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
-	b_Result                                                : BOOLEAN;
+	b_Result,b_ResetObj,b_ResetChild                        : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
 	p_Tmp1,p_Tmp2                                           : POINT;
@@ -67,10 +67,18 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ResetObject(h_Obj);
 	END;
 	{===== Variable Setup =====}
-	SetRField(
-	          h_Obj,s_ObjName,'__Parent',
-	          Concat(PTYPE,' ',PPREFIX,PIDNUM,' (',PMANUFACTURER,' ',PMODEL,')')
-	          );
+	b_ResetObj := FALSE;
+	b_ResetChild := FALSE;
+	IF (P__PARENT <> Concat(PTYPE,' ',PPREFIX,PIDNUM,' (',
+	                       PMANUFACTURER,' ',PMODEL,')'))
+		THEN BEGIN
+			SetRField(
+			          h_Obj,s_ObjName,'__Parent',
+			          Concat(PTYPE,' ',PPREFIX,PIDNUM,' (',
+			          PMANUFACTURER,' ',PMODEL,')')
+			          );
+			b_ResetChild := TRUE;
+		END;
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	Fill_WtoB(0.035);
 	Pen_WtoB(1);
@@ -195,6 +203,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
-	Refresh_Children(h_Obj,'SBD In-Out (Salutz)');
+	IF b_ResetChild THEN Refresh_Children(h_Obj,'SBD In-Out (Salutz)');
 
 END; END; Run(SBD_Device);
