@@ -114,7 +114,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 2');
+	Set_Version_Info('0 . 6 . 5');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -184,10 +184,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Fill_WtoB(1);
 			TextFace([Bold]);
 			CreateText('ERROR! Invalid Dimensions');
+			FillPat(1);
+			FillBack(RGBmax,0,0);
+			h_Tmp := CreateSphere(p_p1.X,p_p1.Y,p_p1.Z,2in);
 			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 			SetRField(h_Obj,s_ObjName,'Result1','ERROR! Invalid Dimensions');
 		END;
-	END;
+	END ELSE SetRField(h_Obj,s_ObjName,'Result1','Incomplete Dimensions');;
 
 	{// Confirm and Draw Result Point 2 //}
 	IF NonNull_Point(p_p2) THEN BEGIN
@@ -214,9 +217,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Fill_WtoB(1);
 			TextFace([Bold]);
 			CreateText('ERROR! Invalid Dimensions');
+			FillPat(1);
+			FillBack(RGBmax,0,0);
+			h_Tmp := CreateSphere(p_p2.X,p_p2.Y,p_p2.Z,2in);
 			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 			SetRField(h_Obj,s_ObjName,'Result2','ERROR! Invalid Dimensions');
 		END;
-	END;
+	END ELSE SetRField(h_Obj,s_ObjName,'Result2','Incomplete Dimensions');;
 
 END; END; Run(Survey3D);

@@ -124,7 +124,7 @@ END;
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits & Set Variables =====}
-	Set_Version_Info('0 . 6 . 1');
+	Set_Version_Info('0 . 6 . 5');
 	Use_PIO_Text_Attributes(h_Obj);
 	IF (PHALFWIDTH='TRUE') THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'HalfWidth', 'Half');
@@ -253,9 +253,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Rect(-r_Width/2,0,r_Width/2,-r_Height);
 	PenSize(2);
 	IF (PCOLOR = 'Rack Ears only') THEN Fill_WtoB(0);
-	IF (PHALFWIDTH='Full') OR (PHALFWIDTH='Half') THEN
-		Rect(-r_Width/2+k_EarWidth,0,r_Width/2-k_EarWidth,-r_Height)
-	ELSE Rect((-r_Width/2)+.125,-.125,(r_Width/2)-.125,-r_Height+.125);
+	IF (PHALFWIDTH='Full') OR (PHALFWIDTH='Half') THEN BEGIN
+		PenSize(2);
+		Rect(-r_Width/2+k_EarWidth,0,r_Width/2-k_EarWidth,-r_Height);
+	END ELSE BEGIN
+		PenSize(0);
+		Rect((-r_Width/2)+.125,-.125,(r_Width/2)-.125,-r_Height+.125);
+	END;
 	h_InnerRect := LNewObj;
 	MoveTo(0,-r_Height/2);
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
@@ -277,7 +281,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			THEN Scale_Fit_Height(h_MakeModel,h_InnerRect,0.5);
 		IF (HHeight(h_MakeModel)>(k_RackU*1.25))
 			THEN Scale_Fit_Height(h_MakeModel,h_MakeModel,
-								  (k_RackU*1.25)/HHeight(h_MakeModel));
+			                      (k_RackU*1.25)/HHeight(h_MakeModel));
 		IF (HWidth(h_MakeModel)>(r_Width*0.9))
 			THEN Scale_Fit_Width(h_MakeModel,h_InnerRect,0.9);
 	END;

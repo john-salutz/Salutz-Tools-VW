@@ -62,7 +62,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 1');
+	Set_Version_Info('0 . 6 . 5');
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
 	IF (PNUMCHAN<1) THEN BEGIN
