@@ -147,7 +147,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	{// Draw Marker //}
-	IF PTYPE<>' ' THEN BEGIN
+	IF PTYPE<>'BLANK' THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		PenPatN(0);
 		PenSize(0);
