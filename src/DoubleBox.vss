@@ -195,7 +195,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		CreateText(Concat(PLABEL,'  '));
 		h_Text := LNewObj;
 		Set_Tight_TextFill(h_Text,FALSE);
-		IF (PLABEL_POSITION='Inside')
+		IF (PLABEL_POSITION='Inside') AND (HWidth(h_Text)>HHeight(h_PadRect))
 			THEN SetTextWidth(h_Text,HHeight(h_PadRect));
 
 		{// Underline creation //}
