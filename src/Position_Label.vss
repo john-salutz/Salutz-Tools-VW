@@ -121,6 +121,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ResetObject(h_Obj);
 	END;
 
+	IF PLABELSTYLE = 'Billington' THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'LabelDirection','---');
+		SetParameterVisibility(h_Obj,'LabelDirection',FALSE);
+		IF (GetRField(h_Obj,s_ObjName,'LabelDirection') <> PLABELDIRECTION)
+			THEN ResetObject(h_Obj);
+		{ PLABELDIRECTION := '---'; }
+	END;
+
 	{===== Variable Setup =====}
 	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
 
@@ -211,7 +219,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		h_PosiName := LNewObj;
 		IF HWidth(h_PosiName)>HWidth(h_Circle)
 			THEN Scale_Fit_Width(h_PosiName,h_Circle,0.9);
-			
 
 		{// Create Trim Text Small/Micro //}
 		IF PSHOWTRIM THEN BEGIN
@@ -259,8 +266,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			{// Create Poly Shape //}
 			BeginPoly;
 			Add2DVertex(0,-4.5in,0,0);
-			Add2DVertex((HWidth(h_PosiName)+1in)*i_Flip,-4.5in,0,0);
-			Add2DVertex(HWidth(h_PosiName)*i_Flip,-5.25in,0,0);
+			Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,-4.5in,0,0);
+			Add2DVertex((HWidth(h_PosiName)+1in)*i_Flip,-5.25in,0,0);
 			Add2DVertex(0,-5.25in,0,0);
 			Add2DVertex(0,-6in,0,0);
 			Add2DVertex(-6in*i_Flip,0,0,0);
@@ -280,8 +287,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Add2DVertex(0,-4.5in,0,0);
 			Add2DVertex(-2.5in*i_Flip,0,4,5.3in);
 			Add2DVertex(0,4.5in,0,0);
-			Add2DVertex((HWidth(h_PosiName)+1in)*i_Flip,4.5in,0,0);
-			Add2DVertex((HWidth(h_PosiName)+1in)*i_Flip,-4.5in,0,0);
+			Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,4.5in,0,0);
+			Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,-4.5in,0,0);
 			Add2DVertex(0,-4.5in,0,0);
 			EndPoly;
 			HMoveBackward(LNewObj,TRUE);
@@ -293,15 +300,20 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			p_LineOrig.Y := 0;
 
 		END {Direction "<<" & ">>"}
-		ELSE IF (PLABELDIRECTION='---') THEN
-		BEGIN {// Direction "---" //}
+		ELSE IF (PLABELDIRECTION='---') OR (PLABELSTYLE='Billington') THEN
+		BEGIN {// Direction "---" & Style "Billington" //}
 			TextSize(10*r_TextScaler);
 			TextJust(2);
 			TextVerticalAlign(3);
 			TextOrigin(0,-4.5in);
 			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-			Fill_WtoB(0);
-			Pen_WtoB(1);
+			IF (PLABELSTYLE = 'Billington') THEN BEGIN
+				Fill_WtoB(1);
+				Pen_WtoB(0);
+			END ELSE BEGIN
+				Fill_WtoB(0);
+				Pen_WtoB(1);
+			END;
 			TextVerticalAlign(5);
 			CreateText(PPOSINAME);
 			h_PosiName := LNewObj;
@@ -318,16 +330,42 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			END;
 
 			{// Create Poly Shape //}
-			BeginPoly;
-			Add2DVertex(0,-4.5in,0,0);
-			Add2DVertex(HWidth(h_PosiName)/2,-4.5in,0,0);
-			Add2DVertex((HWidth(h_PosiName)-1in)/2,-5.25in,0,0);
-			Add2DVertex(0,-6in,0,0);
-			Add2DVertex(-(HWidth(h_PosiName)-1in)/2,-5.25in,0,0);
-			Add2DVertex(-HWidth(h_PosiName)/2,-4.5in,0,0);
-			Add2DVertex(0,-4.5in,0,0);
-			EndPoly;
+			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+			IF (PLABELSTYLE <>'Billington') THEN BEGIN
+				BeginPoly;
+				Add2DVertex(0,-4.5in,0,0);
+				Add2DVertex((HWidth(h_PosiName)+2in)/2,-4.5in,0,0);
+				Add2DVertex((HWidth(h_PosiName)+1in)/2,-5.25in,0,0);
+				Add2DVertex(0,-6in,0,0);
+				Add2DVertex((-HWidth(h_PosiName)-1in)/2,-5.25in,0,0);
+				Add2DVertex((-HWidth(h_PosiName)-2in)/2,-4.5in,0,0);
+				Add2DVertex(0,-4.5in,0,0);
+				EndPoly;
+			END ELSE BEGIN {// Billington Style //}
+				GetBBox(h_PosiName,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+				p_LineOrig.Y := (p_Tmp1.Y+p_Tmp2.Y);
+				IF (PLABELSTYLE = 'Billington') THEN BEGIN
+					Fill_WtoB(1);
+					Pen_WtoB(1);
+				END;
+				BeginPoly;
+				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-1in,0,0);
+				Add2DVertex(
+				            p_Tmp1.X-(HHeight(h_PosiName)/2),
+				            (p_Tmp1.Y+p_Tmp2.Y)/2,
+				            4,HHeight(h_PosiName)/2);
+				Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+1in,0,0);
+				Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+1in,0,0);
+				Add2DVertex(
+				            p_Tmp2.X+(HHeight(h_PosiName)/2),
+				            (p_Tmp1.Y+p_Tmp2.Y),
+				            4,HHeight(h_PosiName)/2);
+				Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-1in,0,0);
+				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-1in,0,0);
+				EndPoly;
+			END;
 			h_Shape := LNewObj;
+			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 			IF (PCONTROLPOINT01X>(HWidth(h_Shape)/2)) THEN
 				p_LineOrig.X := HWidth(h_Shape)/2
@@ -376,8 +414,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				SetTextLeading(LNewObj,GetTextSize(LNewObj,0)*0.9);
 			END;
 		END;
-		HMoveForward(h_Shape,TRUE);
-	END; {"Regular" size}
+		IF (PLABELSTYLE = 'Billington') THEN HMoveBackward(h_Shape,TRUE)
+		ELSE HMoveForward(h_Shape,TRUE);
+	END;{"Regular" size}
+
 
 	EndGroup;
 	HScale2D(LNewObj,0,0,PSCALE,PSCALE,TRUE);
