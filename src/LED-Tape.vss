@@ -97,6 +97,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		h_Path2 := OffsetPoly(h_Path,PTAPEWIDTH/2,1,FALSE,FALSE,100,0)
 	ELSE h_Path2 := OffsetPoly(h_Path,12mm/2,1,FALSE,FALSE,100,0);
 
+	{===== Setup Length & Wattage =====}
+	SetRField(h_Obj,s_ObjName,'TotalLength', Num2StrF(HPerimN(h_Path)));
+	SetRField(h_Obj,s_ObjName,'TotalWatts',
+			  Num2StrF((HPerimN(h_Path)/PWATTLENGTH)*PWATTSPER));
+
 	{===== Text Label Setup =====}
 	s_Label := Concat(PTYPE,' ');
 	IF (PCHAN<>'') AND (PCHAN<>'0') THEN
