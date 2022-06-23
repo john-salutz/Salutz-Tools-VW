@@ -65,9 +65,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextFace([]);
 
 	{===== Draw Text =====}
-	IF (Len(PPREFIX)+Len(PMAGICNUMBER)=1)
-		THEN CreateText(Concat(PPREFIX,PMAGICNUMBER,'  '))
-	ELSE CreateText(Concat(PPREFIX,PMAGICNUMBER,' '));
+	IF (Len(PPREFIX)+Len(PMAGICNUMBER)+Len(PSUFFIX)=1)
+		THEN CreateText(Concat(PPREFIX,PMAGICNUMBER,PSUFFIX,'  '))
+	ELSE CreateText(Concat(PPREFIX,PMAGICNUMBER,PSUFFIX,' '));
 	h_MagicText := LNewObj;
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	Set_Tight_TextFill(h_MagicText,FALSE);
@@ -129,6 +129,18 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Copy_Fill_Color(h_MagicText,h_Container);
 		SetFPat(h_MagicText,0);
 		HMoveBackward(h_Container,TRUE);
+	END;
+
+	IF Len(PLABEL)>0 THEN BEGIN
+		TextOrigin(PLABELDIST,0);
+		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+		TextJust(1);
+		TextVerticalAlign(3);
+		TextFace([]);
+		IF PLABELPEN = 'Black' THEN Pen_WtoB(1);
+		IF PLABELFILL = 'White' THEN Fill_WtoB(0);
+		CreateText(PLABEL);
+		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
 
 END; END; Run(MagicSheet_Number);
