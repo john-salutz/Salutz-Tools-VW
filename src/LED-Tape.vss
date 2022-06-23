@@ -32,13 +32,28 @@ VAR
 	{Script specific variables}
 	s_Label                                                 : STRING;
 	i_NumPathPoints                                         : INTEGER;
-	r_LabelWidth                                            : REAL;
+	r_LabelWidth,r_LengthUnit                               : REAL;
 	h_Path,h_Path2                                          : HANDLE;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
+
+{ Future use IMP/Metric conversion }
+{ CASE GetPrefInt(170) OF }
+{ 1: Message('Feet and Inches'); }
+{ 2: Message('Inches'); }
+{ 3: Message('Feet'); }
+{ 4: Message('Yards'); }
+{ 5: Message('Miles'); }
+{ 6: Message('Microns'); }
+{ 7: Message('Millimeters'); }
+{ 8: Message('Centimeters'); }
+{ 9: Message('Meters'); }
+{ 10: Message('Kilometers'); }
+{ 11: Message('Degrees'); }
+{ END; }
 
 FUNCTION Setup_Text_Label (h : HANDLE;i1,i2 : INTEGER) : BOOLEAN;
 VAR
@@ -69,14 +84,9 @@ BEGIN
 		IF (IsObjectFlipped(h_Obj) AND ((Abs(angle) = 90)
 			OR (Abs(angle) = 270)))
 			THEN BEGIN
-				{ TextFlip(2); }
-				{ IF  }
 				TextRotate(angle+180);
-			{ END ELSE TextFlip(0); }
 			END {ELSE TextFlip(1)};
-		{ IF IsObjectFlipped(h_Obj) THEN TextFlip(1); }
 
-		{ CreateText(Concat(angle)); }
 		Setup_Text_Label := TRUE;
 	END ELSE Setup_Text_Label := FALSE;
 END;
@@ -99,8 +109,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{===== Setup Length & Wattage =====}
 	SetRField(h_Obj,s_ObjName,'TotalLength', Num2StrF(HPerimN(h_Path)));
+	IF ValidNumStr(PWATTLENGTH,r_LengthUnit) THEN
 	SetRField(h_Obj,s_ObjName,'TotalWatts',
-			  Num2StrF((HPerimN(h_Path)/PWATTLENGTH)*PWATTSPER));
+	          Concat(Num2Str(3,(HPerimN(h_Path)/r_LengthUnit)*PWATTSPER),
+	          ' watts'))
+	ELSE SetRField(h_Obj,s_ObjName,'TotalWatts','Invalid Length Unit');
 
 	{===== Text Label Setup =====}
 	s_Label := Concat(PTYPE,' ');
