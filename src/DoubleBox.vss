@@ -225,7 +225,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		MoveTo(0,0);
 		IF (PLABEL_POSITION='Inside') THEN BEGIN
 			GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-			TextOrigin(p_Tmp2.X,0);
+			TextOrigin(p_Tmp2.X+(HWidth(h_Text)*0.1),0);
 		END;
 		IF (PLABEL_POSITION='Outside')
 			OR (NOT PSHOWLABEL)
@@ -276,7 +276,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 		IF PNOTERESIZE <> 'None' THEN BEGIN
 			IF ((PLABEL_POSITION = 'Inside') AND PSHOWLABEL) THEN
-				r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note)-HWidth(h_Text)
+				r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note)-(HWidth(h_Text)*1.1)
 			ELSE r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note);
 			IF ((PNOTERESIZE = 'Box Expands to Note Height') AND
 				(r_HeightDiff < 0)) OR
