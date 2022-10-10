@@ -102,7 +102,7 @@ END;
 {====================================}
 
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 5');
+	Set_Version_Info('0 . 6 . 6');
 	Use_PIO_Text_Attributes(h_Obj);
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
@@ -298,22 +298,26 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				BeginPoly;
 				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-1in,0,0);
 				{ Add2DVertex(p_Tmp1.X,p_Tmp2.Y-1in,0,0); }
-				IF (PLABELDIRECTION = '<<') THEN
+				IF (PLABELDIRECTION = '<<') THEN BEGIN
+					Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-2in, 0,0);
 					Add2DVertex(
 					            p_Tmp1.X+1in-(HHeight(h_PosiName)/2),
-					            (p_Tmp1.Y+p_Tmp2.Y)/2, 0,0)
-				ELSE Add2DVertex(
+								(p_Tmp1.Y+p_Tmp2.Y)/2, 0,0);
+					Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+2in, 0,0);
+				END ELSE Add2DVertex(
 				                 p_Tmp1.X-(HHeight(h_PosiName)/2),
 				                 (p_Tmp1.Y+p_Tmp2.Y)/2,
 				                 4,HHeight(h_PosiName)/2);
 				Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+1in,0,0);
 				{ Add2DVertex(p_Tmp1.X,p_Tmp1.Y+1in,0,0); }
 				Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+1in,0,0);
-				IF (PLABELDIRECTION = '>>') THEN
+				IF (PLABELDIRECTION = '>>') THEN BEGIN
+					Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+2in,0,0);
 					Add2DVertex(
 					            p_Tmp2.X-1in+(HHeight(h_PosiName)/2),
-					            (p_Tmp1.Y+p_Tmp2.Y),0,0)
-				ELSE Add2DVertex(
+								(p_Tmp1.Y+p_Tmp2.Y),0,0);
+					Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-2in,0,0);
+				END ELSE Add2DVertex(
 				                 p_Tmp2.X+(HHeight(h_PosiName)/2),
 				                 (p_Tmp1.Y+p_Tmp2.Y),
 				                 4,HHeight(h_PosiName)/2);
