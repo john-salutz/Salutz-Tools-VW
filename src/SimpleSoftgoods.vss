@@ -1,0 +1,135 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, (c) 2022. Please share freely.
+//
+//  A simplified hanging scenery tool
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE SimpleSoftgoods;
+
+CONST
+	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	r_DrawLength                                            : REAL;
+	h_Softgood,h_Softgood2,h_Label,h_Label2                 : HANDLE;
+	p_Tmp1,p_Tmp2                                           : POINT;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
+
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	Set_Version_Info('0 . 6 . 5');
+	Use_PIO_Text_Attributes(h_Obj);
+
+	{===== Variable Assignment =====}
+	IF (POPENING > 0) THEN r_DrawLength := (PLENGTH-POPENING)/2
+	ELSE r_DrawLength := PLENGTH;
+
+	{===== Parameter Limits =====}
+	IF (PHANGPOINT<0) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'HangPoint', '0');
+		ResetObject(h_Obj);
+	END;
+	IF (PHANGPOINT>1) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'HangPoint', '1');
+		ResetObject(h_Obj);
+	END;
+	IF (PDEPTH<0) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'Depth', '0');
+		ResetObject(h_Obj);
+	END;
+
+	{// Draw Extrude //}
+	BeginXtrd(0,r_DrawLength);
+	BeginPoly;
+	Add2DVertex(0,-PDEPTH+(PDEPTH*PHANGPOINT),0,0);
+	IF PSOFTORHARD = 'Soft' THEN Add2DVertex(-PHEIGHT,0,0,0)
+	ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
+		Add2DVertex(-PHEIGHT,-PDEPTH+(PDEPTH*PHANGPOINT),0,0);
+		Add2DVertex(-PHEIGHT,(PDEPTH*PHANGPOINT),0,0);
+	END;
+	Add2DVertex(0,(PDEPTH*PHANGPOINT),0,0);
+	Add2DVertex(0,-PDEPTH+(PDEPTH*PHANGPOINT),0,0);
+	EndPoly;
+	SetPolyClosed(LNewObj,TRUE);
+	EndXtrd;
+	h_Softgood := LNewObj;
+	SetTextureRefN(h_Softgood,0,3,0);
+
+	{// Rotate, Move, and Duplicate //}
+	SetRot3D(h_Softgood,0,90,0,0,0,0);
+	Move3DObj(h_Softgood,-PLENGTH/2,0,0);
+	IF (POPENING > 0) THEN BEGIN
+		h_Softgood2 := HDuplicate(h_Softgood,0,0);
+		Move3DObj(h_Softgood2,PLENGTH-r_DrawLength,0,0);
+	END;
+
+	{ GetBBox(h_Softgood,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
+	IF (PDEPTH > 0) THEN Rect(
+	                          -PLENGTH/2,(PDEPTH*PHANGPOINT),
+	                          r_DrawLength-(PLENGTH/2),
+	                          -PDEPTH+(PDEPTH*PHANGPOINT)
+	                          )
+	ELSE BEGIN
+		MoveTo(-PLENGTH/2,(PDEPTH*PHANGPOINT));
+		LineTo(r_DrawLength-(PLENGTH/2),-PDEPTH+(PDEPTH*PHANGPOINT));
+	END;
+
+	IF (POPENING > 0) THEN BEGIN
+		{ GetBBox(h_Softgood2,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
+		IF (PDEPTH > 0) THEN Rect(
+		                          POPENING/2,(PDEPTH*PHANGPOINT),
+		                          PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT)
+		                          )
+	ELSE BEGIN
+		MoveTo(POPENING/2,(PDEPTH*PHANGPOINT));
+		LineTo(PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT));
+	END;
+		{ Rect(p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
+	END;
+
+	{// Draw Text //}
+	IF PLABEL <> '' THEN BEGIN
+		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+		TextOrigin(0,0);
+		TextJust(2);
+		TextVerticalAlign(3);
+		IF (PTEXTCOLOR='Black') THEN Pen_WtoB(1);
+		IF (PTEXTBG='White') THEN Fill_WtoB(0);
+		CreateText(PLABEL);
+		h_Label := LNewObj;
+		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+		IF (POPENING > 0) THEN BEGIN
+			h_Label2 := HDuplicate(h_Label,0,0);
+			HMove(h_Label,(-POPENING/2)-(r_DrawLength/2),0);
+			HMove(h_Label2,(POPENING/2)+(r_DrawLength/2),0);
+			{ Move3DObj(h_Softgood2,PLENGTH-r_DrawLength,0,0); }
+		END;
+	END;
+END; END; Run(SimpleSoftgoods);
