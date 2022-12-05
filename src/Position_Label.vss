@@ -295,11 +295,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			END ELSE BEGIN {// Billington Style //}
 				GetBBox(h_PosiName,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 				p_LineOrig.Y := (p_Tmp1.Y+p_Tmp2.Y);
+				p_OffsetLine1.Y := (p_Tmp2.Y-1in);
 				IF (PLABELDIRECTION = '<<') THEN p_Tmp1.X := (p_Tmp1.X-1in);
 				IF (PLABELDIRECTION = '>>') THEN p_Tmp2.X := (p_Tmp2.X+1in);
 
 				BeginPoly;
-				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-1in,0,0);
+				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-0.5in,0,0);
 				IF (PLABELDIRECTION = '<<') THEN BEGIN
 					Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-2in, 0,0);
 					Add2DVertex(
@@ -307,11 +308,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 								(p_Tmp1.Y+p_Tmp2.Y)/2, 0,0);
 					Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+2in, 0,0);
 				END ELSE Add2DVertex(
-				                 p_Tmp1.X-(HHeight(h_PosiName)/2),
+									 p_Tmp1.X-(HHeight(h_PosiName)/2.5),
 				                 (p_Tmp1.Y+p_Tmp2.Y)/2,
-				                 4,HHeight(h_PosiName)/2);
-				Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+1in,0,0);
-				Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+1in,0,0);
+									 4,HHeight(h_PosiName)/2.5);
+				Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+0.5in,0,0);
+				Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+0.5in,0,0);
 				IF (PLABELDIRECTION = '>>') THEN BEGIN
 					Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+2in,0,0);
 					Add2DVertex(
@@ -319,11 +320,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 								(p_Tmp1.Y+p_Tmp2.Y),0,0);
 					Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-2in,0,0);
 				END ELSE Add2DVertex(
-				                 p_Tmp2.X+(HHeight(h_PosiName)/2),
+									 p_Tmp2.X+(HHeight(h_PosiName)/2.5),
 				                 (p_Tmp1.Y+p_Tmp2.Y),
-				                 4,HHeight(h_PosiName)/2);
-				Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-1in,0,0);
-				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-1in,0,0);
+									 4,HHeight(h_PosiName)/2.5);
+				Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-0.5in,0,0);
+				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-0.5in,0,0);
 				EndPoly;
 			END;
 			h_Shape := LNewObj;
