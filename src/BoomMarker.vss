@@ -29,7 +29,7 @@ VAR
 	b_Result                                                : BOOLEAN;
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
-	h_Label                                                 : HANDLE;
+	h_Label,h_Container                                     : HANDLE;
 	r_TextScaler                                            : REAL;
 	p_Tmp1,p_Tmp2,p_NoteStart                               : POINT;
 
@@ -66,7 +66,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 5');
+	Set_Version_Info('0 . 6 . 6');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
@@ -76,24 +76,54 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	p_NoteStart.Y := -1.5in;
 	{===== Attribute Setup =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-	Fill_WtoB(0);
+	
 	{ FillPat(1); }
 	{ FillBack(RGBmax,RGBmax,RGBmax); }
 	PenSize(7*r_TextScaler);
 
 	{// Label Text //}
-	TextOrigin(0,2in);
-	TextJust(2);
-	TextVerticalAlign(5);
-	CreateText(PLABEL);
-	h_Label := LNewObj;
-	Set_Text_HardBold(h_Label);
-	{// Draw Underline //}
-	PenPatN(2);
-	IF PUNDERLINE THEN BEGIN
-		GetBBox(h_Label,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-		MoveTo(p_Tmp1.X,p_Tmp2.Y);
-		LineTo(p_Tmp2.X,p_Tmp2.Y);
+	IF PLABEL <> '' THEN BEGIN
+		TextOrigin(0,2in);
+		TextJust(2);
+		TextVerticalAlign(5);
+		CreateText(PLABEL);
+		h_Label := LNewObj;
+		Set_Text_HardBold(h_Label);
+		IF PLABELPEN = 'Black' THEN Set_Pen_WtoB(h_Label,1)
+		ELSE IF PLABELPEN = 'White' THEN Set_Pen_WtoB(h_Label,0);
+		{// Draw Container //}
+		PenPatN(2);
+		IF PCONTAINER<>'None' THEN BEGIN
+			GetBBox(h_Label,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		END ELSE Set_Background_WtoB(h_Label,0);
+
+		{ IF PUNDERLINE THEN BEGIN }
+		IF PCONTAINER='Underline' THEN BEGIN
+			Set_Background_WtoB(h_Label,0);
+			MoveTo(p_Tmp1.X*1.1,p_Tmp2.Y);
+			LineTo(p_Tmp2.X*1.1,p_Tmp2.Y);
+			h_Container := LNewObj;
+		END ELSE IF PCONTAINER='Rectangle' THEN BEGIN
+			SetFPat(h_Label,0);
+			Rect(p_Tmp1.X*1.1,p_Tmp1.Y,p_Tmp2.X*1.1,p_Tmp2.Y);
+			h_Container := LNewObj;
+			HMoveBackward(h_Container,TRUE);
+		END ELSE IF PCONTAINER='Bubble' THEN BEGIN
+			SetFPat(h_Label,0);
+			BeginPoly;
+			Add2DVertex(p_Tmp1.X*1,p_Tmp2.Y,0,0);
+			Add2DVertex((p_Tmp1.X*1)-(HHeight(h_Label)/2),
+						(p_Tmp1.Y+p_Tmp2.Y)/2,4,HHeight(h_Label)/2.5);
+			Add2DVertex(p_Tmp1.X*1,p_Tmp1.Y,0,0);
+			Add2DVertex(p_Tmp2.X*1,p_Tmp1.Y,0,0);
+			Add2DVertex((p_Tmp2.X*1)+(HHeight(h_Label)/2),
+						(p_Tmp1.Y+p_Tmp2.Y)/2,4,HHeight(h_Label)/2.5);
+			Add2DVertex(p_Tmp2.X*1,p_Tmp2.Y,0,0);
+			Add2DVertex(p_Tmp1.X*1,p_Tmp2.Y,0,0);
+			EndPoly;
+			h_Container := LNewObj;
+			HMoveBackward(h_Container,TRUE);
+		END;
 	END;
 
 	PenSize(5*r_TextScaler);
@@ -117,6 +147,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{// Text Style 'Plain' //}
 	TextFace([]);
 	TextSize(9*r_TextScaler);
+	Fill_WtoB(0);
 	{ Pen_WtoB(1); }
 
 	{// East Text //}
@@ -169,8 +200,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		CreateText('DIMENSION FROM:');
 		HMoveBackward(LNewObj,TRUE);
 		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-		MoveTo(p_Tmp1.X,p_Tmp2.Y);
-		LineTo(p_Tmp2.X,p_Tmp2.Y);
+		{ MoveTo(p_Tmp1.X,p_Tmp2.Y); }
+		{ LineTo(p_Tmp2.X,p_Tmp2.Y); }
+		{ MoveTo(-12in,p_Tmp2.Y); }
+		{ LineTo(12in,p_Tmp2.Y); }
 		TextOrigin(0,p_Tmp2.Y);
 		TextSize(8*r_TextScaler);
 		TextFace([]);
@@ -187,20 +220,32 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextJust(2);
 
 	IF PNOTES <> '' THEN BEGIN
-		TextSize(7*r_TextScaler);
-		TextFace([Italic]);
-		CreateText('NOTE:');
-		HMoveBackward(LNewObj,TRUE);
-		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-		MoveTo(p_Tmp1.X,p_Tmp2.Y);
-		LineTo(p_Tmp2.X,p_Tmp2.Y);
-		TextOrigin(0,p_Tmp2.Y);
+		
+		{ TextSize(7*r_TextScaler); }
+		{ TextFace([Italic]); }
+		{ CreateText('NOTE:'); }
+		{ HMoveBackward(LNewObj,TRUE); }
+		{ GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
+		{ MoveTo(p_Tmp1.X,p_Tmp2.Y); }
+		{ LineTo(p_Tmp2.X,p_Tmp2.Y); }
+		{ TextOrigin(0,p_Tmp2.Y); }
+		{ TextSize(8*r_TextScaler); }
+		{ TextFace([]); }
+		{ CreateText(PNOTES); }
 		TextSize(8*r_TextScaler);
 		TextFace([]);
-		CreateText(PNOTES);
+		CreateText(Concat('NOTE: ',PNOTES));
+		SetTextStyle(LNewObj,0,5,1);
+		SetTextStyle(LNewObj,0,5,2);
+		SetTextSize(LNewObj,0,5,6*r_TextScaler);
 		Set_Tight_TextFill(LNewObj,TRUE);
 		SetTextWidth(LNewObj,33in);
 		HMoveBackward(LNewObj,TRUE);
+		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		MoveTo(-12in,p_Tmp1.Y);
+		LineTo(12in,p_Tmp1.Y);
+		{ MoveTo(p_Tmp1.X,p_Tmp1.Y); }
+		{ LineTo(p_Tmp2.X,p_Tmp1.Y); }
 	END;
 
 	{===== End Sequence =====}
