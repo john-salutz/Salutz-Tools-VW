@@ -98,7 +98,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF PSTYLE='Bold'
 			THEN SetTextStyle(h_MagicText,0,GetTextLength(h_MagicText),1);
 	END;
-	IF PLABEL<>'' THEN HMove(h_MagicText,-HWidth(h_MagicText)/2,0);
+	IF PLABEL<>'' THEN BEGIN
+		IF PLABELPOSI ='Right'
+			THEN HMove(h_MagicText,-HWidth(h_MagicText)/2,0)
+		ELSE IF PLABELPOSI ='Left'
+			THEN HMove(h_MagicText,HWidth(h_MagicText)/2,0);
+	END;
 
 	{===== Draw Containers =====}
 	IF (PCONTAINER<>'None') THEN BEGIN
@@ -147,9 +152,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	IF Len(PLABEL)>0 THEN BEGIN
-		TextOrigin(PLABELDIST,0);
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-		TextJust(1);
+		IF PLABELPOSI='Right' THEN BEGIN
+			TextOrigin(PLABELDIST,0);
+			TextJust(1);
+		END ELSE IF PLABELPOSI='Left' THEN BEGIN
+			TextOrigin(-PLABELDIST,0);
+			TextJust(3);
+		END;
 		TextVerticalAlign(3);
 		TextFace([]);
 		IF PLABELPEN = 'Black' THEN Pen_WtoB(1);
