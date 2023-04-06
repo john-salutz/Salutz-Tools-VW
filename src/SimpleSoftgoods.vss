@@ -122,6 +122,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextVerticalAlign(3);
 		IF (PTEXTCOLOR='Black') THEN Pen_WtoB(1);
 		IF (PTEXTBG='White') THEN Fill_WtoB(0);
+		IF (PTEXTBG='None') THEN FillPat(0);
 		CreateText(PLABEL);
 		h_Label := LNewObj;
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
