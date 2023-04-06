@@ -69,6 +69,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'MagicNumber', '0');
 		ResetObject(h_Obj);
 	END;
+	IF (PLABELSCALE<=0) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'LabelScale', '1');
+		ResetObject(h_Obj);
+	END;
 	IF (PCONTAINER='<<') THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'Container', 'West');
 		ResetObject(h_Obj);
@@ -162,6 +166,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 		TextVerticalAlign(3);
 		TextFace([]);
+		TextSize(GetTextSize(h_MagicText,0)*PLABELSCALE);
 		IF PLABELPEN = 'Black' THEN Pen_WtoB(1);
 		IF PLABELFILL = 'White' THEN Fill_WtoB(0);
 		CreateText(PLABEL);
