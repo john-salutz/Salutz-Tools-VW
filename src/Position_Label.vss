@@ -30,7 +30,8 @@ VAR
 	{Script specific variables}
 	h_PosiName,h_Shape,h_Circle                             : HANDLE;
 	p_OffsetPosiName,p_OffsetLine1,p_LineOrig,p_Tmp1,p_Tmp2 : POINT;
-	r_Scale,r_TextScaler                                    : REAL;
+	p_RePosition                                            : POINT;
+	r_Scale,r_TextScaler,r_TextHeight                       : REAL;
 	i_Flip                                                  : INTEGER;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
@@ -100,14 +101,21 @@ END;
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
-
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 5');
+	Set_Version_Info('0 . 6 . 7');
 	Use_PIO_Text_Attributes(h_Obj);
+
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
 	SetParameterVisibility(h_Obj,'WrapWidth',PWRAPTEXT);
+	IF ((PLABELSTYLE='Bubble') OR (PSHOWINNERCIRCLE = FALSE))
+		THEN SetParameterVisibility(h_Obj,'NameColor',TRUE)
+	ELSE SetParameterVisibility(h_Obj,'NameColor',FALSE);
+	IF (PLABELSTYLE = 'Regular')
+		THEN SetParameterVisibility(h_Obj,'ShowInnerCircle',FALSE)
+	ELSE SetParameterVisibility(h_Obj,'ShowInnerCircle',TRUE);
 
 	{===== Parameter Limits =====}
 	IF (PSCALE<=0) THEN BEGIN
@@ -115,22 +123,19 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		AlrtDialog('Scale Out of Bounds, Scale may not be zero or negative.');
 		ResetObject(h_Obj);
 	END;
-
+	IF (PLABELSTYLE='Billington') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'LabelStyle','Bubble');
+		ResetObject(h_Obj);
+	END;
 	IF PLABELSTYLE = 'Smaller' THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'LabelStyle','Micro');
 		ResetObject(h_Obj);
 	END;
 
-	{ IF PLABELSTYLE = 'Billington' THEN BEGIN }
-	{ 	SetRField(h_Obj,s_ObjName,'LabelDirection','---'); }
-	{ 	SetParameterVisibility(h_Obj,'LabelDirection',FALSE); }
-	{ 	IF (GetRField(h_Obj,s_ObjName,'LabelDirection') <> PLABELDIRECTION) }
-	{ 		THEN ResetObject(h_Obj); }
-	{ 	{\ PLABELDIRECTION := '---'; !{\ }
-	{ END; }
-
 	{===== Variable Setup =====}
 	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
+	p_RePosition.X := 0;
+	p_RePosition.Y := 0;
 
 	{===== Draw Shapes & Set Text Orig Points =====}
 	BeginGroup;
@@ -173,6 +178,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			h_Circle := LNewObj;
 			HMoveForward(LNewObj,TRUE);
 			From_Back_Set_Pen(h_Obj,LNewObj);
+			IF NOT PSHOWINNERCIRCLE THEN SetOpacity(LNewObj,0);
 		END {Small} ELSE
 
 		BEGIN {===== "Micro" size =====}
@@ -205,11 +211,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			h_Circle := LNewObj;
 			HMoveForward(LNewObj,TRUE);
 			From_Back_Set_Pen(h_Obj,LNewObj);
+			IF NOT PSHOWINNERCIRCLE THEN SetOpacity(LNewObj,0);
 		END; {Micro}
 
 		{// Create Position Name Label Small/Micro //}
 		TextOrigin(0,0);
-		Pen_WtoB(1);
+		IF PSHOWINNERCIRCLE THEN Pen_WtoB(1)
+		ELSE IF (PNAMECOLOR = 'Black') THEN Pen_WtoB(1)
+		ELSE IF (PNAMECOLOR = 'White') THEN Pen_WtoB(0);
 		FillPat(0);
 		TextFace([Bold]);
 		IF (PLABELSTYLE = 'Small') THEN TextSize(10*r_TextScaler)
@@ -225,6 +234,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			GetBBox(h_Shape,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextVerticalAlign(1);
 			Fill_WtoB(0);
+			Pen_WtoB(1);
 			TextFace([]);
 			IF (PLABELSTYLE = 'Small') THEN TextSize(5*r_TextScaler)
 			ELSE TextSize(4*r_TextScaler);
@@ -241,31 +251,30 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		PenPatN(2);
 		PenSize(5);
 
-		IF (PLABELDIRECTION='---') OR (PLABELSTYLE='Billington') THEN
-		BEGIN {// Direction "---" & Style "Billington" //}
+		IF (PLABELDIRECTION='---') OR (PLABELSTYLE='Bubble') THEN
+		BEGIN {// Direction "---" & Style "Bubble" //}
 			TextSize(10*r_TextScaler);
 			TextJust(2);
 			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-			IF (PLABELSTYLE = 'Billington') THEN BEGIN
-				Fill_WtoB(1);
-				Pen_WtoB(0);
+			IF (PLABELSTYLE = 'Bubble') THEN BEGIN
+				FillPat(0);
+				IF (PNAMECOLOR = 'Black') THEN Pen_WtoB(1)
+				ELSE IF (PNAMECOLOR = 'White') THEN Pen_WtoB(0);
 				TextOrigin(0,0);
 				TextVerticalAlign(3);
 			END ELSE BEGIN
 				Fill_WtoB(0);
 				Pen_WtoB(1);
 				TextOrigin(0,-4.5in);
-				{ TextVerticalAlign(3); }
 				TextVerticalAlign(5);
 			END;
-			{ TextVerticalAlign(5); }
 			CreateText(PPOSINAME);
 			h_PosiName := LNewObj;
 			Set_Tight_TextFill(h_PosiName,TRUE);
 			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 			i_Flip := 1;
 			p_OffsetLine1.X := 0;
-			p_OffsetLine1.Y := -6in;
+			p_OffsetLine1.Y := -5.75in;
 			p_LineOrig.X := 0;
 			p_LineOrig.Y := -4.5in;
 			IF (PWRAPTEXT) THEN BEGIN
@@ -275,7 +284,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 			{// Create Poly Shape //}
 			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-			IF (PLABELSTYLE <>'Billington') THEN BEGIN
+			IF (PLABELSTYLE <>'Bubble') THEN BEGIN
 				BeginPoly;
 				Add2DVertex(0,-4.5in,0,0);
 				Add2DVertex((HWidth(h_PosiName)+2in)/2,-4.5in,0,0);
@@ -285,54 +294,88 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				Add2DVertex((-HWidth(h_PosiName)-2in)/2,-4.5in,0,0);
 				Add2DVertex(0,-4.5in,0,0);
 				EndPoly;
-			END ELSE BEGIN {// Billington Style //}
+				h_Shape := LNewObj;
+			END ELSE BEGIN {// Bubble Style //}
 				GetBBox(h_PosiName,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 				p_LineOrig.Y := (p_Tmp1.Y+p_Tmp2.Y);
-				IF (PLABELSTYLE = 'Billington') THEN BEGIN
-					Fill_WtoB(1);
-					Pen_WtoB(1);
-				END;
-				IF (PLABELDIRECTION = '<<') THEN p_Tmp1.X := (p_Tmp1.X-1in);
-				IF (PLABELDIRECTION = '>>') THEN p_Tmp2.X := (p_Tmp2.X+1in);
+				p_OffsetLine1.Y := (p_Tmp2.Y-1in);
+				r_TextHeight := HHeight(h_PosiName);
 
 				BeginPoly;
-				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-1in,0,0);
-				{ Add2DVertex(p_Tmp1.X,p_Tmp2.Y-1in,0,0); }
-				IF (PLABELDIRECTION = '<<') THEN
-					Add2DVertex(
-					            p_Tmp1.X+1in-(HHeight(h_PosiName)/2),
-					            (p_Tmp1.Y+p_Tmp2.Y)/2, 0,0)
-				ELSE Add2DVertex(
-				                 p_Tmp1.X-(HHeight(h_PosiName)/2),
-				                 (p_Tmp1.Y+p_Tmp2.Y)/2,
-				                 4,HHeight(h_PosiName)/2);
-				Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+1in,0,0);
-				{ Add2DVertex(p_Tmp1.X,p_Tmp1.Y+1in,0,0); }
-				Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+1in,0,0);
-				IF (PLABELDIRECTION = '>>') THEN
-					Add2DVertex(
-					            p_Tmp2.X-1in+(HHeight(h_PosiName)/2),
-					            (p_Tmp1.Y+p_Tmp2.Y),0,0)
-				ELSE Add2DVertex(
-				                 p_Tmp2.X+(HHeight(h_PosiName)/2),
-				                 (p_Tmp1.Y+p_Tmp2.Y),
-				                 4,HHeight(h_PosiName)/2);
-				Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-1in,0,0);
-				Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-1in,0,0);
+				IF (PLABELDIRECTION = '<<') THEN BEGIN {Left Side}
+					Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
+					Add2DVertex(p_Tmp1.X,p_Tmp2.Y-2in, 0,0);
+					Add2DVertex(p_Tmp1.X-(r_TextHeight*0.75),
+					            (p_Tmp1.Y+p_Tmp2.Y)/2, 0,0);
+					Add2DVertex(p_Tmp1.X,p_Tmp1.Y+2in, 0,0);
+					Add2DVertex(p_Tmp1.X,p_Tmp1.Y+0.5in,0,0);
+				END ELSE BEGIN
+					Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-0.5in,0,0);
+					Add2DVertex(p_Tmp1.X-(r_TextHeight/2.5),
+					            (p_Tmp1.Y+p_Tmp2.Y)/2,4,r_TextHeight/2.5);
+					Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+0.5in,0,0);
+				END;
+				IF (PLABELDIRECTION = '>>') THEN BEGIN {Right Side}
+					Add2DVertex(p_Tmp2.X,p_Tmp1.Y+0.5in,0,0);
+					Add2DVertex(p_Tmp2.X,p_Tmp1.Y+2in,0,0);
+					Add2DVertex(p_Tmp2.X+(r_TextHeight*0.75),
+					            (p_Tmp1.Y+p_Tmp2.Y),0,0);
+					Add2DVertex(p_Tmp2.X,p_Tmp2.Y-2in,0,0);
+					Add2DVertex(p_Tmp2.X,p_Tmp2.Y-0.5in,0,0);
+				END ELSE BEGIN
+					Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+0.5in,0,0);
+					Add2DVertex(p_Tmp2.X+(r_TextHeight/2.5),
+					            (p_Tmp1.Y+p_Tmp2.Y),4,r_TextHeight/2.5);
+					Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-0.5in,0,0);
+				END;
 				EndPoly;
+				h_Shape := LNewObj;
+				SetPolyClosed(h_Shape,TRUE);
+
+				IF (PSHOWINNERCIRCLE) THEN BEGIN
+					Fill_WtoB(0);
+					p_Tmp1.X := (p_Tmp1.X+1in);
+					p_Tmp2.X := (p_Tmp2.X-1in);
+					BeginPoly;
+					Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
+					Add2DVertex(p_Tmp1.X-(r_TextHeight/2.5)-1in,
+					            (p_Tmp1.Y+p_Tmp2.Y)/2,4,r_TextHeight/2.5);
+					Add2DVertex(p_Tmp1.X,p_Tmp1.Y+0.5in,0,0);
+					Add2DVertex(p_Tmp2.X,p_Tmp1.Y+0.5in,0,0);
+					Add2DVertex(p_Tmp2.X+(r_TextHeight/2.5)+1in,
+					            (p_Tmp1.Y+p_Tmp2.Y),4,r_TextHeight/2.5);
+					Add2DVertex(p_Tmp2.X,p_Tmp2.Y-0.5in,0,0);
+					Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
+					EndPoly;
+					h_Circle := LNewObj;
+				END;
 			END;
-			h_Shape := LNewObj;
 			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
-			IF (PCONTROLPOINT01X>(HWidth(h_Shape)/2)) THEN
-				p_LineOrig.X := HWidth(h_Shape)/2
-			ELSE IF (PCONTROLPOINT01X<(-HWidth(h_Shape)/2)) THEN
-				p_LineOrig.X := -HWidth(h_Shape)/2;
+			IF PLABELDIRECTION = '---' THEN BEGIN
+				IF (PCONTROLPOINT01X>(HWidth(h_Shape)/2)) THEN
+					p_LineOrig.X := HWidth(h_Shape)/2
+				ELSE IF (PCONTROLPOINT01X<(-HWidth(h_Shape)/2)) THEN
+					p_LineOrig.X := -HWidth(h_Shape)/2;
+				END ELSE BEGIN {// Bubble "<<" & ">>" //}
+					p_LineOrig.X := 0;
+					GetBBox(h_Shape,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+					IF PLABELDIRECTION = '<<' THEN BEGIN
+						p_RePosition.X := p_Tmp1.X;
+						p_OffsetLine1.X := (-HWidth(h_PosiName)/2)+0.5in;
+						SetTextJustN(h_PosiName,1);
+						TextJust(1);
+					END ELSE IF PLABELDIRECTION = '>>' THEN BEGIN
+						p_RePosition.X := p_Tmp2.X;
+						p_OffsetLine1.X := (HWidth(h_PosiName)/2)-0.5in;
+						SetTextJustN(h_PosiName,3);
+						TextJust(3);
+					END;
+				END;
 		END {Direction ---}
 
 		ELSE IF (PLABELDIRECTION<>'---') THEN
 		BEGIN {// Direction "<<" & ">>" //}
-			{ TextVerticalAlign(5); }
 			IF (PLABELDIRECTION='<<') THEN BEGIN
 				TextJust(1);
 				i_Flip := 1;
@@ -384,27 +427,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			HMoveBackward(LNewObj,TRUE);
 			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
-			p_OffsetLine1.X := 1in*i_Flip;
-			p_OffsetLine1.Y := -6in;
-			p_LineOrig.X := -6in*i_Flip;
+			p_OffsetLine1.X := 0.5in*i_Flip;
+			p_OffsetLine1.Y := -5.75in;
+			p_LineOrig.X := 0;
 			p_LineOrig.Y := 0;
-
+			p_RePosition.X := -6in*i_Flip;
 		END; {Direction "<<" & ">>"}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		{// Setup Line 1&2 Attributes //}
 		TextVerticalAlign(1);
@@ -447,20 +475,24 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				SetTextLeading(LNewObj,GetTextSize(LNewObj,0)*0.9);
 			END;
 		END;
-		IF (PLABELSTYLE = 'Billington') THEN HMoveBackward(h_Shape,TRUE)
-		ELSE HMoveForward(h_Shape,TRUE);
+		IF (PLABELSTYLE = 'Bubble') THEN BEGIN
+			HMoveBackward(h_Circle,TRUE);
+			HMoveBackward(h_Shape,TRUE)
+		END ELSE HMoveForward(h_Shape,TRUE);
 	END;{"Regular" size}
 
 
 	EndGroup;
+	HMove(LNewObj,-p_RePosition.X,0);
 	HScale2D(LNewObj,0,0,PSCALE,PSCALE,TRUE);
+
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{===== Draw Leader Line =====}
 	SetCntrlPtVis(h_Obj,1,PUSEPOINT);
 	IF PUSEPOINT THEN BEGIN
 		Draw_Squiggle(
-		              p_LineOrig.X*PSCALE, p_LineOrig.Y*PSCALE,
+					  (p_LineOrig.X)*PSCALE, p_LineOrig.Y*PSCALE,
 		              PCONTROLPOINT01X, PCONTROLPOINT01Y
 		              );
 		HMoveBackward(LNewObj,TRUE);

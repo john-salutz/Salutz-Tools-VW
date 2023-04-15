@@ -30,7 +30,7 @@ VAR
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
 	h_MagicText,h_Container                                 : HANDLE;
-	pt1,pt2                                                 : POINT;
+	pt1,pt2,ptC                                             : POINT;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -44,18 +44,41 @@ BEGIN
 	SetFillBack(target,r,g,b);
 END;
 
+PROCEDURE Convert_to_Bezier (h : HANDLE);
+VAR
+	vNum,vType	: INTEGER;
+	x,y,radius		: REAL;
+BEGIN
+	FOR vNum := 1 TO GetVertNum(h) DO BEGIN
+		GetPolylineVertex(h, vNum, x, y, vType, radius);
+		SetPolylineVertex(h, vNum, x, y, 1, 0, TRUE);
+	END;
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 5');
+	Set_Version_Info('0 . 6 . 6');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
 	IF (PMAGICNUMBER='') THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'MagicNumber', '0');
+		ResetObject(h_Obj);
+	END;
+	IF (PLABELSCALE<=0) THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'LabelScale', '1');
+		ResetObject(h_Obj);
+	END;
+	IF (PCONTAINER='<<') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'Container', 'West');
+		ResetObject(h_Obj);
+	END;
+	IF (PCONTAINER='>>') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'Container', 'East');
 		ResetObject(h_Obj);
 	END;
 	TextOrigin(0,0);
@@ -79,50 +102,51 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF PSTYLE='Bold'
 			THEN SetTextStyle(h_MagicText,0,GetTextLength(h_MagicText),1);
 	END;
+	IF PLABEL<>'' THEN BEGIN
+		IF PLABELPOSI ='Right'
+			THEN HMove(h_MagicText,-HWidth(h_MagicText)/2,0)
+		ELSE IF PLABELPOSI ='Left'
+			THEN HMove(h_MagicText,HWidth(h_MagicText)/2,0);
+	END;
 
 	{===== Draw Containers =====}
 	IF (PCONTAINER<>'None') THEN BEGIN
 		GetBBox(h_MagicText,pt1.X,pt1.Y,pt2.X,pt2.Y);
+		HCenter(h_MagicText,ptC.X,ptC.Y);
 		IF (PCONTAINER='Circle') THEN BEGIN
-			ArcByCenter(0,0,pt2.X,0,360);
+			ArcByCenter(ptC.X,ptC.Y,HWidth(h_MagicText)/2,0,360);
 			h_Container := LNewObj;
 		END ELSE IF (PCONTAINER='Oval') THEN BEGIN
 			BeginPoly;
 			Add2DVertex(pt1.X,pt1.Y,0,0);
-			Add2DVertex(0,pt1.Y*1.2,4,pt1.Y*1.2);
 			Add2DVertex(pt2.X,pt1.Y,0,0);
-			Add2DVertex(pt2.X+(pt1.Y/2),0,4,pt1.Y/2);
 			Add2DVertex(pt2.X,pt2.Y,0,0);
-			Add2DVertex(0,pt2.Y*1.2,4,pt1.Y*1.2);
 			Add2DVertex(pt1.X,pt2.Y,0,0);
-			Add2DVertex(pt1.X-(pt1.Y/2),0,4,pt1.Y/2);
-			Add2DVertex(pt1.X,pt1.Y,0,0);
 			EndPoly;
 			h_Container := LNewObj;
-			HScale2D(h_Container,0,0,(pt2.X/(pt2.x+(pt1.Y/2))),(1/(1.2)),FALSE);
+			SetPolyClosed(h_Container,TRUE);
+			Convert_to_Bezier(h_Container);
+			HScale2D(h_Container,ptC.X,ptC.Y,1,1.075,FALSE);
 		END ELSE IF (PCONTAINER='Rectangle') THEN BEGIN
 			Rect(pt1.X,pt1.Y,pt2.X,pt2.Y);
 			h_Container := LNewObj;
-		END ELSE IF (PCONTAINER='<<') THEN BEGIN
+		END ELSE BEGIN
 			BeginPoly;
-			Add2DVertex(pt2.X,pt1.Y,0,0);
 			Add2DVertex(pt1.X,pt1.Y,0,0);
-			Add2DVertex(pt1.X-((pt1.Y-pt2.Y)/2),0,0,0);
-			Add2DVertex(pt1.X,pt2.Y,0,0);
-			Add2DVertex(pt2.X,pt2.Y,0,0);
 			Add2DVertex(pt2.X,pt1.Y,0,0);
+			Add2DVertex(pt2.X,pt2.Y,0,0);
+			Add2DVertex(pt1.X,pt2.Y,0,0);
+			Add2DVertex(pt1.X,pt1.Y,0,0);
 			EndPoly;
 			h_Container := LNewObj;
-		END ELSE IF (PCONTAINER='>>') THEN BEGIN
-			BeginPoly;
-			Add2DVertex(pt1.X,pt2.Y,0,0);
-			Add2DVertex(pt2.X,pt2.Y,0,0);
-			Add2DVertex(pt2.X-((pt2.Y-pt1.Y)/2),0,0,0);
-			Add2DVertex(pt2.X,pt1.Y,0,0);
-			Add2DVertex(pt1.X,pt1.Y,0,0);
-			Add2DVertex(pt1.X,pt2.Y,0,0);
-			EndPoly;
-			h_Container := LNewObj;
+			IF (PCONTAINER='North')
+				THEN InsertVertex(h_Container,ptC.X,pt1.Y+(pt1.Y-ptC.Y)/2,2,0,0);
+			IF (PCONTAINER='South')
+				THEN InsertVertex(h_Container,ptC.X,pt2.Y-(pt1.Y-ptC.Y)/2,4,0,0);
+			IF (PCONTAINER='East')
+				THEN InsertVertex(h_Container,pt2.X+(pt1.Y-ptC.Y)/1.5,ptC.Y,3,0,0);
+			IF (PCONTAINER='West')
+				THEN InsertVertex(h_Container,pt1.X-(pt1.Y-ptC.Y)/1.5,ptC.Y,5,0,0);
 		END;
 		Set_Pen_WtoB(h_Container,1);
 		SetLW(h_Container,7);
@@ -132,11 +156,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	IF Len(PLABEL)>0 THEN BEGIN
-		TextOrigin(PLABELDIST,0);
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-		TextJust(1);
+		IF PLABELPOSI='Right' THEN BEGIN
+			TextOrigin(PLABELDIST,0);
+			TextJust(1);
+		END ELSE IF PLABELPOSI='Left' THEN BEGIN
+			TextOrigin(-PLABELDIST,0);
+			TextJust(3);
+		END;
 		TextVerticalAlign(3);
 		TextFace([]);
+		TextSize(GetTextSize(h_MagicText,0)*PLABELSCALE);
 		IF PLABELPEN = 'Black' THEN Pen_WtoB(1);
 		IF PLABELFILL = 'White' THEN Fill_WtoB(0);
 		CreateText(PLABEL);

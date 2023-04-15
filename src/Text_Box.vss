@@ -30,7 +30,7 @@ VAR
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
 	r_ArrowWidth,r_ArrowLength                              : REAL;
-	h_BackRect,h_FrontRect,h_Text,h_UnLine                  : HANDLE;
+	h_BackRect,h_FrontRect,h_Text,h_UnLine,h_Group          : HANDLE;
 	p_Tmp1,p_Tmp2                                           : POINT;
 	li_Dash                                                 : LONGINT;
 
@@ -134,6 +134,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{===== Setup text creation =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+	BeginGroup;
 	TextJust(2);
 	TextVerticalAlign(3);
 	TextRotate(0);
@@ -214,6 +215,23 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 		h_BackRect := AddSurface(LNewObj,h_BackRect);
 	END; {Create Arrow}
+	EndGroup;
+	h_Group := LNewObj;
+	IF ((PALIGNMENT <> 'Center') AND (PARROWPLACE<>'No Arrow')) THEN BEGIN
+		GetBBox(h_Group,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		IF (PARROWPLACE = 'Right') THEN BEGIN
+			HMove(h_Group,-p_Tmp2.X,0);
+		END
+		ELSE IF (PARROWPLACE = 'Top') THEN BEGIN
+			HMove(h_Group,0,-p_Tmp1.Y);
+		END
+		ELSE IF (PARROWPLACE = 'Left') THEN BEGIN
+			HMove(h_Group,-p_Tmp1.X,0);
+		END
+		ELSE IF (PARROWPLACE = 'Bottom') THEN BEGIN
+			HMove(h_Group,0,-p_Tmp2.Y);
+		END;
+	END;
 
 	{===== End sequence =====}
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}

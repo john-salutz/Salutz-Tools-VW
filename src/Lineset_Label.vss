@@ -156,6 +156,19 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
 
+	{// Draw Custom Load Depth //}
+	IF PLOADDEPTH <> 0 THEN BEGIN
+		BeginPoly;
+		Add2DVertex(6in*i_Flip,-PLOADDEPTH/2,0,0);
+		Add2DVertex(2in*i_Flip,-PLOADDEPTH/2,0,0);
+		Add2DVertex(2in*i_Flip,0,0,0);
+		Add2DVertex(0,0,0,0);
+		Add2DVertex(2in*i_Flip,0,0,0);
+		Add2DVertex(2in*i_Flip,PLOADDEPTH/2,0,0);
+		Add2DVertex(6in*i_Flip,PLOADDEPTH/2,0,0);
+		EndPoly;
+	END;
+
 	{// Hide/Show in 3D Views //}
 	IF PSHOW3D=FALSE THEN Locus3D(0,0,0);
 

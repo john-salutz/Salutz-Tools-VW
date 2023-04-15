@@ -34,6 +34,8 @@ VAR
 	i_NumPathPoints                                         : INTEGER;
 	r_LabelWidth,r_LengthUnit                               : REAL;
 	h_Path,h_Path2                                          : HANDLE;
+	h_PathTmp1,h_PathTmp2,h_PathTmp3,h_PathTmp4             : HANDLE;
+	p_1,p_2                                                 : POINT;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -54,6 +56,74 @@ VAR
 { 10: Message('Kilometers'); }
 { 11: Message('Degrees'); }
 { END; }
+
+	FUNCTION Offset_Poly_Sections(hOrig : HANDLE; rOffset : REAL) : HANDLE;
+VAR
+	hTotal,hPart,hTemp : HANDLE;
+	p1,p2,p3        : POINT;
+	vT1,vT2,vT3      : INTEGER; {Vertex Type}
+	vertexNum    : INTEGER;
+	aR1,aR2,aR3      : REAL; {Arc Radius}
+BEGIN
+
+	IF GetVertNum(hOrig)>2 THEN BEGIN
+		vertexNum := 3;
+		GetPolylineVertex(hOrig, vertexNum-2, p1.X, p1.Y, vT1, aR1);
+		GetPolylineVertex(hOrig, vertexNum-1, p2.X, p2.Y, vT2, aR2);
+		GetPolylineVertex(hOrig, vertexNum, p3.X, p3.Y, vT3, aR3);
+		BeginPoly;
+		Add2DVertex(p1.X, p1.Y, vT1, aR1);
+		Add2DVertex(p2.X, p2.Y, vT2, aR2);
+		Add2DVertex(p3.X, p3.Y, vT3, aR3);
+		EndPoly;
+		hTemp := LNewObj;
+		hPart := OffsetPoly(hTemp,rOffset/2,1,FALSE,FALSE,100,0);
+		DelObject(hTemp);
+		hTotal := hPart;
+		vertexNum := vertexNum+1;
+
+		FOR vertexNum := 4 TO GetVertNum(hOrig) DO BEGIN
+			GetPolylineVertex(hOrig, vertexNum-2, p1.X, p1.Y, vT1, aR1);
+			GetPolylineVertex(hOrig, vertexNum-1, p2.X, p2.Y, vT2, aR2);
+			GetPolylineVertex(hOrig, vertexNum, p3.X, p3.Y, vT3, aR3);
+			IF (vT1=0) THEN BEGIN
+				BeginPoly;
+				Add2DVertex(p1.X, p1.Y, vT1, aR1);
+				Add2DVertex(p2.X, p2.Y, vT2, aR2);
+				Add2DVertex(p3.X, p3.Y, vT3, aR3);
+				EndPoly;
+				hTemp := LNewObj;
+				SetPolylineVertex(hTemp,vertexNum-2, p1.X, p1.Y, vT1, aR1,TRUE);
+				SetPolylineVertex(hTemp,vertexNum-1, p2.X, p2.Y, vT2, aR2,TRUE);
+				SetPolylineVertex(hTemp,vertexNum, p3.X, p3.Y, vT3, aR3,TRUE);
+				
+			END ELSE BEGIN
+				BeginPoly;
+				Add2DVertex(p2.X, p2.Y, vT2, aR2);
+				Add2DVertex(p3.X, p3.Y, vT3, aR3);
+				EndPoly;
+				hTemp := LNewObj;
+			END;
+			hPart := OffsetPoly(hTemp,rOffset/2,1,FALSE,FALSE,100,0);
+			DelObject(hTemp);
+			hTotal := hPart;
+			{ hTemp := AddSurface(hTotal,hPart); }
+			{ hTotal := hTemp; }
+		END;
+	END ELSE BEGIN
+		GetPolylineVertex(hOrig, 1, p1.X, p1.Y, vT1, aR1);
+		GetPolylineVertex(hOrig, 2, p2.X, p2.Y, vT2, aR2);
+		BeginPoly;
+		Add2DVertex(p1.X, p1.Y, vT1, aR1);
+		Add2DVertex(p2.X, p2.Y, vT2, aR2);
+		EndPoly;
+		hPart := OffsetPoly(LNewObj,rOffset/2,1,FALSE,FALSE,100,0);
+		hTemp := hPart;
+		hTotal := hTemp;
+
+	END;
+	Offset_Poly_Sections := hTotal;
+END;
 
 FUNCTION Setup_Text_Label (h : HANDLE;i1,i2 : INTEGER) : BOOLEAN;
 VAR
@@ -103,9 +173,47 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{===== Duplicate PIO Path Object =====}
 	h_Path := GetCustomObjectPath(h_Obj);
-	IF (PTAPEWIDTH > 0) THEN
-		h_Path2 := OffsetPoly(h_Path,PTAPEWIDTH/2,1,FALSE,FALSE,100,0)
-	ELSE h_Path2 := OffsetPoly(h_Path,12mm/2,1,FALSE,FALSE,100,0);
+	{ h_PathTmp1 := HDuplicate(h_Path,0,0); }
+	{ h_PathTmp2 := HDuplicate(h_Path,0,0); }
+	IF (GetVertNum(h_Path)>2) THEN BEGIN
+		{ DelVertex(h_PathTmp1,GetVertNum(h_PathTmp1)); }
+		{ DelVertex(h_PathTmp2,1); }
+	END;
+	IF (PTAPEWIDTH > 0) THEN BEGIN
+		h_Path2 := OffsetPoly(h_Path,PTAPEWIDTH/2,1,FALSE,FALSE,100,0);
+		h_PathTmp1 := HDuplicate(h_Path,0,0);
+		h_PathTmp2 := OffsetPoly(h_PathTmp1,-PTAPEWIDTH/2,1,FALSE,FALSE,100,0);
+		{ Ungroup; }
+		{ h_PathTmp2 := LNewObj; }
+		DelObject(h_PathTmp1);
+
+		{ h_Path2 := Offset_Poly_Sections(h_Path,PTAPEWIDTH); }
+
+		{ h_PathTmp3 := OffsetPoly(h_PathTmp1,PTAPEWIDTH/2,1,FALSE,FALSE,100,0); }
+		{ h_PathTmp4 := OffsetPoly(h_PathTmp2,PTAPEWIDTH/2,1,FALSE,FALSE,100,0); }
+		{ DelObject(h_PathTmp1); }
+		{ DelObject(h_PathTmp2); }
+	END ELSE BEGIN
+		h_Path2 := OffsetPoly(h_Path,12mm/2,1,FALSE,FALSE,100,0);
+		h_PathTmp1 := HDuplicate(h_Path,0,0);
+		h_PathTmp2 := OffsetPoly(h_PathTmp1,-12mm/2,1,FALSE,FALSE,100,0);
+		DelObject(h_PathTmp1);
+
+		{ h_Path2 := Offset_Poly_Sections(h_Path,12mm); }
+
+		{ h_PathTmp3 := OffsetPoly(h_PathTmp1,12mm/2,1,FALSE,FALSE,100,0); }
+		{ h_PathTmp4 := OffsetPoly(h_PathTmp2,12mm/2,1,FALSE,FALSE,100,0); }
+	END;
+	{ HUngroup(GetParent(h_PathTmp2)); }
+	{ ClipSurface(h_Path2,h_PathTmp2); }
+	DelObject(h_PathTmp2);
+	{ DelObject(h_PathTmp2); }
+	{ b_Result := AddHole(h_Path2,h_PathTmp2); }
+	{ SetFPat(h_Path2,0); }
+	{ SetFPat(h_PathTmp2,0); }
+	{ GetPolyPt(h_Path,1,p_1.X,p_1.Y); }
+	{ h_PathTmp3 := CombineIntoSurface(p_1.X,p_1.Y); }
+	{ DelObject(h_Path2); }
 
 	{===== Setup Length & Wattage =====}
 	SetRField(h_Obj,s_ObjName,'TotalLength', Num2StrF(HPerimN(h_Path)));

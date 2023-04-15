@@ -1,0 +1,154 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, (c) 2022. Please share freely.
+//
+//  Hydra provides a keyboard based series of macros to call up favorite
+//  classes and layers based on a tag of 'Hydra-<key>'.
+//  Version 0.6.7
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE Hydra;
+CONST
+	PREFIX		   = 'Hydra-';
+	ESCAPE		   = Chr(27);
+VAR
+	c_Key1,c_Key2                                           : CHAR;
+	s_Search                                                : STRING;
+	s_Log                                                   : STRING;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+FUNCTION Get_Key_Simple : CHAR;
+VAR li_Key : LONGINT;
+BEGIN
+	GetKeyDown(li_Key);
+	IF ((li_Key>31) AND (li_Key<127))
+		THEN Get_Key_Simple := Chr(li_Key)
+	ELSE Get_Key_Simple := ESCAPE;
+END;
+
+FUNCTION Concat_Array1(theArray : ARRAY [1..20] OF STRING) : STRING;
+VAR
+	rSt,rEnd,cSt,cEnd : INTEGER;
+	allStrings        : STRING;
+BEGIN
+	GetArrayDimensions(theArray,rSt,rEnd,cSt,cEnd);
+	IF rEnd>0 THEN FOR rSt := rSt to rEnd
+		DO allStrings := Concat(allStrings,theArray[rSt]);
+	Concat_Array1 := allStrings;
+END;
+
+PROCEDURE Hydra_Test_Class(s : STRING);
+VAR
+	allTags      : STRING;
+	resourceTags : ARRAY [1..20] OF STRING;
+BEGIN IF GetObjectTags(GetObject(s),resourceTags) THEN BEGIN
+	allTags := '';
+	allTags := Concat_Array1(resourceTags);
+	IF POS(Concat(PREFIX,c_Key2),allTags)<>0
+		THEN s_Search := s;
+END; END;
+
+PROCEDURE Hydra_Name_Class;
+VAR i : INTEGER;
+BEGIN
+	c_Key2 := Get_Key_Simple;
+	IF c_Key2<>ESCAPE THEN FOR i := 1 TO ClassNum
+		DO BEGIN
+			Hydra_Test_Class(ClassList(i));
+		END;
+	IF s_Search<>'' THEN NameClass(s_Search)
+		ELSE AlrtDialog(Concat('No Class with tag ',PREFIX,c_Key2));
+END;
+
+FUNCTION Hack_Set_Class(h : HANDLE) : BOOLEAN;
+BEGIN
+	IF ((h<>NIL) AND (s_Search<>'')) THEN BEGIN
+		SetClassN(h,s_Search,FALSE);
+		ResetObject(h);
+		Hack_Set_Class := FALSE;
+	END ELSE Hack_Set_Class := TRUE;
+END;
+
+PROCEDURE Hydra_Set_Class;
+VAR i : INTEGER;
+BEGIN
+	c_Key2 := Get_Key_Simple;
+	IF c_Key2<>ESCAPE THEN FOR i := 1 TO ClassNum
+		DO BEGIN
+			Hydra_Test_Class(ClassList(i));
+		END;
+	IF s_Search<>'' THEN ForEachObjectInLayer(Hack_Set_Class,2,0,0)
+		ELSE AlrtDialog(Concat('No Class with tag ',PREFIX,c_Key2));
+END;
+
+PROCEDURE Hydra_Test_Layer(h : HANDLE);
+VAR
+	allTags      : STRING;
+	resourceTags : ARRAY [1..20] OF STRING;
+BEGIN IF GetObjectTags(h,resourceTags) THEN BEGIN
+	allTags := '';
+	allTags := Concat_Array1(resourceTags);
+	IF POS(Concat(PREFIX,c_Key2),allTags)<>0
+		THEN s_Search := GetLName(h);
+END; END;
+
+PROCEDURE Hydra_Name_Layer;
+VAR
+	i : INTEGER;
+	h : HANDLE;
+BEGIN
+	c_Key2 := Get_Key_Simple;
+	h := GetParent(FObject);
+	IF c_Key2<>ESCAPE THEN WHILE h<>NIL
+		DO BEGIN
+			Hydra_Test_Layer(h);
+			h := NextLayer(h);
+		END;
+	IF s_Search<>'' THEN Layer(s_Search)
+		ELSE AlrtDialog(Concat('No Layer with tag ',PREFIX,c_Key2));
+END;
+
+PROCEDURE Hydra_Restore_SavedView;
+VAR h : HANDLE;
+BEGIN
+	c_Key2 := Get_Key_Simple;
+	IF c_Key2<>ESCAPE THEN BEGIN
+		s_Search := '';
+		h := Fin3D(GetObject('Saved Views'));
+		WHILE ((h<>NIL) AND (s_Search = '')) DO BEGIN
+			IF (Pos(Concat(PREFIX,c_Key2),GetName(h)) <> 0)
+				THEN s_Search := GetName(h);
+			h := NextObj(h);
+		END;
+	END;
+	IF s_Search<>'' THEN VRestore(s_Search)
+		ELSE AlrtDialog(Concat('No Saved View containing ',PREFIX,c_Key2));
+END;
+
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+BEGIN
+	s_Search := '';
+	c_Key1 := Get_Key_Simple;
+	CASE c_Key1 OF
+	  'c','C' : Hydra_Name_Class;
+	  's','S' : Hydra_Set_Class;
+	  'l','L' : Hydra_Name_Layer;
+	  'v','V' : Hydra_Restore_SavedView;
+	END;
+END; Run(Hydra);
