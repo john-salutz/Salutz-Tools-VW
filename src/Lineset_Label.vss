@@ -39,6 +39,16 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
+PROCEDURE Scale_Fit_Width_Dim (toScale : HANDLE; fitToDim : REAL);
+VAR p1 : POINT;
+BEGIN
+	HCenter(toScale,p1.X,p1.Y);
+	HScale2D(
+	         toScale, p1.X, p1.Y, fitToDim/HWidth(toScale),
+	         fitToDim/HWidth(toScale), TRUE
+	         );
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -106,6 +116,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		CreateText(Num2StrF(y_coor));
 		SetParameterVisibility(h_Obj,'PLDist',FALSE);
 	END ELSE CreateText(Num2StrF(PPLDIST));
+	IF HWidth(LNewObj)>7.75in THEN Scale_Fit_Width_Dim(LNewObj,7.75in);
 	{Lineset Number}
 	TextSize(5*r_TextScaler);
 	Pen_WtoB(1);
