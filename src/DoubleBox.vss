@@ -185,11 +185,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextOrigin(p_Tmp1.X,0);
 			TextVerticalAlign(1);
-			FillPat(0);
+			{ FillPat(0); }
+			Fill_WtoB(0);
 		END ELSE IF (PLABEL_POSITION='Outside') THEN BEGIN
 			GetBBox(h_BackRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextOrigin(p_Tmp1.X+((-POFFSET_EDGE-PPAD)/4),0);
 			TextVerticalAlign(5);
+			Fill_WtoB(0);
+		END ELSE IF (PLABEL_POSITION='Pad') THEN BEGIN
+			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			TextOrigin(p_Tmp1.X-(PPAD/2),0);
+			TextVerticalAlign(3);
 			Fill_WtoB(0);
 		END;
 		CreateText(Concat(PLABEL,'  '));
@@ -223,10 +229,15 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'TabSize',TRUE);
 		SetTextVertAlignN(h_Text,1);
 		MoveTo(0,0);
-		IF (PLABEL_POSITION='Inside') THEN BEGIN
+		IF (PLABEL_POSITION='Inside') OR (PLABEL_POSITION='Pad') THEN BEGIN
 			GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextOrigin(p_Tmp2.X+(HWidth(h_Text)*0.1),0);
 		END;
+		{ IF (PLABEL_POSITION='Pad') THEN BEGIN }
+		{ 	GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
+		{ 	IF p_Tmp2.X  }
+		{ 	TextOrigin(p_Tmp2.X+(HWidth(h_Text)*0.1),0); }
+		{ END; }
 		IF (PLABEL_POSITION='Outside')
 			OR (NOT PSHOWLABEL)
 			OR (GetTextLength(h_Text)=0)THEN BEGIN
@@ -274,7 +285,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ELSE IF PNOTEHORIZ = 'Right' THEN SetTextJustN(h_Note,3)
 		ELSE IF PNOTEHORIZ = 'Justify' THEN SetTextJustN(h_Note,4);
 
-		IF PNOTERESIZE <> 'None' THEN BEGIN
+		IF (PNOTERESIZE <> 'None') AND (s_NoteText<>'') THEN BEGIN
 			IF ((PLABEL_POSITION = 'Inside') AND PSHOWLABEL) THEN
 				r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note)-(HWidth(h_Text)*1.1)
 			ELSE r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note);
