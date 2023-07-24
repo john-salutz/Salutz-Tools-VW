@@ -50,7 +50,7 @@ FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
 VAR r_RRectDiam : REAL;
 BEGIN
 	IF roundTrue THEN BEGIN
-		r_RRectDiam := POFFSET_EDGE*2;
+		r_RRectDiam := POFFSET_EDGE*2.25;
 		RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
 	END {IF roundTrue} ELSE BEGIN
 		r_RRectDiam := 0;
@@ -72,6 +72,7 @@ BEGIN
 	                              Pt2.X+offset, Pt2.Y-offset, roundTrue
 	                              );
 END;
+
 
 PROCEDURE Set_DashStyle_Cust(h : HANDLE; style : STRING);
 VAR li_Dash : LONGINT;
@@ -98,13 +99,26 @@ BEGIN
 	SetLSN(h,li_Dash);
 END;
 
+
+PROCEDURE DrawDuplicateOffset(h : HANDLE; limit : REAL);
+VAR
+	i     : INTEGER;
+	hCopy : HANDLE;
+BEGIN
+	hCopy := h;
+	FOR i:=1 TO Round(limit) DO BEGIN
+		hCopy := DrawOffsetRect(hCopy,POFFSET_EDGE/(limit+1),PISROUNDED);
+		IF (PDASH<>'Cut-Out') THEN Set_DashStyle_Cust(hCopy,PDASH);
+	END;
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 5');
+	Set_Version_Info('0 . 6 . 8');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -158,6 +172,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	PenSize(7);
 	h_FrontRect := DrawOffsetRect(h_BackRect,-POFFSET_EDGE,PISROUNDED);
 
+	{// Create foreground rectangle duplicates //}
+	PenSize(5);
+	FillPat(0);
+	IF (PINNERDUP<>'0')
+		THEN DrawDuplicateOffset(h_FrontRect,Str2Num(PINNERDUP));
+
 	{// Create pad rectangle //}
 	FillPat(0);
 	PenPatN(2);
@@ -165,10 +185,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	h_PadRect := DrawOffsetRect(h_FrontRect,-PPAD,PISROUNDED);
 
 	{// foreground rectangle style //}
+		{ Keep this here. Needs to be called after "Create pad rect" }
+		{ because it needs h_FrontRect to exist for reference }
 	IF PDASH = 'Cut-Out' THEN BEGIN
 		IF (POFFSET_EDGE > 0)
 			THEN h_BackRect := ClipSurfaceN(h_BackRect,h_FrontRect);
 		DelObject(h_FrontRect);
+		HMoveBackward(h_BackRect,TRUE);
 	END ELSE Set_DashStyle_Cust(h_FrontRect,PDASH);
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
@@ -185,7 +208,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextOrigin(p_Tmp1.X,0);
 			TextVerticalAlign(1);
-			{ FillPat(0); }
 			Fill_WtoB(0);
 		END ELSE IF (PLABEL_POSITION='Outside') THEN BEGIN
 			GetBBox(h_BackRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
@@ -233,11 +255,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextOrigin(p_Tmp2.X+(HWidth(h_Text)*0.1),0);
 		END;
-		{ IF (PLABEL_POSITION='Pad') THEN BEGIN }
-		{ 	GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
-		{ 	IF p_Tmp2.X  }
-		{ 	TextOrigin(p_Tmp2.X+(HWidth(h_Text)*0.1),0); }
-		{ END; }
 		IF (PLABEL_POSITION='Outside')
 			OR (NOT PSHOWLABEL)
 			OR (GetTextLength(h_Text)=0)THEN BEGIN
