@@ -169,11 +169,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Create foreground rectangle //}
 	Fill_WtoB(0);
-	PenSize(7);
+	{ PenSize(7); }
+	PenSize(Round(GetLW(h_Obj)*0.5));
 	h_FrontRect := DrawOffsetRect(h_BackRect,-POFFSET_EDGE,PISROUNDED);
 
 	{// Create foreground rectangle duplicates //}
-	PenSize(5);
+	{ PenSize(5); }
+	PenSize(Round(GetLW(h_Obj)*0.25));
 	FillPat(0);
 	IF (PINNERDUP<>'0')
 		THEN DrawDuplicateOffset(h_FrontRect,Str2Num(PINNERDUP));
