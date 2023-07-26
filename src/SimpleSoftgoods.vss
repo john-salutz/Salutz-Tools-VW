@@ -30,13 +30,38 @@ VAR
 	i_Counter                                               : INTEGER;
 	{Script specific variables}
 	r_DrawLength                                            : REAL;
-	h_Softgood,h_Softgood2,h_Label,h_Label2                 : HANDLE;
-	p_Tmp1,p_Tmp2                                           : POINT;
+	h_Softgood,h_Softgood2,h_Label,h_Label2,h_Rect1,h_Rect2 : HANDLE;
+	p_TopL,p_BotR                                           : POINT;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
+
+PROCEDURE Set_DashStyle_Cust(h : HANDLE; style : STRING);
+VAR li_Dash : LONGINT;
+BEGIN
+	{// Dashed Line Setup //}
+	IF style = 'Solid' THEN
+		li_Dash := 2
+	ELSE IF style='Dashed' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12in, 0.03in);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-02 Dashed');
+	END
+	ELSE IF style='Dashed Spaced' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.12in, 0.18in);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-03 Dashed Spaced');
+	END
+	ELSE IF style='Dotted' THEN BEGIN
+		li_Dash := GetDashStyleIndexN(TRUE, 1, 0.005in, 0.03in);
+		b_Result := SetDashLineTypeName(li_Dash, 'ISO-07 Dotted');
+	END
+	ELSE IF style='None' THEN BEGIN
+		li_Dash := 2;
+		SetLW(h,0);
+	END;
+	SetLSN(h,li_Dash);
+END;
 
 {====================================}
 {------------- < MAIN > -------------}
@@ -50,6 +75,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Variable Assignment =====}
 	IF (POPENING > 0) THEN r_DrawLength := (PLENGTH-POPENING)/2
 	ELSE r_DrawLength := PLENGTH;
+
+	p_TopL.X := -PLENGTH/2;
+	p_TopL.Y := PDEPTH-(PDEPTH*PHANGPOINT);
+	p_BotR.X := PLENGTH/2;
+	p_BotR.Y := -PDEPTH+(PDEPTH*PHANGPOINT);
 
 	{===== Parameter Limits =====}
 	IF (PHANGPOINT<0) THEN BEGIN
@@ -66,18 +96,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	END;
 
 	{// Draw Extrude //}
-	BeginXtrd(0,r_DrawLength);
+	BeginXtrd(0,PLENGTH);
 	BeginPoly;
-	Add2DVertex(0,-PDEPTH+(PDEPTH*PHANGPOINT),0,0);
+	Add2DVertex(0,p_BotR.Y,0,0);
 	IF PSOFTORHARD = 'Soft' THEN Add2DVertex(-PHEIGHT,0,0,0)
 	ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
-		Add2DVertex(-PHEIGHT,-PDEPTH+(PDEPTH*PHANGPOINT),0,0);
-		Add2DVertex(-PHEIGHT,(PDEPTH*PHANGPOINT),0,0);
+		Add2DVertex(-PHEIGHT,p_BotR.Y,0,0);
+		Add2DVertex(-PHEIGHT,p_TopL.Y,0,0);
 	END;
-	Add2DVertex(0,(PDEPTH*PHANGPOINT),0,0);
-	Add2DVertex(0,-PDEPTH+(PDEPTH*PHANGPOINT),0,0);
+	Add2DVertex(0,p_TopL.Y,0,0);
+	Add2DVertex(0,p_BotR.Y,0,0);
 	EndPoly;
-	SetPolyClosed(LNewObj,TRUE);
 	EndXtrd;
 	h_Softgood := LNewObj;
 	SetTextureRefN(h_Softgood,0,3,0);
@@ -86,51 +115,65 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetRot3D(h_Softgood,0,90,0,0,0,0);
 	Move3DObj(h_Softgood,-PLENGTH/2,0,0);
 	IF (POPENING > 0) THEN BEGIN
-		h_Softgood2 := HDuplicate(h_Softgood,0,0);
-		Move3DObj(h_Softgood2,PLENGTH-r_DrawLength,0,0);
+		BeginXtrd(0,PHEIGHT-PPORTAL);
+		Rect(-POPENING/2,p_TopL.Y+1,POPENING/2,p_BotR.Y-1);
+		EndXtrd;
+		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
 	END;
 
-	{ GetBBox(h_Softgood,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
-	IF (PDEPTH > 0) THEN Rect(
-	                          -PLENGTH/2,(PDEPTH*PHANGPOINT),
-	                          r_DrawLength-(PLENGTH/2),
-	                          -PDEPTH+(PDEPTH*PHANGPOINT)
-	                          )
+	{// Draw 2D Components //}
+	IF (PDEPTH > 0)
+		THEN Rect(p_TopL.X,p_TopL.Y,p_BotR.X,p_BotR.Y)
 	ELSE BEGIN
 		MoveTo(-PLENGTH/2,(PDEPTH*PHANGPOINT));
-		LineTo(r_DrawLength-(PLENGTH/2),-PDEPTH+(PDEPTH*PHANGPOINT));
-	END;
-
-	IF (POPENING > 0) THEN BEGIN
-		{ GetBBox(h_Softgood2,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
-		IF (PDEPTH > 0) THEN Rect(
-		                          POPENING/2,(PDEPTH*PHANGPOINT),
-		                          PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT)
-		                          )
-	ELSE BEGIN
-		MoveTo(POPENING/2,(PDEPTH*PHANGPOINT));
 		LineTo(PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT));
 	END;
-		{ Rect(p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y); }
+	h_Rect1 := LNewObj;
+
+	IF (POPENING > 0) THEN BEGIN
+		IF (PDEPTH > 0) THEN BEGIN
+			Rect(-POPENING/2,p_TopL.Y,POPENING/2,p_BotR.Y);
+			h_Rect2 := LNewObj;
+			ClipSurface(h_Rect1,h_Rect2);
+		END ELSE BEGIN
+			{// Draw Lines for Legs //}
+			DelObject(h_Rect1);
+			MoveTo(-PLENGTH/2,(PDEPTH*PHANGPOINT));
+			LineTo(-POPENING/2,-PDEPTH+(PDEPTH*PHANGPOINT));
+			MoveTo(POPENING/2,(PDEPTH*PHANGPOINT));
+			LineTo(PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT));
+			{// Draw Line for Opening //}
+			MoveTo(-POPENING/2,(PDEPTH*PHANGPOINT));
+			LineTo(POPENING/2,-PDEPTH+(PDEPTH*PHANGPOINT));
+			h_Rect2 := LNewObj;
+		END;
+		Set_DashStyle_Cust(h_Rect2,POPENPORTALPEN);
+		SetFPat(h_Rect2,0);
 	END;
 
 	{// Draw Text //}
 	IF PLABEL <> '' THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-		TextOrigin(0,0);
 		TextJust(2);
 		TextVerticalAlign(3);
 		IF (PTEXTCOLOR='Black') THEN Pen_WtoB(1);
 		IF (PTEXTBG='White') THEN Fill_WtoB(0);
 		IF (PTEXTBG='None') THEN FillPat(0);
-		CreateText(PLABEL);
-		h_Label := LNewObj;
-		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
-		IF (POPENING > 0) THEN BEGIN
-			h_Label2 := HDuplicate(h_Label,0,0);
-			HMove(h_Label,(-POPENING/2)-(r_DrawLength/2),0);
-			HMove(h_Label2,(POPENING/2)+(r_DrawLength/2),0);
-			{ Move3DObj(h_Softgood2,PLENGTH-r_DrawLength,0,0); }
+		IF (PLABELPOSI = 'Center')
+			OR (PLABELPOSI = 'Both')
+			OR (POPENING = 0) THEN BEGIN
+				TextOrigin(0,0);
+				CreateText(PLABEL);
+				h_Label := LNewObj;
 		END;
+		IF (POPENING > 0)
+			AND ((PLABELPOSI = 'Legs') OR (PLABELPOSI = 'Both')) THEN BEGIN
+				TextOrigin((-POPENING/2)-(r_DrawLength/2),0);
+				CreateText(PLABEL);
+				TextOrigin((POPENING/2)+(r_DrawLength/2),0);
+				CreateText(PLABEL);
+		END;
+		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
+
 END; END; Run(SimpleSoftgoods);
