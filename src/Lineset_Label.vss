@@ -140,10 +140,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PWEIGHT>0 THEN BEGIN
 		TextFace([]);
 		Fill_WtoB(0);
-		TextOrigin(1in*i_Flip,0);
+		TextOrigin(3in*i_Flip,0);
 		CreateText(Concat(PWEIGHT,' ',PWEIGHTUNITS));
-		IF PDIRECTION = '>>' THEN SetTextJust(LNewObj,1)
-		ELSE SetTextJust(LNewObj,3);
+		h_Weight := LNewObj;
+		IF PDIRECTION = '>>' THEN SetTextJust(h_Weight,1)
+		ELSE SetTextJust(h_Weight,3);
 	END;
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
@@ -178,6 +179,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Add2DVertex(2in*i_Flip,PLOADDEPTH/2,0,0);
 		Add2DVertex(6in*i_Flip,PLOADDEPTH/2,0,0);
 		EndPoly;
+		HMoveForward(h_Weight,TRUE);
 	END;
 
 	{// Hide/Show in 3D Views //}
