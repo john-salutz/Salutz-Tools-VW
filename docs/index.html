@@ -1,0 +1,2637 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Salutz Tools Guide, v0.6.7</title>
+	<meta name="author" content="*John Salutz* | /[[https://www.johnsalutzdesigns.com][John Salutz Designs]]/ | [[mailto:john.salutz@gmail.com][~john.salutz@gmail.com~]]" />
+	<meta name="generator" content="Org Mode" />
+	<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/htmlize.css"/>
+	<link rel="stylesheet" type="text/css" href="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/css/readtheorg.css"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
+	<script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+	<style> h3{font-size:115%;}</style>
+	<style> h4{font-size:110%;}</style>
+	<style> h5{font-size:105%;}</style>
+  </head>
+  <body>
+	<div id="content" class="content">
+	  <h1 class="title">Salutz Tools Guide, v0.6.7</h1>
+	  <div id="table-of-contents" role="doc-toc">
+		<h2>Table of Contents</h2>
+		<div id="text-table-of-contents" role="doc-toc">
+		  <ul>
+			<li><a href="#Overview">1. Overview</a></li>
+			<li><a href="#Text+Box">2. Text+Box Object</a>
+			  <ul>
+				<li><a href="#orgf794465">Description</a></li>
+				<li><a href="#org2bbe792">User Editable Attributes</a></li>
+				<li><a href="#orgfc1fae3">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#DoubleBox">3. DoubleBox Object</a>
+			  <ul>
+				<li><a href="#org449de15">Description</a></li>
+				<li><a href="#orgaf659b5">User Editable Attributes</a></li>
+				<li><a href="#org4463d00">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#LinesetLabel">4. Lineset Label Object</a>
+			  <ul>
+				<li><a href="#orgd41def6">Description</a></li>
+				<li><a href="#org049ac53">User Editable Attributes</a></li>
+				<li><a href="#orgf9b227c">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#PositionLabel">5. Position Label Object</a>
+			  <ul>
+				<li><a href="#orgb4449e1">Description</a></li>
+				<li><a href="#orgd3c3f7d">User Editable Attributes</a></li>
+				<li><a href="#orgd48a39e">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#BoomMarker">6. Boom Marker Object</a>
+			  <ul>
+				<li><a href="#org120b001">Description</a></li>
+				<li><a href="#org6e10361">User Editable Attributes</a></li>
+				<li><a href="#org10c487b">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#LEDTape">7. LED Tape Object</a>
+			  <ul>
+				<li><a href="#org50b8882">Description</a></li>
+				<li><a href="#org400cb12">User Editable Attributes</a></li>
+				<li><a href="#org08d5e2c">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#MagicHeader">8. MagicSheet Header Object</a>
+			  <ul>
+				<li><a href="#org6f6fd11">Description</a></li>
+				<li><a href="#org19317cd">User Editable Attributes</a></li>
+				<li><a href="#org197bb21">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#MagicNumber">9. MagicSheet Number Object</a>
+			  <ul>
+				<li><a href="#org445932f">Description</a></li>
+				<li><a href="#orgfe62568">User Editable Attributes</a></li>
+				<li><a href="#orgf1f1eb5">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#RackObject">10. RackObject Object</a>
+			  <ul>
+				<li><a href="#org576882e">Description</a></li>
+				<li><a href="#orgf8a1c49">User Editable Attributes</a></li>
+				<li><a href="#org184d7a2">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#RackEquip">11. RackEquip Object</a>
+			  <ul>
+				<li><a href="#orgfe99a9d">Description</a></li>
+				<li><a href="#org5b88714">User Editable Attributes</a></li>
+				<li><a href="#org7ecdbbd">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#SBD Family">12. SBD Family</a>
+			  <ul>
+				<li><a href="#org5bc60d4">Size</a></li>
+			  </ul>
+			</li>
+			<li><a href="#SBD-Device">13. SBD Device Object</a>
+			  <ul>
+				<li><a href="#org4070a17">Description</a></li>
+				<li><a href="#org797a41b">User Editable Attributes</a></li>
+				<li><a href="#org7c52c6b">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#SBD-InOut">14. SBD In-Out Object</a>
+			  <ul>
+				<li><a href="#org7ecc2ed">Description</a></li>
+				<li><a href="#org93a1efe">User Editable Attributes</a></li>
+				<li><a href="#org2b42aa9">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#SBD-Amp">15. SBD Amp Object</a>
+			  <ul>
+				<li><a href="#org1e280c2">Description</a></li>
+				<li><a href="#orga6d31a1">User Editable Attributes</a></li>
+				<li><a href="#org3303a0f">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#SBD-SpeakerMic">16. SBD Speaker-Mic Object</a>
+			  <ul>
+				<li><a href="#org62d9153">Description</a></li>
+				<li><a href="#org693ecf6">User Editable Attributes</a></li>
+				<li><a href="#orgab25ef1">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#SBD-Flyoff">17. SBD Flyoff</a>
+			  <ul>
+				<li><a href="#org96bd024">Description</a></li>
+				<li><a href="#org93c0ac2">User Editable Attributes</a></li>
+				<li><a href="#orgd84f4a8">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#SBD-Line">18. SBD Line Object</a>
+			  <ul>
+				<li><a href="#org1bdf1b8">Description</a></li>
+				<li><a href="#org1d9a3f5">User Editable Attributes</a></li>
+				<li><a href="#org6216fa1">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#SBD-Path">19. SBD Path Object</a>
+			  <ul>
+				<li><a href="#org9801de0">Description</a></li>
+				<li><a href="#orgd00884e">User Editable Attributes</a></li>
+				<li><a href="#orgd7e992d">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#Survey3D">20. Survey 3D Object</a>
+			  <ul>
+				<li><a href="#org407fc77">Description</a></li>
+				<li><a href="#org44b8cbc">User Editable Attributes</a></li>
+				<li><a href="#orgd66b971">Parameters</a></li>
+			  </ul>
+			</li>
+			<li><a href="#MenuCommands">21. Menu Commands</a>
+			  <ul>
+				<li><a href="#org354145f">Refresh Selected</a></li>
+				<li><a href="#orgab07389">Refresh Worksheets</a></li>
+				<li><a href="#orgab4116d">Refresh Section VP</a></li>
+				<li><a href="#org81f6f55">UnFlip Selected</a></li>
+				<li><a href="#org11266a4">Hydra</a></li>
+			  </ul>
+			</li>
+		  </ul>
+		</div>
+	  </div>
+	  <div id="outline-container-Overview" class="outline-2">
+		<h2 id="Overview"><span class="section-number-2">1.</span> Overview</h2>
+		<div class="outline-text-2" id="text-Overview">
+		  <p>
+			Salutz Tools are a series of un-encrypted, free and open source Vectorscript Plug-In Objects for use in Vectorworks software, primarily for use by theatrical designers and technicians. <br />
+		  </p>
+
+		  <p>
+			All objects have normal Vectorworks parameters for X &amp; Y coordinates and rotation. Objects must be on the Layer Plane (not Screen Plane) to use the Z coordinate. <br />
+		  </p>
+
+		  <p>
+			See <a href="https://github.com/john-salutz/Salutz-Tools-VW">README</a> file for installation and license information.
+		  </p>
+		</div>
+	  </div>
+	  <div id="outline-container-Text+Box" class="outline-2">
+		<h2 id="Text+Box"><span class="section-number-2">2.</span> Text+Box Object</h2>
+		<div class="outline-text-2" id="text-Text+Box">
+		</div>
+		<div id="outline-container-orgf794465" class="outline-3">
+		  <h3 id="orgf794465">Description</h3>
+		  <div class="outline-text-3" id="text-orgf794465">
+			<p>
+			  <code>Text+Box</code> is a point-object that places a user defined text label and draws 1 or 2 rectangles around the text, automatically adjusting the rectangle size based on text size.
+			</p>
+
+			<div class="org-center">
+
+			  <div id="orgc1a9d80" class="figure">
+				<p><img src="./img-style/TextBox.png" alt="TextBox.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orge76e937" class="figure">
+				<p><img src="./img-style/TextBoxOIP.png" alt="TextBoxOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<div id="outline-container-org2bbe792" class="outline-3">
+		  <h3 id="org2bbe792">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org2bbe792">
+		  </div>
+		  <div id="outline-container-org6bed9dc" class="outline-4">
+			<h4 id="org6bed9dc">Fill/Pen/Color</h4>
+			<div class="outline-text-4" id="text-org6bed9dc">
+			  <p>
+				Fill and Pen may be set on a per-object basis via the VW Attribute Palette. Hatches, Gradients, etc. may be used, but can not have local settings per object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgfcc39ae" class="outline-4">
+			<h4 id="orgfcc39ae">Text</h4>
+			<div class="outline-text-4" id="text-orgfcc39ae">
+			  <p>
+				Font options can be changed by altering the text attributes of the object via the Text menu or the Format Text box. Change color by using the <code>Text Color Paramenter</code> and object Pen Color.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org2bbe792">
+		  </div>
+		</div>
+		<div id="outline-container-orgfc1fae3" class="outline-3">
+		  <h3 id="orgfc1fae3">Parameters</h3>
+		  <div class="outline-text-3" id="text-orgfc1fae3">
+		  </div>
+		  <div id="outline-container-org46fd855" class="outline-4">
+			<h4 id="org46fd855">Label</h4>
+		  </div>
+		  <div id="outline-container-org48f60b2" class="outline-4">
+			<h4 id="org48f60b2">Underline</h4>
+		  </div>
+		  <div id="outline-container-org854c0fd" class="outline-4">
+			<h4 id="org854c0fd">Offset to outer edge</h4>
+			<div class="outline-text-4" id="text-org854c0fd">
+			  <p>
+				Gap from the inner rectangle to the outer rectangle.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org3fdae20" class="outline-4">
+			<h4 id="org3fdae20">Pad to Text</h4>
+			<div class="outline-text-4" id="text-org3fdae20">
+			  <p>
+				Gap from the text to the inner rectangle.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org407c138" class="outline-4">
+			<h4 id="org407c138">Use Rounded Rectangles?</h4>
+			<div class="outline-text-4" id="text-org407c138">
+			  <p>
+				Draws both rectangles as rounded rectangles.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org376d318" class="outline-4">
+			<h4 id="org376d318">Inner Rectangle?</h4>
+			<div class="outline-text-4" id="text-org376d318">
+			  <p>
+				Toggles visibility of the inner rectangle. If visible, the inner rectangle will always have a white fill and a line style set by the <code>Inner Rectangle Line Style</code> parameter.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgd678ad7" class="outline-4">
+			<h4 id="orgd678ad7">Inner Rectangle Line Style</h4>
+			<div class="outline-text-4" id="text-orgd678ad7">
+			  <p>
+				Choices: <code>Solid</code>, <code>Dashed</code>, <code>Dashed Spaced</code>, <code>Dotted</code>, <code>None</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org635f655" class="outline-4">
+			<h4 id="org635f655">Text Color</h4>
+			<div class="outline-text-4" id="text-org635f655">
+			  <p>
+				Choose whether to <code>Keep Text Black</code> or <code>Follow Object Pen Color</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org1cc849c" class="outline-4">
+			<h4 id="org1cc849c">Arrow Placement</h4>
+			<div class="outline-text-4" id="text-org1cc849c">
+			  <p>
+				Options: <code>No Arrow, Left, Right, Top, Bottom</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgda1eabd" class="outline-4">
+			<h4 id="orgda1eabd">Arrow Scale (Separate Length &amp; Width)</h4>
+			<div class="outline-text-4" id="text-orgda1eabd">
+			  <p>
+				Scaled as <code>1</code> = 100% scale, <code>2</code> = 200% scale, etc.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgfc1fae3">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-DoubleBox" class="outline-2">
+		<h2 id="DoubleBox"><span class="section-number-2">3.</span> DoubleBox Object</h2>
+		<div class="outline-text-2" id="text-DoubleBox">
+		</div>
+		<div id="outline-container-org449de15" class="outline-3">
+		  <h3 id="org449de15">Description</h3>
+		  <div class="outline-text-3" id="text-org449de15">
+			<p>
+			  <code>DoubleBox</code> is a rectangle-object that draws two inset rectangles and can place <code>Label</code> and <code>Notes</code> text in the object.
+			</p>
+
+			<p>
+			  <b>Note:</b> Inner rectangle will always have a solid, white fill and a thin line with linetype set by the <code>Inner Rectangle Line Style</code> unless <code>Inner Rectangle Line Style</code> is set to <code>Cut-Out</code>.
+			</p>
+			<div class="org-center">
+
+			  <div id="org91c6f2f" class="figure">
+				<p><img src="./img-style/DoubleBox.png" alt="DoubleBox.png" /> 
+				</p>
+			  </div>
+
+			  <div id="org9b2ee66" class="figure">
+				<p><img src="./img-style/DoubleBoxOIP.png" alt="DoubleBoxOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-orgaf659b5" class="outline-3">
+		  <h3 id="orgaf659b5">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-orgaf659b5">
+		  </div>
+		  <div id="outline-container-org69a0f03" class="outline-4">
+			<h4 id="org69a0f03">Fill/Pen/Color</h4>
+			<div class="outline-text-4" id="text-org69a0f03">
+			  <p>
+				Fill and Pen may be set on a per-object basis via the VW Attribute Palette. Hatches, Gradients, etc. may be used, but can not have local settings per object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orge9f4fd5" class="outline-4">
+			<h4 id="orge9f4fd5">Text</h4>
+			<div class="outline-text-4" id="text-orge9f4fd5">
+			  <p>
+				Font options can be changed by altering the text attributes of the object via the Text menu or the Format Text box. Change color by using the <code>Text Color Paramenter</code> and object Pen Color. <code>Notes</code> text size is set by <code>Notes Text Size Parameter</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org735928f" class="outline-4">
+			<h4 id="org735928f">Handles</h4>
+			<div class="outline-text-4" id="text-org735928f">
+			  <p>
+				The object has the standard 8 Vectorworks handles for re-shaping with the mouse.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgaf659b5">
+		  </div>
+		</div>
+		<div id="outline-container-org4463d00" class="outline-3">
+		  <h3 id="org4463d00">Parameters</h3>
+		  <div class="outline-text-3" id="text-org4463d00">
+		  </div>
+		  <div id="outline-container-org375891c" class="outline-4">
+			<h4 id="org375891c">Height</h4>
+		  </div>
+		  <div id="outline-container-org626b828" class="outline-4">
+			<h4 id="org626b828">Width</h4>
+		  </div>
+		  <div id="outline-container-org2450173" class="outline-4">
+			<h4 id="org2450173">Offset Direction</h4>
+			<div class="outline-text-4" id="text-org2450173">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="orge129339"></a>Inward:<br />
+				<div class="outline-text-5" id="text-orge129339">
+				  <p>
+					draws the rectangles inward from the object handles and <code>Height</code> / <code>Width</code>.
+				  </p>
+				</div>
+			  </li>
+			  <li><a id="org48f1229"></a>Outward:<br />
+				<div class="outline-text-5" id="text-org48f1229">
+				  <p>
+					draws the rectangles outward from the object handles and <code>Height</code> / <code>Width</code>. (ie. The object draws larger than that size specified).
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		  <div id="outline-container-orge1cb516" class="outline-4">
+			<h4 id="orge1cb516">Use Rounded Rectangle?</h4>
+			<div class="outline-text-4" id="text-orge1cb516">
+			  <p>
+				Draws both rectangles as rounded rectangles.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org7b45cf2" class="outline-4">
+			<h4 id="org7b45cf2">Offset to outer edge</h4>
+			<div class="outline-text-4" id="text-org7b45cf2">
+			  <p>
+				Gap from the inner rectangle to the outer rectangle.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgd7ad2f6" class="outline-4">
+			<h4 id="orgd7ad2f6">Pad to Contents</h4>
+			<div class="outline-text-4" id="text-orgd7ad2f6">
+			  <p>
+				Gap from the contents to the inner rectangle.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orga2c4ecc" class="outline-4">
+			<h4 id="orga2c4ecc">Text Color</h4>
+			<div class="outline-text-4" id="text-orga2c4ecc">
+			  <p>
+				Choose whether to <code>Keep Text Black</code> or <code>Follow Object Pen Color</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org0bd9e7d" class="outline-4">
+			<h4 id="org0bd9e7d">Inner Rectangle Line Style</h4>
+			<div class="outline-text-4" id="text-org0bd9e7d">
+			  <p>
+				Choices: <code>Solid</code>, <code>Dashed</code>, <code>Dashed Spaced</code>, <code>Dotted</code>, <code>None</code>, <code>Cut-Out</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org68277b6" class="outline-4">
+			<h4 id="org68277b6">Show Label Text</h4>
+		  </div>
+		  <div id="outline-container-org42b8b40" class="outline-4">
+			<h4 id="org42b8b40">Label Text</h4>
+		  </div>
+		  <div id="outline-container-org6f67b7f" class="outline-4">
+			<h4 id="org6f67b7f">Label Container</h4>
+			<div class="outline-text-4" id="text-org6f67b7f">
+			  <p>
+				Choices: <code>None</code>, <code>Underline</code>, <code>Box</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org4226ee0" class="outline-4">
+			<h4 id="org4226ee0">Label Position</h4>
+			<div class="outline-text-4" id="text-org4226ee0">
+			  <p>
+				Places Label Text <code>Inside</code> or <code>Outside</code> the rectangles. Alignment is set to centered.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org4463d00">
+		  </div>
+		  <div id="outline-container-orga0fc823" class="outline-4">
+			<h4 id="orga0fc823">Show Notes Text</h4>
+		  </div>
+		  <div id="outline-container-org5514891" class="outline-4">
+			<h4 id="org5514891">Note Text Size</h4>
+		  </div>
+		  <div id="outline-container-org6355dc0" class="outline-4">
+			<h4 id="org6355dc0">Note Horiz. Align</h4>
+			<div class="outline-text-4" id="text-org6355dc0">
+			  <p>
+				Choices: <code>Left</code>, <code>Center</code>, <code>Right</code>, <code>Justify</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgfffe50b" class="outline-4">
+			<h4 id="orgfffe50b">Resize Box to Note?</h4>
+			<div class="outline-text-4" id="text-orgfffe50b">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="orgd6a9703"></a>None: Draws box at user specified size.<br /></li>
+			  <li><a id="org442b638"></a>Box Expands to <code>Note</code> Height: If <code>Note</code> is larger than the box height, box will automatically increase in height to fit <code>Note</code> text inside the box boundary.<br /></li>
+			  <li><a id="orgd5d2f19"></a>Box Follows <code>Note</code> Height: Box will increase or decrease its height to match the height of the <code>Note</code> text.<br /></li>
+			</ul>
+		  </div>
+		  <div id="outline-container-orgb04311c" class="outline-4">
+			<h4 id="orgb04311c">Click here to edit notes</h4>
+			<div class="outline-text-4" id="text-orgb04311c">
+			  <p>
+				This brings up a dialog box to edit the notes text.
+			  </p>
+			  <ul class="org-ul">
+				<li>Alignment is set to left-aligned in the dialog box, but will align on drawing based on <code>Note Horiz. Align</code> parameter.</li>
+				<li>Newline/paragraph breaks are allowed.</li>
+				<li>Tabs may be entered on a Mac with key sequence &lt;Alt&gt;-&lt;Shift&gt;-&lt;Tab&gt;.</li>
+				<li>Currently limited to 2,047 characters.</li>
+			  </ul>
+			</div>
+		  </div>
+		  <div id="outline-container-orgcd62349" class="outline-4">
+			<h4 id="orgcd62349">Notes Tab Size (Page)</h4>
+			<div class="outline-text-4" id="text-orgcd62349">
+			  <p>
+				This sets the width of tab characters in the <code>Notes</code> text. The object is set to default to 1/2" because that is the spacing the VW dialog box shows as a default. <br />
+			  </p>
+
+			  <p>
+				Tab characters may be entered on a Mac with key sequence &lt;Alt&gt;-&lt;Shift&gt;-&lt;Tab&gt;.<br />
+			  </p>
+
+			  <p>
+				Bullet Lists may be entered on a Mac with &lt;Alt&gt;-&lt;Tab&gt;.<br />
+			  </p>
+
+			  <p>
+				<b>NOTE: This functionality is not tested on Windows.</b>
+			  </p>
+			</div>
+		  </div>
+
+		  <div class="outline-text-3" id="text-org4463d00">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-LinesetLabel" class="outline-2">
+		<h2 id="LinesetLabel"><span class="section-number-2">4.</span> Lineset Label Object</h2>
+		<div class="outline-text-2" id="text-LinesetLabel">
+		</div>
+		<div id="outline-container-orgd41def6" class="outline-3">
+		  <h3 id="orgd41def6">Description</h3>
+		  <div class="outline-text-3" id="text-orgd41def6">
+			<p>
+			  <code>Lineset Label</code> is a point-object that inserts a bi-directional label for creating lineset schedules on a drawing.
+			</p>
+			<div class="org-center">
+
+			  <div id="org9cf36c0" class="figure">
+				<p><img src="./img-style/Lineset.png" alt="Lineset.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orga8da3d5" class="figure">
+				<p><img src="./img-style/LinesetOIP.png" alt="LinesetOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org049ac53" class="outline-3">
+		  <h3 id="org049ac53">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org049ac53">
+		  </div>
+		  <div id="outline-container-org206f6f4" class="outline-4">
+			<h4 id="org206f6f4">Fill</h4>
+			<div class="outline-text-4" id="text-org206f6f4">
+			  <p>
+				Sets the color of the <code>Type</code> flag.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org60342e4" class="outline-4">
+			<h4 id="org60342e4">Pen</h4>
+			<div class="outline-text-4" id="text-org60342e4">
+			  <p>
+				Sets the color of the <code>Purpose</code>. This is useful for using class coloring for different types of positions/departments.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgd605a5b" class="outline-4">
+			<h4 id="orgd605a5b">Text</h4>
+			<div class="outline-text-4" id="text-orgd605a5b">
+			  <p>
+				Font typeface can be changed by altering the text attributes of the object via the Text menu or the Format Text box. All other font attributes (aside from color) are dictated by the object.
+			  </p>
+			</div>
+		  </div>
+
+		  <div class="outline-text-3" id="text-org049ac53">
+		  </div>
+		</div>
+		<div id="outline-container-orgf9b227c" class="outline-3">
+		  <h3 id="orgf9b227c">Parameters</h3>
+		  <div class="outline-text-3" id="text-orgf9b227c">
+		  </div>
+		  <div id="outline-container-orgd49430c" class="outline-4">
+			<h4 id="orgd49430c">LS #</h4>
+			<div class="outline-text-4" id="text-orgd49430c">
+			  <p>
+				A text string for the lineset number. It is set as a string to allow for letter modifiers (eg. "Lineset 25a").
+			  </p>
+
+			  <p>
+				The <code>Spotlight Numbering Command</code> can be used to automatically number this field.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org4b9871c" class="outline-4">
+			<h4 id="org4b9871c">Direction</h4>
+			<div class="outline-text-4" id="text-org4b9871c">
+			  <p>
+				Sets whether label points left or right.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org3e17b9e" class="outline-4">
+			<h4 id="org3e17b9e">Purpose</h4>
+			<div class="outline-text-4" id="text-org3e17b9e">
+			  <p>
+				The Name or Label or contents of the Lineset.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org2895760" class="outline-4">
+			<h4 id="org2895760">Type</h4>
+			<div class="outline-text-4" id="text-org2895760">
+			  <p>
+				Dropdown list of common departments that might put equipment on linesets. This information does not display on the drawing; it is mainly used for displaying in worksheet summaries.
+			  </p>
+
+			  <p>
+				If the field is set to anything other than <code>blank</code>, a flag will be drawn at the point of the label. This flag's color can be altered by the <code>Fill</code> attribute. If the field is set to <code>LX</code>, the <code>Purpose</code> field will be bolded.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org550501c" class="outline-4">
+			<h4 id="org550501c">Use Object Y position for Plasterline Distance?</h4>
+		  </div>
+		  <div id="outline-container-orgf7907f0" class="outline-4">
+			<h4 id="orgf7907f0">Distance from PL</h4>
+			<div class="outline-text-4" id="text-orgf7907f0">
+			  <p>
+				This field is only used if <code>Use Object Y position for Plasterline Distance?</code> is deselected.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org030ebde" class="outline-4">
+			<h4 id="org030ebde">Use Object Z position for Trim?</h4>
+			<div class="outline-text-4" id="text-org030ebde">
+			  <p>
+				If <code>Object Z</code> is 0", value does not display on drawing.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgee1e5aa" class="outline-4">
+			<h4 id="orgee1e5aa">Trim</h4>
+			<div class="outline-text-4" id="text-orgee1e5aa">
+			  <p>
+				This field is only used if <code>Use Object Z position for Trim?</code> is deselected. If <code>Trim</code> is 0", value does not display on drawing.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org4f90fce" class="outline-4">
+			<h4 id="org4f90fce">Show in 3D views?</h4>
+		  </div>
+		  <div id="outline-container-org253e231" class="outline-4">
+			<h4 id="org253e231">Weight</h4>
+			<div class="outline-text-4" id="text-org253e231">
+			  <p>
+				Set the weight load of the lineset as a number. This value will only appear on the drawing if it is non-zero.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org37415a1" class="outline-4">
+			<h4 id="org37415a1">Weight Units</h4>
+			<div class="outline-text-4" id="text-org37415a1">
+			  <p>
+				Units used for the weight load (ie. lbs, kg, bricks).
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orga010577" class="outline-4">
+			<h4 id="orga010577">Notes</h4>
+			<div class="outline-text-4" id="text-orga010577">
+			  <p>
+				Any additional notes for the lineset. This information does not display on the drawing; it is mainly used for displaying in worksheet summaries.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgf9b227c">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-PositionLabel" class="outline-2">
+		<h2 id="PositionLabel"><span class="section-number-2">5.</span> Position Label Object</h2>
+		<div class="outline-text-2" id="text-PositionLabel">
+		</div>
+		<div id="outline-container-orgb4449e1" class="outline-3">
+		  <h3 id="orgb4449e1">Description</h3>
+		  <div class="outline-text-3" id="text-orgb4449e1">
+			<p>
+			  <code>Position Label</code> is a point-object that inserts a multi-directional label for labeling hanging positions/truss/etc for lighting and audio applications.
+			</p>
+			<div class="org-center">
+
+			  <div id="orgc0571a3" class="figure">
+				<p><img src="./img-style/PositionLabel.png" alt="PositionLabel.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgb55f908" class="figure">
+				<p><img src="./img-style/PositionLabelOIP.png" alt="PositionLabelOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-orgd3c3f7d" class="outline-3">
+		  <h3 id="orgd3c3f7d">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-orgd3c3f7d">
+		  </div>
+		  <div id="outline-container-org1e44195" class="outline-4">
+			<h4 id="org1e44195">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org1e44195">
+			  <p>
+				Sets the color of the decorative arrow shape and the color/linetype of the <code>Leader Line</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org22b9813" class="outline-4">
+			<h4 id="org22b9813">Text</h4>
+			<div class="outline-text-4" id="text-org22b9813">
+			  <p>
+				Font typeface can be changed by altering the text attributes of the object via the Text menu or the Format Text box. All other font attributes are dictated by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgd3c3f7d">
+		  </div>
+		</div>
+		<div id="outline-container-orgd48a39e" class="outline-3">
+		  <h3 id="orgd48a39e">Parameters</h3>
+		  <div class="outline-text-3" id="text-orgd48a39e">
+		  </div>
+		  <div id="outline-container-org1f17c3d" class="outline-4">
+			<h4 id="org1f17c3d">Label Style</h4>
+			<div class="outline-text-4" id="text-org1f17c3d">
+			  <p>
+				Choices: <code>Regular</code>, <code>Small</code>, or <code>Micro</code>
+			  </p>
+
+			  <p>
+				Sets the size and style of the label.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org7991413" class="outline-4">
+			<h4 id="org7991413">Position Name</h4>
+			<div class="outline-text-4" id="text-org7991413">
+			  <p>
+				<b>Note</b>: In <code>Small</code> and <code>Micro</code> styles, if <code>Position Name</code> is more than 2 characters it will overshoot the edges of the object, therefore the text will be scaled down to fit inside the circle. In <code>Regular</code> style the shape is responsive to <code>Position Name</code> length.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org4ec30be" class="outline-4">
+			<h4 id="org4ec30be">Show z-Trim Height</h4>
+			<div class="outline-text-4" id="text-org4ec30be">
+			  <p>
+				Draws an extra line of text with "TRIM@ " and the z-coordinate height of the object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orga1d5227" class="outline-4">
+			<h4 id="orga1d5227">Text Line 1</h4>
+			<div class="outline-text-4" id="text-orga1d5227">
+			  <p>
+				A line of text for user notes.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org7646cc7" class="outline-4">
+			<h4 id="org7646cc7">Text Line 2</h4>
+			<div class="outline-text-4" id="text-org7646cc7">
+			  <p>
+				Another line of text for user notes.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org215d73f" class="outline-4">
+			<h4 id="org215d73f">Label Direction</h4>
+			<div class="outline-text-4" id="text-org215d73f">
+			  <p>
+				Choose left-pointing, right-pointing, or centered-line.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgc180382" class="outline-4">
+			<h4 id="orgc180382">Use Leader Line?</h4>
+			<div class="outline-text-4" id="text-orgc180382">
+			  <p>
+				Engages a leader line from the object to a point set by the user with the mouse. Potentially useful if the label has to be a fair distance from the hanging position.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org34041b0" class="outline-4">
+			<h4 id="org34041b0">Scale</h4>
+			<div class="outline-text-4" id="text-org34041b0">
+			  <p>
+				In addition to the 3 size/styles in <code>Label Style</code>, the object can be individually scaled to user preference.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgf7c3e3a" class="outline-4">
+			<h4 id="orgf7c3e3a">Drawing Usage</h4>
+			<div class="outline-text-4" id="text-orgf7c3e3a">
+			  <p>
+				Choices: <code>Plot</code>, <code>Section</code>, or <code>Other</code>. Used for worksheets or Custom Selection to differentiate what the label is being used for.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org5ae45d8" class="outline-4">
+			<h4 id="org5ae45d8">Wrap Text?</h4>
+		  </div>
+		  <div id="outline-container-org6909425" class="outline-4">
+			<h4 id="org6909425">Text Wrap Width</h4>
+			<div class="outline-text-4" id="text-org6909425">
+			  <p>
+				If <code>Wrap Text?</code> is engaged, sets the width of text wrap for all text lines.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgd48a39e">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-BoomMarker" class="outline-2">
+		<h2 id="BoomMarker"><span class="section-number-2">6.</span> Boom Marker Object</h2>
+		<div class="outline-text-2" id="text-BoomMarker">
+		</div>
+		<div id="outline-container-org120b001" class="outline-3">
+		  <h3 id="org120b001">Description</h3>
+		  <div class="outline-text-3" id="text-org120b001">
+			<p>
+			  <code>Boom Marker</code> is a point-object that inserts a compass style directional label for labeling vertical hanging positions.
+			</p>
+			<div class="org-center">
+
+			  <div id="org6ec1e4d" class="figure">
+				<p><img src="./img-style/BoomMarker.png" alt="BoomMarker.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgeb618e2" class="figure">
+				<p><img src="./img-style/BoomMarkerOIP.png" alt="BoomMarkerOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org6e10361" class="outline-3">
+		  <h3 id="org6e10361">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org6e10361">
+		  </div>
+		  <div id="outline-container-orga1a22ed" class="outline-4">
+			<h4 id="orga1a22ed">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-orga1a22ed">
+			  <p>
+				Sets the Pen color of the <code>Label</code> text and the directional arrows. All other Fill/Pen attributes are dictated by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org11bad5d" class="outline-4">
+			<h4 id="org11bad5d">Text</h4>
+			<div class="outline-text-4" id="text-org11bad5d">
+			  <p>
+				Font typeface can be changed by altering the text attributes of the object via the Text menu or the Format Text box. The object's font size affects the size of the <code>Label</code> text. All other font attributes are dictated by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org6e10361">
+		  </div>
+		</div>
+		<div id="outline-container-org10c487b" class="outline-3">
+		  <h3 id="org10c487b">Parameters</h3>
+		  <div class="outline-text-3" id="text-org10c487b">
+		  </div>
+		  <div id="outline-container-orgc1b8673" class="outline-4">
+			<h4 id="orgc1b8673">Label</h4>
+		  </div>
+		  <div id="outline-container-org1d8455c" class="outline-4">
+			<h4 id="org1d8455c">Underline Label?</h4>
+		  </div>
+		  <div id="outline-container-orgfcf3efa" class="outline-4">
+			<h4 id="orgfcf3efa">"West" Label</h4>
+			<div class="outline-text-4" id="text-orgfcf3efa">
+			  <p>
+				The text on the "West"/Left side of the label compass.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgc010236" class="outline-4">
+			<h4 id="orgc010236">"East" Label</h4>
+			<div class="outline-text-4" id="text-orgc010236">
+			  <p>
+				The text on the "East"/Right side of the label compass.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org92f5e97" class="outline-4">
+			<h4 id="org92f5e97">"South" Label</h4>
+			<div class="outline-text-4" id="text-org92f5e97">
+			  <p>
+				IF <code>South Label</code> is left blank the "South"/Downward arrow will not be drawn.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgc48e87b" class="outline-4">
+			<h4 id="orgc48e87b">Dimension From</h4>
+			<div class="outline-text-4" id="text-orgc48e87b">
+			  <p>
+				If not blank, adds "DIMENSION FROM: &lt;user text&gt;" text under compass.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orge8d5031" class="outline-4">
+			<h4 id="orge8d5031">Notes</h4>
+			<div class="outline-text-4" id="text-orge8d5031">
+			  <p>
+				If not blank, adds "NOTE: &lt;user text&gt;" text under compass.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org10c487b">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-LEDTape" class="outline-2">
+		<h2 id="LEDTape"><span class="section-number-2">7.</span> LED Tape Object</h2>
+		<div class="outline-text-2" id="text-LEDTape">
+		</div>
+		<div id="outline-container-org50b8882" class="outline-3">
+		  <h3 id="org50b8882">Description</h3>
+		  <div class="outline-text-3" id="text-org50b8882">
+			<p>
+			  <code>LED Tape</code> is a path-object that allows the user to draw and edit a poly-line with the normal Vectorworks methods, calculates length and wattage, and places <code>Type/Channel/Address</code> labels along the length of the polyline.
+			</p>
+			<div class="org-center">
+
+			  <div id="orgdd6c5ea" class="figure">
+				<p><img src="./img-style/LEDTape.png" alt="LEDTape.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgae3e8aa" class="figure">
+				<p><img src="./img-style/LEDTapeOIP.png" alt="LEDTapeOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org400cb12" class="outline-3">
+		  <h3 id="org400cb12">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org400cb12">
+		  </div>
+		  <div id="outline-container-org11f7952" class="outline-4">
+			<h4 id="org11f7952">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org11f7952">
+			  <p>
+				Fill/Pen attributes only affect the polyline drawing. All other Fill/Pen attributes are dictated by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgab3f1ee" class="outline-4">
+			<h4 id="orgab3f1ee">Text</h4>
+			<div class="outline-text-4" id="text-orgab3f1ee">
+			  <p>
+				Font typeface and style can be changed by altering the text attributes of the object via the Text menu or the Format Text box. Text size is set by the <code>Text Label Height</code> parameter. All other font attributes are dictated by the object. <br />
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org400cb12">
+		  </div>
+		</div>
+		<div id="outline-container-org08d5e2c" class="outline-3">
+		  <h3 id="org08d5e2c">Parameters</h3>
+		  <div class="outline-text-3" id="text-org08d5e2c">
+		  </div>
+		  <div id="outline-container-org432918b" class="outline-4">
+			<h4 id="org432918b">Type of Tape (Label)</h4>
+		  </div>
+		  <div id="outline-container-org51da6ef" class="outline-4">
+			<h4 id="org51da6ef">Channel</h4>
+		  </div>
+		  <div id="outline-container-orgc2f1b3d" class="outline-4">
+			<h4 id="orgc2f1b3d">Address</h4>
+			<div class="outline-text-4" id="text-orgc2f1b3d">
+			  <p>
+				These values will be combined into a single label with the format: <br />
+			  </p>
+
+			  <p>
+				<b>Type of Tape (Channel) [Address]</b> <br />
+			  </p>
+
+			  <p>
+				If any field is left blank, that field and its parentheses/brackets will be excluded from the drawn label. Labels are placed at the midpoint between two polyline vertices. For curves, Cubic Spline or Radius (Point on Arc) are recommended.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgc513503" class="outline-4">
+			<h4 id="orgc513503">Text Label Height</h4>
+			<div class="outline-text-4" id="text-orgc513503">
+			  <p>
+				Set text height as a dimension, eg. 2".
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org0202c0c" class="outline-4">
+			<h4 id="org0202c0c">Tape Width</h4>
+			<div class="outline-text-4" id="text-org0202c0c">
+			  <p>
+				Sets the width of the LED Tape polyline on the drawing. If set to <code>0"</code>, the drawing will default to 12mm.<br />
+			  </p>
+
+			  <p>
+				<b>Note:</b> The <code>Tape Width</code> parameter is a dimension. This means that you can enter a value of inches or millimeters, regardless of your document units setting. Simply type <code>1.5in</code> or <code>12mm</code> into the field.
+			  </p>
+			</div>
+		  </div>
+
+		  <div id="outline-container-orga97b0b3" class="outline-4">
+			<h4 id="orga97b0b3">Watts per <code>Length Unit</code></h4>
+		  </div>
+
+		  <div id="outline-container-org54d6230" class="outline-4">
+			<h4 id="org54d6230">Length Unit</h4>
+			<div class="outline-text-4" id="text-org54d6230">
+			  <p>
+				<b>Note:</b> The <code>Length Unit</code> parameter is a dimension. This means that you can enter a value of feet or meters, regardless of your document units setting.
+			  </p>
+			</div>
+		  </div>
+
+		  <div id="outline-container-org766ea6e" class="outline-4">
+			<h4 id="org766ea6e">Total Tape Length</h4>
+		  </div>
+
+		  <div id="outline-container-org6ba3536" class="outline-4">
+			<h4 id="org6ba3536">Total Wattage</h4>
+		  </div>
+
+		  <div id="outline-container-org6422d9a" class="outline-4">
+			<h4 id="org6422d9a">Type of Tape (Long)</h4>
+			<div class="outline-text-4" id="text-org6422d9a">
+			  <p>
+				This parameter is an additional field for a more detailed description of the type of tape. This information does not display on the drawing; it is mainly used for displaying in worksheet summaries.
+			  </p>
+			</div>
+		  </div>
+
+		  <div class="outline-text-3" id="text-org08d5e2c">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-MagicHeader" class="outline-2">
+		<h2 id="MagicHeader"><span class="section-number-2">8.</span> MagicSheet Header Object</h2>
+		<div class="outline-text-2" id="text-MagicHeader">
+		</div>
+		<div id="outline-container-org6f6fd11" class="outline-3">
+		  <h3 id="org6f6fd11">Description</h3>
+		  <div class="outline-text-3" id="text-org6f6fd11">
+			<p>
+			  <code>MagicSheet Header</code> is a point-object for creating lighting magic sheets on a sheet layer or a 1:1 design layer. It is intended as a label for a system of channels on a magic sheet.
+			</p>
+			<div class="org-center">
+
+			  <div id="orgc61d94f" class="figure">
+				<p><img src="./img-style/MagicHeader.png" alt="MagicHeader.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgf6a8c05" class="figure">
+				<p><img src="./img-style/MagicHeaderOIP.png" alt="MagicHeaderOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org19317cd" class="outline-3">
+		  <h3 id="org19317cd">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org19317cd">
+		  </div>
+		  <div id="outline-container-org886ea44" class="outline-4">
+			<h4 id="org886ea44">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org886ea44">
+			  <p>
+				Sets the color of the box around the text. Gradients and Tiles may be used (eg. for RGB or CMY systems), but local settings per object are unreliable.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgdb09019" class="outline-4">
+			<h4 id="orgdb09019">Text</h4>
+			<div class="outline-text-4" id="text-orgdb09019">
+			  <p>
+				Font typeface can be changed by altering the text attributes of the object via the Text menu or the Format Text box. All other font attributes are dictated by the object.
+			  </p>
+			</div>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-MagicHeader">
+		</div>
+		<div id="outline-container-org197bb21" class="outline-3">
+		  <h3 id="org197bb21">Parameters</h3>
+		  <div class="outline-text-3" id="text-org197bb21">
+		  </div>
+		  <div id="outline-container-org0254128" class="outline-4">
+			<h4 id="org0254128">System</h4>
+			<div class="outline-text-4" id="text-org0254128">
+			  <p>
+				Label for the lighting system (eg. Front, Side, Practicals, etc).
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org891c382" class="outline-4">
+			<h4 id="org891c382">Color</h4>
+			<div class="outline-text-4" id="text-org891c382">
+			  <p>
+				Label for the gel color or color-mixing method for that system of fixtures.
+			  </p>
+
+			  <p>
+				<b>Note:</b> this does not automatically change the color of the box around the text. That must be set by the <code>Fill</code> or <code>Pen Attribute</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org9a52135" class="outline-4">
+			<h4 id="org9a52135">Scale</h4>
+			<div class="outline-text-4" id="text-org9a52135">
+			  <p>
+				<b>Note:</b> A value of 1 equals 100% scale.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org197bb21">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-MagicNumber" class="outline-2">
+		<h2 id="MagicNumber"><span class="section-number-2">9.</span> MagicSheet Number Object</h2>
+		<div class="outline-text-2" id="text-MagicNumber">
+		</div>
+		<div id="outline-container-org445932f" class="outline-3">
+		  <h3 id="org445932f">Description</h3>
+		  <div class="outline-text-3" id="text-org445932f">
+			<p>
+			  <code>MagicSheet Number</code> is a point-object for creating lighting magic sheets on a sheet layer or a 1:1 design layer. It is intended as a label for channels or groups.
+			</p>
+			<div class="org-center">
+
+			  <div id="org4d21acd" class="figure">
+				<p><img src="./img-style/MagicNumber.png" alt="MagicNumber.png" /> 
+				</p>
+			  </div>
+
+			  <div id="org5a54b80" class="figure">
+				<p><img src="./img-style/MagicNumberOIP.png" alt="MagicNumberOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-orgfe62568" class="outline-3">
+		  <h3 id="orgfe62568">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-orgfe62568">
+		  </div>
+		  <div id="outline-container-org707e65f" class="outline-4">
+			<h4 id="org707e65f">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org707e65f">
+			  <p>
+				Fill may be set on a per-object basis via the VW Attribute Palette. All Pen attributes are set by the plug-in object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org4422204" class="outline-4">
+			<h4 id="org4422204">Text</h4>
+			<div class="outline-text-4" id="text-org4422204">
+			  <p>
+				Font typeface and size can be changed by altering the text attributes of the object via the Text menu or the Format Text box. All other font attributes are dictated by the object.
+			  </p>
+			</div>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-MagicNumber">
+		</div>
+		<div id="outline-container-orgf1f1eb5" class="outline-3">
+		  <h3 id="orgf1f1eb5">Parameters</h3>
+		  <div class="outline-text-3" id="text-orgf1f1eb5">
+		  </div>
+		  <div id="outline-container-org49e5db2" class="outline-4">
+			<h4 id="org49e5db2">Number</h4>
+			<div class="outline-text-4" id="text-org49e5db2">
+			  <p>
+				The channel or group number. Does support decimal values for multi-cell fixtures. The <code>Spotlight Numbering Command</code> can be used to automatically number this field.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org19e3b0d" class="outline-4">
+			<h4 id="org19e3b0d">Prefix</h4>
+			<div class="outline-text-4" id="text-org19e3b0d">
+			  <p>
+				A value before the channel number to allow labeling (eg. Groups) without interfering with automatic-numbering.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgf1f1eb5">
+		  </div>
+		  <div id="outline-container-orga5107ff" class="outline-4">
+			<h4 id="orga5107ff">Style</h4>
+			<div class="outline-text-4" id="text-orga5107ff">
+			  <p>
+				Choices: <code>Plain</code>, <code>Bold</code>, <code>Invert Bold</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgbd60f4b" class="outline-4">
+			<h4 id="orgbd60f4b">Container</h4>
+			<div class="outline-text-4" id="text-orgbd60f4b">
+			  <p>
+				Draws a container around the number value. The container re-sizes as the value gets longer/shorter.
+				Choices: <code>None</code>, <code>Rectangle</code>, <code>Circle</code>, <code>Oval</code>, <code>&lt; &lt;</code> (sidelight), <code>&gt; &gt;</code> (sidelight).
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgf1f1eb5">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-RackObject" class="outline-2">
+		<h2 id="RackObject"><span class="section-number-2">10.</span> RackObject Object</h2>
+		<div class="outline-text-2" id="text-RackObject">
+		</div>
+		<div id="outline-container-org576882e" class="outline-3">
+		  <h3 id="org576882e">Description</h3>
+		  <div class="outline-text-3" id="text-org576882e">
+			<p>
+			  <code>RackObject</code> is a point-object for drawing 19" A/V racks for mounting gear. Built to interface with <code>RackEquip</code> plug-in objects. <code>RackObject</code> will re-draw/re-size based on the <code>Number of Rack Spaces</code> parameter.
+			</p>
+			<div class="org-center">
+
+			  <div id="org35c7180" class="figure">
+				<p><img src="./img-style/RackObject.png" alt="RackObject.png" /> 
+				</p>
+			  </div>
+
+			  <div id="org7001b1b" class="figure">
+				<p><img src="./img-style/RackObjectOIP.png" alt="RackObjectOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-orgf8a1c49" class="outline-3">
+		  <h3 id="orgf8a1c49">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-orgf8a1c49">
+		  </div>
+		  <div id="outline-container-org446739b" class="outline-4">
+			<h4 id="org446739b">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org446739b">
+			  <p>
+				Sets the attributes of the frame around the Rack Object. <code>Pen</code> also sets the color of the <code>Rack Name/ID</code> text.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgf471ec2" class="outline-4">
+			<h4 id="orgf471ec2">Text</h4>
+			<div class="outline-text-4" id="text-orgf471ec2">
+			  <p>
+				Font attributes of the <code>Rack Name</code> can be changed by altering the text attributes of the object via the Text menu or the Format Text box. The space numbers are affected by the changes in typeface, but no other attributes including size because they are scaled to fit in 1 rack space to avoid overlap.
+			  </p>
+			</div>
+		  </div>
+		</div>
+
+		<div class="outline-text-2" id="text-RackObject">
+		</div>
+		<div id="outline-container-org184d7a2" class="outline-3">
+		  <h3 id="org184d7a2">Parameters</h3>
+		  <div class="outline-text-3" id="text-org184d7a2">
+			<p>
+			  <b>Note:</b> Rack uses the bottom of the bottom-most rack space as its origin point and draws upward. If you change the frame size or number of rack spaces, you will likely have to check its alignment with other racks.
+			</p>
+		  </div>
+		  <div id="outline-container-orgab8d275" class="outline-4">
+			<h4 id="orgab8d275">Rack Name/ID</h4>
+		  </div>
+		  <div id="outline-container-org1435c8d" class="outline-4">
+			<h4 id="org1435c8d">Rack ID Position</h4>
+			<div class="outline-text-4" id="text-org1435c8d">
+			  <p>
+				Choices: <code>None</code>, <code>Top</code>, or <code>Bottom</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgf3a5304" class="outline-4">
+			<h4 id="orgf3a5304">Number of Rack Spaces</h4>
+		  </div>
+		  <div id="outline-container-orge5ef73b" class="outline-4">
+			<h4 id="orge5ef73b">Number Spaces From</h4>
+			<div class="outline-text-4" id="text-orge5ef73b">
+			  <p>
+				Choices: <code>Bottom</code> or <code>Top</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgf2382ff" class="outline-4">
+			<h4 id="orgf2382ff">Front or Back?</h4>
+			<div class="outline-text-4" id="text-orgf2382ff">
+			  <p>
+				Added to the Rack label on drawing.
+				Choices: <code>blank</code>, <code>Front</code>, <code>Rear</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org8759334" class="outline-4">
+			<h4 id="org8759334">Frame Size</h4>
+			<div class="outline-text-4" id="text-org8759334">
+			  <p>
+				Specifies the outside offset drawn from the rack spaces in inches, not the overall width or height.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org2eace1b" class="outline-4">
+			<h4 id="org2eace1b">Show Rack Space Numbers</h4>
+			<div class="outline-text-4" id="text-org2eace1b">
+			  <p>
+				Choices: <code>None</code>, <code>Left</code>, <code>Right</code>, <code>Both</code>
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org184d7a2">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-RackEquip" class="outline-2">
+		<h2 id="RackEquip"><span class="section-number-2">11.</span> RackEquip Object</h2>
+		<div class="outline-text-2" id="text-RackEquip">
+		</div>
+		<div id="outline-container-orgfe99a9d" class="outline-3">
+		  <h3 id="orgfe99a9d">Description</h3>
+		  <div class="outline-text-3" id="text-orgfe99a9d">
+			<p>
+			  <code>RackEquip</code> is a point-object for drawing rack-mounted gear. Built to interface with <code>RackObject</code> plug-in objects. <code>RackEquip</code> will pick up its <code>Rack ID</code> and <code>Position in Rack</code> parameters from the <code>RackObject</code> it is placed over. However, it will not automatically move or rotate with its parent <code>RackObject</code>, they must be selected and moved together.
+			</p>
+			<div class="org-center">
+
+			  <div id="orgd4504fc" class="figure">
+				<p><img src="./img-style/RackEquip.png" alt="RackEquip.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgd8e63fb" class="figure">
+				<p><img src="./img-style/RackEquipOIP.png" alt="RackEquipOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org5b88714" class="outline-3">
+		  <h3 id="org5b88714">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org5b88714">
+		  </div>
+		  <div id="outline-container-orgf6bfeda" class="outline-4">
+			<h4 id="orgf6bfeda">Fill</h4>
+			<div class="outline-text-4" id="text-orgf6bfeda">
+			  <p>
+				Sets the fill of Rack Ears or whole unit based on <code>Object color affects</code> attribute.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgf215b7e" class="outline-4">
+			<h4 id="orgf215b7e">Pen</h4>
+			<div class="outline-text-4" id="text-orgf215b7e">
+			  <p>
+				Sets the color of the text labels.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org4bc98c0" class="outline-4">
+			<h4 id="org4bc98c0">Text</h4>
+			<div class="outline-text-4" id="text-org4bc98c0">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="orgd7271c8"></a>Font typeface<br />
+				<div class="outline-text-5" id="text-orgd7271c8">
+				  <p>
+					can be changed by altering the text attributes of the object via the Text menu or the Format Text box.
+				  </p>
+				</div>
+			  </li>
+			  <li><a id="org1b4498e"></a>Style changes (Bold, Italic, etc)<br />
+				<div class="outline-text-5" id="text-org1b4498e">
+				  <p>
+					affect the <code>Manufacturer</code> &amp; <code>Model</code> but not the <code>Purpose</code>.
+				  </p>
+				</div>
+			  </li>
+			  <li><a id="org6c6117a"></a>Size<br />
+				<div class="outline-text-5" id="text-org6c6117a">
+				  <p>
+					will attempt to follow the user text size settings, but the plug-in will scale the text to fit inside the equipment.
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		  <div class="outline-text-3" id="text-org5b88714">
+		  </div>
+		</div>
+		<div id="outline-container-org7ecdbbd" class="outline-3">
+		  <h3 id="org7ecdbbd">Parameters</h3>
+		  <div class="outline-text-3" id="text-org7ecdbbd">
+		  </div>
+		  <div id="outline-container-org5c52eee" class="outline-4">
+			<h4 id="org5c52eee">Purpose Label</h4>
+		  </div>
+		  <div id="outline-container-org6445f80" class="outline-4">
+			<h4 id="org6445f80">Manufacturer</h4>
+		  </div>
+		  <div id="outline-container-orgd5236f1" class="outline-4">
+			<h4 id="orgd5236f1">Model</h4>
+		  </div>
+		  <div id="outline-container-orgaba7a03" class="outline-4">
+			<h4 id="orgaba7a03">Number of Rack Spaces</h4>
+			<div class="outline-text-4" id="text-orgaba7a03">
+			  <p>
+				Note: Uses the top of the equipment piece as its origin point.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgcd1ef32" class="outline-4">
+			<h4 id="orgcd1ef32">Width</h4>
+			<div class="outline-text-4" id="text-orgcd1ef32">
+			  <p>
+				Choices: <code>Full</code>, <code>Half</code>, <code>Quarter</code>, <code>Fifth</code>. <br />
+			  </p>
+
+			  <p>
+				<code>Half</code> width will render a <code>-L</code> or <code>-R</code> at the end of <code>Position in Rack</code> depending on whether it is on the left or right side of the rack.
+			  </p>
+
+			  <p>
+				<code>Quarter</code> or <code>Fifth</code> will add a decimal point number to the end of <code>Position in Rack</code> based on left/right position.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org8a6888a" class="outline-4">
+			<h4 id="org8a6888a">Object color affects</h4>
+			<div class="outline-text-4" id="text-org8a6888a">
+			  <p>
+				Choices: <code>Rack Ears Only</code> or <code>Entire Object</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org5c0c52a" class="outline-4">
+			<h4 id="org5c0c52a">Rack ID</h4>
+			<div class="outline-text-4" id="text-org5c0c52a">
+			  <p>
+				(CAN NOT BE EDITED)
+			  </p>
+
+			  <p>
+				Automatically finds the <code>Rack Object</code> it is placed in and displays its ID. Objects must be on the same layer and may not be in a Symbol.
+			  </p>
+
+			  <p>
+				Can be useful for Custom Selection and Worksheet displays.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org0dddb54" class="outline-4">
+			<h4 id="org0dddb54">Position in Rack</h4>
+			<div class="outline-text-4" id="text-org0dddb54">
+			  <p>
+				(CAN NOT BE EDITED)
+			  </p>
+
+			  <p>
+				Automatically finds its position in the <code>Rack Object</code> and displays the space number. Objects must be on the same layer and may not be in a Symbol.
+			  </p>
+
+			  <p>
+				Can be useful for Custom Selection and Worksheet displays.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org7ecdbbd">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-SBD Family" class="outline-2">
+		<h2 id="SBD Family"><span class="section-number-2">12.</span> SBD Family</h2>
+		<div class="outline-text-2" id="text-SBD Family">
+		  <p>
+			<code>SBD Objects</code> are for use in preparing a <b>System Block Diagram</b> for audio, video, or networking systems. They are intended for use in design layers, with the intention of using viewports and sheet layers for printing/exporting.
+		  </p>
+
+		  <div id="orgda973b5" class="figure">
+			<p><img src="img-style/SBD Group.png" alt="SBD Group.png" style="float:left;margin:10px 10px 10px 0px;" />
+			</p>
+		  </div>
+		</div>
+		<div id="outline-container-org5bc60d4" class="outline-3">
+		  <h3 id="org5bc60d4">Size</h3>
+		  <div class="outline-text-3" id="text-org5bc60d4">
+		  </div>
+		  <div id="outline-container-orgd17209b" class="outline-4">
+			<h4 id="orgd17209b">Size in <code>SBD Objects</code> uses the following convention for <code>Size</code> fields:</h4>
+			<div class="outline-text-4" id="text-orgd17209b">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="org45b1c24"></a>Regular= 12 inches<br /></li>
+			  <li><a id="org9d870bc"></a>Small= 9 inches<br /></li>
+			  <li><a id="org8c50caf"></a>Micro= 6 inches (This also applies to <code>USITT</code> style objects)<br /></li>
+			</ul>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-SBD Family">
+		</div>
+	  </div>
+	  <div id="outline-container-SBD-Device" class="outline-2">
+		<h2 id="SBD-Device"><span class="section-number-2">13.</span> SBD Device Object</h2>
+		<div class="outline-text-2" id="text-SBD-Device">
+		</div>
+		<div id="outline-container-org4070a17" class="outline-3">
+		  <h3 id="org4070a17">Description</h3>
+		  <div class="outline-text-3" id="text-org4070a17">
+			<p>
+			  <code>SBD Device</code> is a point-object for drawing a general piece of equipment in an SBD drawing.
+			</p>
+			<div class="org-center">
+
+			  <div id="org14fc1f2" class="figure">
+				<p><img src="./img-style/SBD-Device.png" alt="SBD-Device.png" /> 
+				</p>
+			  </div>
+
+			  <div id="org5aa4dec" class="figure">
+				<p><img src="./img-style/SBD-DeviceOIP.png" alt="SBD-DeviceOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org797a41b" class="outline-3">
+		  <h3 id="org797a41b">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org797a41b">
+		  </div>
+		  <div id="outline-container-org0e58c26" class="outline-4">
+			<h4 id="org0e58c26">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org0e58c26">
+			  <p>
+				All attributes are set by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgdc261ec" class="outline-4">
+			<h4 id="orgdc261ec">Text</h4>
+			<div class="outline-text-4" id="text-orgdc261ec">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="orgfa7c190"></a>Font typeface<br />
+				<div class="outline-text-5" id="text-orgfa7c190">
+				  <p>
+					can be changed by altering the text attributes of the object via the Text menu or the Format Text box.
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-SBD-Device">
+		</div>
+		<div id="outline-container-org7c52c6b" class="outline-3">
+		  <h3 id="org7c52c6b">Parameters</h3>
+		  <div class="outline-text-3" id="text-org7c52c6b">
+		  </div>
+		  <div id="outline-container-orgfa0897c" class="outline-4">
+			<h4 id="orgfa0897c">Type</h4>
+			<div class="outline-text-4" id="text-orgfa0897c">
+			  <p>
+				Choices: <code>Console</code>, <code>Rack</code>, <code>Multi</code>, <code>FX Process</code>, <code>Mixer</code>, <code>DAC</code>, <code>Computer</code>, <code>Com</code>, <code>Amp</code>, <code>Other</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orga2a48ab" class="outline-4">
+			<h4 id="orga2a48ab">Header Size</h4>
+			<div class="outline-text-4" id="text-orga2a48ab">
+			  <p>
+				Sets the height of the object box and dictates which parameter fields are placed on the drawing.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org59ccac1" class="outline-4">
+			<h4 id="org59ccac1">Column Width</h4>
+			<div class="outline-text-4" id="text-org59ccac1">
+			  <p>
+				Choices: 
+			  </p>
+			  <ul class="org-ul">
+				<li><code>Double</code>:Standard two columns for inputs and outputs.</li>
+				<li><code>Single</code>:One column, ideal for a Pass Thru configuration.</li>
+				<li><code>Break</code>:Draws a break line at the selected position to indicate multiple instances of this piece of equipment.
+				  <ul class="org-ul">
+					<li><code>Bottom</code></li>
+					<li><code>Left</code></li>
+					<li><code>Right</code></li>
+				</ul></li>
+			  </ul>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org7c52c6b">
+		  </div>
+		  <div id="outline-container-org925bff6" class="outline-4">
+			<h4 id="org925bff6">Manufacturer</h4>
+		  </div>
+		  <div id="outline-container-org1008f30" class="outline-4">
+			<h4 id="org1008f30">Model</h4>
+		  </div>
+		  <div id="outline-container-org9860db2" class="outline-4">
+			<h4 id="org9860db2">ID#</h4>
+		  </div>
+		  <div id="outline-container-orgacb027c" class="outline-4">
+			<h4 id="orgacb027c">Prefix</h4>
+			<div class="outline-text-4" id="text-orgacb027c">
+			  <p>
+				Precedes the <code>ID#</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgfc1517f" class="outline-4">
+			<h4 id="orgfc1517f">Location</h4>
+		  </div>
+		  <div id="outline-container-org8ff97a5" class="outline-4">
+			<h4 id="org8ff97a5">Purpose</h4>
+		  </div>
+		  <div id="outline-container-org987e7a5" class="outline-4">
+			<h4 id="org987e7a5">IP Address</h4>
+		  </div>
+		  <div id="outline-container-orgad08074" class="outline-4">
+			<h4 id="orgad08074">Size of Spaces</h4>
+			<div class="outline-text-4" id="text-orgad08074">
+			  <p>
+				Affects the size of spaces drawn under the Device header. These spaces are for placement of <code>SBD In-Out</code> Objects.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgc5bb5c4" class="outline-4">
+			<h4 id="orgc5bb5c4">Number of Spaces</h4>
+		  </div>
+		  <div id="outline-container-org2dedff5" class="outline-4">
+			<h4 id="org2dedff5">Notes</h4>
+		  </div>
+		  <div id="outline-container-org736646c" class="outline-4">
+			<h4 id="org736646c">Show Notes on Drawing?</h4>
+		  </div>
+		  <div class="outline-text-3" id="text-org7c52c6b">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-SBD-InOut" class="outline-2">
+		<h2 id="SBD-InOut"><span class="section-number-2">14.</span> SBD In-Out Object</h2>
+		<div class="outline-text-2" id="text-SBD-InOut">
+		</div>
+		<div id="outline-container-org7ecc2ed" class="outline-3">
+		  <h3 id="org7ecc2ed">Description</h3>
+		  <div class="outline-text-3" id="text-org7ecc2ed">
+			<p>
+			  <code>SBD In-Out</code> is a  point-object for drawing the inputs or outputs of a piece of equipment in an SBD drawing.
+			</p>
+			<div class="org-center">
+
+			  <div id="org43c6b04" class="figure">
+				<p><img src="./img-style/SBD-InOut.png" alt="SBD-InOut.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgc9c7247" class="figure">
+				<p><img src="./img-style/SBD-InOutOIP.png" alt="SBD-InOutOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org93a1efe" class="outline-3">
+		  <h3 id="org93a1efe">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org93a1efe">
+		  </div>
+		  <div id="outline-container-org45463b8" class="outline-4">
+			<h4 id="org45463b8">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org45463b8">
+			  <p>
+				All attributes are set by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org10d2c4b" class="outline-4">
+			<h4 id="org10d2c4b">Text</h4>
+			<div class="outline-text-4" id="text-org10d2c4b">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="org788ead6"></a>Font typeface<br />
+				<div class="outline-text-5" id="text-org788ead6">
+				  <p>
+					can be changed by altering the text attributes of the object via the Text menu or the Format Text box.
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-SBD-InOut">
+		</div>
+		<div id="outline-container-org2b42aa9" class="outline-3">
+		  <h3 id="org2b42aa9">Parameters</h3>
+		  <div class="outline-text-3" id="text-org2b42aa9">
+		  </div>
+		  <div id="outline-container-org09d69d6" class="outline-4">
+			<h4 id="org09d69d6">Type</h4>
+			<div class="outline-text-4" id="text-org09d69d6">
+			  <p>
+				Choices: <code>Input</code>, <code>Output</code>, <code>Header</code>, <code>Spacer</code>, <code>Thru</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org32fefe5" class="outline-4">
+			<h4 id="org32fefe5">Size</h4>
+		  </div>
+		  <div id="outline-container-org88b943b" class="outline-4">
+			<h4 id="org88b943b">ID#</h4>
+		  </div>
+		  <div id="outline-container-org4d5498a" class="outline-4">
+			<h4 id="org4d5498a">Prefix</h4>
+			<div class="outline-text-4" id="text-org4d5498a">
+			  <p>
+				Precedes the <code>ID#</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org5c5907a" class="outline-4">
+			<h4 id="org5c5907a">Routing</h4>
+		  </div>
+		  <div id="outline-container-orgdd5fc97" class="outline-4">
+			<h4 id="orgdd5fc97">Routing Label Class</h4>
+		  </div>
+		  <div class="outline-text-3" id="text-org2b42aa9">
+		  </div>
+		  <div id="outline-container-orgba057ed" class="outline-4">
+			<h4 id="orgba057ed">Purpose</h4>
+		  </div>
+		  <div id="outline-container-org363934a" class="outline-4">
+			<h4 id="org363934a">Purpose Label Class</h4>
+		  </div>
+		  <div id="outline-container-org72719d1" class="outline-4">
+			<h4 id="org72719d1">Parent Device</h4>
+			<div class="outline-text-4" id="text-org72719d1">
+			  <p>
+				<b>NOTE:</b> This field is filled by the object based on the <code>SBD Device</code> boundary that the <code>SBD In-Out</code> object is placed within.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org9580358" class="outline-4">
+			<h4 id="org9580358">Connector</h4>
+			<div class="outline-text-4" id="text-org9580358">
+			  <p>
+				<b>Note:</b> This field does not appear on the drawing. It is mainly used for worksheets or Custom Selection.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org6b76f31" class="outline-4">
+			<h4 id="org6b76f31">Notes</h4>
+		  </div>
+		  <div class="outline-text-3" id="text-org2b42aa9">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-SBD-Amp" class="outline-2">
+		<h2 id="SBD-Amp"><span class="section-number-2">15.</span> SBD Amp Object</h2>
+		<div class="outline-text-2" id="text-SBD-Amp">
+		</div>
+		<div id="outline-container-org1e280c2" class="outline-3">
+		  <h3 id="org1e280c2">Description</h3>
+		  <div class="outline-text-3" id="text-org1e280c2">
+			<p>
+			  <code>SBD Amp</code> is a point-object for drawing an amplifier in an SBD drawing.
+			</p>
+			<div class="org-center">
+
+			  <div id="org2294c49" class="figure">
+				<p><img src="./img-style/SBD-Amp.png" alt="SBD-Amp.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgbecdbde" class="figure">
+				<p><img src="./img-style/SBD-AmpOIP.png" alt="SBD-AmpOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-orga6d31a1" class="outline-3">
+		  <h3 id="orga6d31a1">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-orga6d31a1">
+		  </div>
+		  <div id="outline-container-org3ad19a8" class="outline-4">
+			<h4 id="org3ad19a8">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org3ad19a8">
+			  <p>
+				Fill/Pen affects the <code>Model</code> label text. All other attributes are set by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org49883c0" class="outline-4">
+			<h4 id="org49883c0">Text</h4>
+			<div class="outline-text-4" id="text-org49883c0">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="org377e19b"></a>Font typeface<br />
+				<div class="outline-text-5" id="text-org377e19b">
+				  <p>
+					can be changed by altering the text attributes of the object via the Text menu or the Format Text box.
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-SBD-Amp">
+		</div>
+		<div id="outline-container-org3303a0f" class="outline-3">
+		  <h3 id="org3303a0f">Parameters</h3>
+		  <div class="outline-text-3" id="text-org3303a0f">
+		  </div>
+		  <div id="outline-container-orgcf92e0e" class="outline-4">
+			<h4 id="orgcf92e0e">Type</h4>
+			<div class="outline-text-4" id="text-orgcf92e0e">
+			  <p>
+				Automatically set to 'Amp'.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org3a3b3fa" class="outline-4">
+			<h4 id="org3a3b3fa">Number of Channels</h4>
+			<div class="outline-text-4" id="text-org3a3b3fa">
+			  <p>
+				<code>SBD Amp</code> will re-draw with the specified number of channels at Size: <code>Regular</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org4da3afb" class="outline-4">
+			<h4 id="org4da3afb">Manufacturer</h4>
+		  </div>
+		  <div id="outline-container-org604b34e" class="outline-4">
+			<h4 id="org604b34e">Model</h4>
+		  </div>
+		  <div id="outline-container-org4f74e24" class="outline-4">
+			<h4 id="org4f74e24">ID#</h4>
+		  </div>
+		  <div id="outline-container-orgf614582" class="outline-4">
+			<h4 id="orgf614582">Prefix</h4>
+			<div class="outline-text-4" id="text-orgf614582">
+			  <p>
+				Precedes the <code>ID#</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org2261cc9" class="outline-4">
+			<h4 id="org2261cc9">Location</h4>
+		  </div>
+		  <div id="outline-container-org1d1a42c" class="outline-4">
+			<h4 id="org1d1a42c">Purpose</h4>
+		  </div>
+		  <div id="outline-container-org55a5cb1" class="outline-4">
+			<h4 id="org55a5cb1">IP Address</h4>
+		  </div>
+		  <div id="outline-container-orgad77783" class="outline-4">
+			<h4 id="orgad77783">Notes</h4>
+		  </div>
+		  <div id="outline-container-org351e343" class="outline-4">
+			<h4 id="org351e343">Show Notes on Drawing?</h4>
+		  </div>
+		  <div class="outline-text-3" id="text-org3303a0f">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-SBD-SpeakerMic" class="outline-2">
+		<h2 id="SBD-SpeakerMic"><span class="section-number-2">16.</span> SBD Speaker-Mic Object</h2>
+		<div class="outline-text-2" id="text-SBD-SpeakerMic">
+		</div>
+		<div id="outline-container-org62d9153" class="outline-3">
+		  <h3 id="org62d9153">Description</h3>
+		  <div class="outline-text-3" id="text-org62d9153">
+			<p>
+			  <code>SBD Speaker-Mic</code> is a point-object for drawing a speaker, microphone, or signal source in an SBD drawing.
+			</p>
+			<div class="org-center">
+
+			  <div id="org3e3b7b4" class="figure">
+				<p><img src="./img-style/SBD-SpeakerMic.png" alt="SBD-SpeakerMic.png" /> 
+				</p>
+			  </div>
+
+			  <div id="org2144aa6" class="figure">
+				<p><img src="./img-style/SBD-SpeakerMicOIP.png" alt="SBD-SpeakerMicOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org693ecf6" class="outline-3">
+		  <h3 id="org693ecf6">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org693ecf6">
+		  </div>
+		  <div id="outline-container-org1365305" class="outline-4">
+			<h4 id="org1365305">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org1365305">
+			  <p>
+				All attributes are set by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org40add90" class="outline-4">
+			<h4 id="org40add90">Text</h4>
+			<div class="outline-text-4" id="text-org40add90">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="org71160e5"></a>Font typeface<br />
+				<div class="outline-text-5" id="text-org71160e5">
+				  <p>
+					can be changed by altering the text attributes of the object via the Text menu or the Format Text box.
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-SBD-SpeakerMic">
+		</div>
+		<div id="outline-container-orgab25ef1" class="outline-3">
+		  <h3 id="orgab25ef1">Parameters</h3>
+		  <div class="outline-text-3" id="text-orgab25ef1">
+		  </div>
+		  <div id="outline-container-orgdb75660" class="outline-4">
+			<h4 id="orgdb75660">Type</h4>
+			<div class="outline-text-4" id="text-orgdb75660">
+			  <p>
+				Choices: <code>Speaker</code>, <code>Microphone</code>, <code>Source</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org2b5f9fd" class="outline-4">
+			<h4 id="org2b5f9fd">ID#</h4>
+		  </div>
+		  <div id="outline-container-org9bcfc02" class="outline-4">
+			<h4 id="org9bcfc02">Prefix</h4>
+			<div class="outline-text-4" id="text-org9bcfc02">
+			  <p>
+				Precedes the <code>ID#</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org76b05d2" class="outline-4">
+			<h4 id="org76b05d2">Manufacturer</h4>
+		  </div>
+		  <div id="outline-container-org94e1f1d" class="outline-4">
+			<h4 id="org94e1f1d">Model</h4>
+		  </div>
+		  <div class="outline-text-3" id="text-orgab25ef1">
+		  </div>
+		  <div id="outline-container-orga6d1787" class="outline-4">
+			<h4 id="orga6d1787">Active or Passive</h4>
+		  </div>
+		  <div id="outline-container-org7ea1555" class="outline-4">
+			<h4 id="org7ea1555">Purpose</h4>
+		  </div>
+		  <div id="outline-container-org60cd1b3" class="outline-4">
+			<h4 id="org60cd1b3">Purpose Label Class</h4>
+		  </div>
+		  <div id="outline-container-org0a6bcf2" class="outline-4">
+			<h4 id="org0a6bcf2">Notes</h4>
+		  </div>
+		  <div class="outline-text-3" id="text-orgab25ef1">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-SBD-Flyoff" class="outline-2">
+		<h2 id="SBD-Flyoff"><span class="section-number-2">17.</span> SBD Flyoff</h2>
+		<div class="outline-text-2" id="text-SBD-Flyoff">
+		</div>
+		<div id="outline-container-org96bd024" class="outline-3">
+		  <h3 id="org96bd024">Description</h3>
+		  <div class="outline-text-3" id="text-org96bd024">
+			<p>
+			  <code>SBD Flyoff</code> is a point-object for drawing a flyoff indicator in an SBD drawing.
+			</p>
+			<div class="org-center">
+
+			  <div id="orgae46754" class="figure">
+				<p><img src="./img-style/SBD-Flyoff.png" alt="SBD-Flyoff.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgc097559" class="figure">
+				<p><img src="./img-style/SBD-FlyoffOIP.png" alt="SBD-FlyoffOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org93c0ac2" class="outline-3">
+		  <h3 id="org93c0ac2">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org93c0ac2">
+		  </div>
+		  <div id="outline-container-org842ef5d" class="outline-4">
+			<h4 id="org842ef5d">Fill/Pen</h4>
+			<div class="outline-text-4" id="text-org842ef5d">
+			  <p>
+				All attributes are set by the object.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgc16d15f" class="outline-4">
+			<h4 id="orgc16d15f">Text</h4>
+			<div class="outline-text-4" id="text-orgc16d15f">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="org1d6fc6b"></a>Font typeface<br />
+				<div class="outline-text-5" id="text-org1d6fc6b">
+				  <p>
+					can be changed by altering the text attributes of the object via the Text menu or the Format Text box.
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-SBD-Flyoff">
+		</div>
+		<div id="outline-container-orgd84f4a8" class="outline-3">
+		  <h3 id="orgd84f4a8">Parameters</h3>
+		  <div class="outline-text-3" id="text-orgd84f4a8">
+		  </div>
+		  <div id="outline-container-orgc5dde07" class="outline-4">
+			<h4 id="orgc5dde07">Type</h4>
+			<div class="outline-text-4" id="text-orgc5dde07">
+			  <p>
+				Currently <code>Flyoff</code> is the only choice. This is being held for possible future expansion.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org468a260" class="outline-4">
+			<h4 id="org468a260">Size</h4>
+			<div class="outline-text-4" id="text-org468a260">
+			  <p>
+				Choices: <code>Regular</code>, <code>Small</code>, or <code>Micro</code>
+			  </p>
+
+
+			  <p>
+				<b>Note:</b> currently <code>Regular</code> and <code>Small</code> draw the same shape on the drawing. This may have more options in a future expansion.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgd84f4a8">
+		  </div>
+		  <div id="outline-container-orga834080" class="outline-4">
+			<h4 id="orga834080">ID#</h4>
+		  </div>
+		  <div id="outline-container-org52866f7" class="outline-4">
+			<h4 id="org52866f7">Prefix</h4>
+			<div class="outline-text-4" id="text-org52866f7">
+			  <p>
+				Precedes the <code>ID#</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org1dd05f9" class="outline-4">
+			<h4 id="org1dd05f9">Purpose</h4>
+		  </div>
+		  <div id="outline-container-org565ccc9" class="outline-4">
+			<h4 id="org565ccc9">Notes</h4>
+		  </div>
+		  <div class="outline-text-3" id="text-orgd84f4a8">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-SBD-Line" class="outline-2">
+		<h2 id="SBD-Line"><span class="section-number-2">18.</span> SBD Line Object</h2>
+		<div class="outline-text-2" id="text-SBD-Line">
+		</div>
+		<div id="outline-container-org1bdf1b8" class="outline-3">
+		  <h3 id="org1bdf1b8">Description</h3>
+		  <div class="outline-text-3" id="text-org1bdf1b8">
+			<p>
+			  <code>SBD Line</code> is a point-object which draws a multi-segment polyline between two points. It has 3 ControlPoint handles to set the begin-point, the end-point, and the position at which with line curves in the middle. The beginning point is also the origin point of the object.
+			</p>
+			<div class="org-center">
+
+			  <div id="org5cf2343" class="figure">
+				<p><img src="./img-style/SBD-Line.png" alt="SBD-Line.png" /> 
+				</p>
+			  </div>
+
+			  <div id="org8e8ffb8" class="figure">
+				<p><img src="./img-style/SBD-LineOIP.png" alt="SBD-LineOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-org1d9a3f5" class="outline-3">
+		  <h3 id="org1d9a3f5">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org1d9a3f5">
+		  </div>
+		  <div id="outline-container-org8d3683c" class="outline-4">
+			<h4 id="org8d3683c">Pen</h4>
+			<div class="outline-text-4" id="text-org8d3683c">
+			  <p>
+				Sets all relevant pen attributes of the drawn line except for beginning &amp; end markers.
+			  </p>
+			</div>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-SBD-Line">
+		</div>
+		<div id="outline-container-org6216fa1" class="outline-3">
+		  <h3 id="org6216fa1">Parameters</h3>
+		  <div class="outline-text-3" id="text-org6216fa1">
+		  </div>
+		  <div id="outline-container-orgc60c27f" class="outline-4">
+			<h4 id="orgc60c27f">Corner Style</h4>
+			<div class="outline-text-4" id="text-orgc60c27f">
+			  <p>
+				<b>Note:</b> all styles adjust their sizing to fit in the geometry of their path.
+			  </p>
+			</div>
+			<ul class="org-ul">
+			  <li><a id="orgb93cb90"></a>Square:<br />
+				<div class="outline-text-5" id="text-orgb93cb90">
+				  <p>
+					Right-angle square curves
+				  </p>
+				</div>
+			  </li>
+			  <li><a id="org7d79011"></a>Rounded:<br />
+				<div class="outline-text-5" id="text-org7d79011">
+				  <p>
+					Rounded curves
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		  <div id="outline-container-orgc9cacf8" class="outline-4">
+			<h4 id="orgc9cacf8">Initial Rounded Radius</h4>
+		  </div>
+		  <div id="outline-container-orgc46dea5" class="outline-4">
+			<h4 id="orgc46dea5">Start to Midpoint Distance</h4>
+			<div class="outline-text-4" id="text-orgc46dea5">
+			  <p>
+				Corresponds to the middle ControlPoint handle. Useful as a measurement or to type in a value when using the handle would not be most effective (eg. adjusting multiple selected lines at once).
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org87f1859" class="outline-4">
+			<h4 id="org87f1859">Start to Endpoint Distance</h4>
+			<div class="outline-text-4" id="text-org87f1859">
+			  <p>
+				Corresponds to the end ControlPoint handle. Useful as a measurement or to type in a value when using the handle would not be most effective (eg. adjusting multiple selected lines at once).
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org6216fa1">
+		  </div>
+		  <div id="outline-container-orgd0158c5" class="outline-4">
+			<h4 id="orgd0158c5">Beginning Marker</h4>
+			<div class="outline-text-4" id="text-orgd0158c5">
+			  <p>
+				Sets the style of the Beginning Marker.
+			  </p>
+
+			  <p>
+				Choices: <code>None</code>, <code>Dot</code>, <code>Arrow</code>, <code>Box</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org77fcb68" class="outline-4">
+			<h4 id="org77fcb68"># of Beginning Duplicates</h4>
+			<div class="outline-text-4" id="text-org77fcb68">
+			  <p>
+				Creates multiple inputs at the beginning of the line for instances where multiple sources are combining. Use positive numbers to place duplicates above the line start point and use negative numbers to place duplicates under.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org5c5a058" class="outline-4">
+			<h4 id="org5c5a058">Beginning Duplicates Size</h4>
+			<div class="outline-text-4" id="text-org5c5a058">
+			  <p>
+				Choices: <code>Regular</code>, <code>Small</code>, <code>Micro</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org1918504" class="outline-4">
+			<h4 id="org1918504">Ending Marker</h4>
+			<div class="outline-text-4" id="text-org1918504">
+			  <p>
+				Sets the style of the Ending Marker.
+			  </p>
+
+			  <p>
+				Choices: <code>None</code>, <code>Dot</code>, <code>Arrow</code>, <code>Box</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org78cdd38" class="outline-4">
+			<h4 id="org78cdd38"># of End Duplicates</h4>
+			<div class="outline-text-4" id="text-org78cdd38">
+			  <p>
+				Creates multiple inputs at the end of the line for instances where multiple sources are splitting. Use positive numbers to place duplicates above the line end point and use negative numbers to place duplicates under.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org5231f1b" class="outline-4">
+			<h4 id="org5231f1b">End Duplicates Size</h4>
+			<div class="outline-text-4" id="text-org5231f1b">
+			  <p>
+				Choices: <code>Regular</code>, <code>Small</code>, <code>Micro</code>.
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-org6216fa1">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-SBD-Path" class="outline-2">
+		<h2 id="SBD-Path"><span class="section-number-2">19.</span> SBD Path Object</h2>
+		<div class="outline-text-2" id="text-SBD-Path">
+		</div>
+		<div id="outline-container-org9801de0" class="outline-3">
+		  <h3 id="org9801de0">Description</h3>
+		  <div class="outline-text-3" id="text-org9801de0">
+			<p>
+			  <code>SBD Path</code> is a path-object that allows the user to draw and edit a poly-line with the normal Vectorworks methods. The plug-in object just takes care of the beginning and end markers and stylizing the corners based on the <code>Corner Style</code> parameter.
+			</p>
+
+			<p>
+			  <code>SBD Path</code> largely exists for situations where a <code>SBD Line</code> object is insufficient for a task, and more complicated geometry or control is needed.
+			</p>
+			<div class="org-center">
+
+			  <div id="orga490f2f" class="figure">
+				<p><img src="./img-style/SBD-Path.png" alt="SBD-Path.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orgb552e7d" class="figure">
+				<p><img src="./img-style/SBD-PathOIP.png" alt="SBD-PathOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-orgd00884e" class="outline-3">
+		  <h3 id="orgd00884e">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-orgd00884e">
+		  </div>
+		  <div id="outline-container-orgaaa6c30" class="outline-4">
+			<h4 id="orgaaa6c30">Pen</h4>
+			<div class="outline-text-4" id="text-orgaaa6c30">
+			  <p>
+				Sets all relevant pen attributes of the drawn line except for beginning &amp; end markers.
+			  </p>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-orgd7e992d" class="outline-3">
+		  <h3 id="orgd7e992d">Parameters</h3>
+		  <div class="outline-text-3" id="text-orgd7e992d">
+		  </div>
+		  <div id="outline-container-org21414d6" class="outline-4">
+			<h4 id="org21414d6">Corner Style</h4>
+			<div class="outline-text-4" id="text-org21414d6">
+			  <p>
+				<b>Note:</b> all styles adjust their sizing to fit in the geometry of their path.
+			  </p>
+			</div>
+			<ul class="org-ul">
+			  <li><a id="org9adde61"></a>Square:<br />
+				<div class="outline-text-5" id="text-org9adde61">
+				  <p>
+					Right-angle square curves
+				  </p>
+				</div>
+			  </li>
+			  <li><a id="org81c621d"></a>Rounded:<br />
+				<div class="outline-text-5" id="text-org81c621d">
+				  <p>
+					Rounded curves
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		  <div id="outline-container-org70a4330" class="outline-4">
+			<h4 id="org70a4330">Initial Rounded Radius</h4>
+		  </div>
+		  <div class="outline-text-3" id="text-orgd7e992d">
+		  </div>
+		  <div id="outline-container-org69d08c2" class="outline-4">
+			<h4 id="org69d08c2">Beginning Marker</h4>
+			<div class="outline-text-4" id="text-org69d08c2">
+			  <p>
+				Sets the style of the Beginning Marker.
+			  </p>
+
+			  <p>
+				Choices: <code>None</code>, <code>Dot</code>, <code>Arrow</code>, <code>Box</code>
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org17d0fc8" class="outline-4">
+			<h4 id="org17d0fc8">Ending Marker</h4>
+			<div class="outline-text-4" id="text-org17d0fc8">
+			  <p>
+				Sets the style of the Ending Marker.
+			  </p>
+
+			  <p>
+				Choices: <code>None</code>, <code>Dot</code>, <code>Arrow</code>, <code>Box</code>
+			  </p>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgd7e992d">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-Survey3D" class="outline-2">
+		<h2 id="Survey3D"><span class="section-number-2">20.</span> Survey 3D Object</h2>
+		<div class="outline-text-2" id="text-Survey3D">
+		</div>
+		<div id="outline-container-org407fc77" class="outline-3">
+		  <h3 id="org407fc77">Description</h3>
+		  <div class="outline-text-3" id="text-org407fc77">
+			<p>
+			  <code>Survey 3D</code> is a point-object that allows the user to calculate one or two points in 3D space based on measurements (likely taken with a laser distance meter) in order to locate hanging positions or architectural features in 3D space while only having access to a limited amount of a stage deck.
+			</p>
+
+			<ul class="org-ul">
+			  <li>Measurement point placements can be set to negative values to flip the side of the origin point on which they are placed.</li>
+
+			  <li>Make sure <code>Vectorworks Preferences&gt;Display&gt;Display 3D Loci</code> is set correctly to allow the result points to display properly in 3D.</li>
+
+			  <li>Result points will not be drawn until all related measurements and distances have non-zero values.</li>
+
+			  <li>It is not recommended to rotate the object. While the point may still be drawn correctly in space, the measurements and coordinates will not be accurate.
+
+				<ul class="org-ul">
+				  <li><code>Measure 1</code> is set at the origin of the object.</li>
+				  <li><code>Measure 2</code> is set on the Y-axis on the opposite side of <code>Measure 1</code> from the result points.</li>
+				  <li><code>Measure 3</code> is set on the X-axis if <code>Measurement Style</code> is set to <code>Off Axis</code>.</li>
+			  </ul></li>
+			</ul>
+
+			<div class="org-center">
+
+			  <div id="orgf8f8fbb" class="figure">
+				<p><img src="./img-style/Survey3D1.png" alt="Survey3D1.png" /> 
+				</p>
+			  </div>
+
+			  <div id="org078db90" class="figure">
+				<p><img src="./img-style/Survey3D2.png" alt="Survey3D2.png" /> 
+				</p>
+			  </div>
+
+			  <div id="orga40d9c8" class="figure">
+				<p><img src="./img-style/Survey3DOIP.png" alt="Survey3DOIP.png" /> 
+				</p>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		<div class="outline-text-2" id="text-Survey3D">
+		</div>
+		<div id="outline-container-org44b8cbc" class="outline-3">
+		  <h3 id="org44b8cbc">User Editable Attributes</h3>
+		  <div class="outline-text-3" id="text-org44b8cbc">
+		  </div>
+		  <div id="outline-container-orgecab1f6" class="outline-4">
+			<h4 id="orgecab1f6">Fill/Pen/Color</h4>
+			<div class="outline-text-4" id="text-orgecab1f6">
+			  <p>
+				Fill and Pen may be set on a per-object basis via the VW Attribute Palette. Hatches, Gradients, etc. may be used, but can not have local settings per object. 3D Guide Lines receive their color from the Fill attribute, while 3D Loci receive color from the Pen attribute.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgd86eba0" class="outline-4">
+			<h4 id="orgd86eba0">Text</h4>
+			<div class="outline-text-4" id="text-orgd86eba0">
+			  <p>
+				Font options can be changed by altering the text attributes of the object via the Text menu or the Format Text box. Alignment is set to <code>Center</code> by the object.
+			  </p>
+			</div>
+		  </div>
+		</div>
+		<div id="outline-container-orgd66b971" class="outline-3">
+		  <h3 id="orgd66b971">Parameters</h3>
+		  <div class="outline-text-3" id="text-orgd66b971">
+		  </div>
+		  <div id="outline-container-org7681fd2" class="outline-4">
+			<h4 id="org7681fd2">Label</h4>
+			<div class="outline-text-4" id="text-org7681fd2">
+			  <p>
+				This will be drawn over the result points to differentiate between multiple <code>Survey 3D</code> objects.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org55e2b19" class="outline-4">
+			<h4 id="org55e2b19">Measurement Style</h4>
+			<div class="outline-text-4" id="text-org55e2b19">
+			</div>
+			<ul class="org-ul">
+			  <li><a id="org2901c2b"></a>On Axis<br />
+				<div class="outline-text-5" id="text-org2901c2b">
+				  <p>
+					<br />
+					This style only uses <code>Measure 1</code> &amp; <code>2</code> to locate result points that are directly in-line and on-axis in the X/Y plane with those two points.
+				  </p>
+				</div>
+			  </li>
+			  <li><a id="org3a75f83"></a>Off Axis<br />
+				<div class="outline-text-5" id="text-org3a75f83">
+				  <p>
+					<br />
+					This style uses all three <code>Measure</code> points, and can locate result points that are anywhere in 3D space with a Z-height greater than the <code>Measure</code> points.
+				  </p>
+				</div>
+			  </li>
+			</ul>
+		  </div>
+		  <div id="outline-container-org8818b92" class="outline-4">
+			<h4 id="org8818b92">Number of Result Points</h4>
+			<div class="outline-text-4" id="text-org8818b92">
+			  <p>
+				Choices: <code>1</code> or <code>2</code>. The <code>2</code> points can be useful when trying to describe multiple points on an object without having to re-measure. Examples would be the two ends of a hanging pipe or the two extreme sightlines of a balcony seating area.
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-orgc6dffd9" class="outline-4">
+			<h4 id="orgc6dffd9">Draw 3D Guide Lines?</h4>
+		  </div>
+		  <div id="outline-container-org02176f2" class="outline-4">
+			<h4 id="org02176f2">Draw Coordinates?</h4>
+		  </div>
+		  <div id="outline-container-orgafc1a36" class="outline-4">
+			<h4 id="orgafc1a36">Dist Measure 1 to Point 1</h4>
+		  </div>
+		  <div id="outline-container-orge51a533" class="outline-4">
+			<h4 id="orge51a533">Dist Measure 1 to Point 2</h4>
+		  </div>
+		  <div id="outline-container-org4a939b5" class="outline-4">
+			<h4 id="org4a939b5">Measure 2 Y Dist</h4>
+			<div class="outline-text-4" id="text-org4a939b5">
+			  <p>
+				Placement of Measure 2 from Measure 1
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org942b23a" class="outline-4">
+			<h4 id="org942b23a">Dist Measure 2 to Point 1</h4>
+		  </div>
+		  <div id="outline-container-org088c74d" class="outline-4">
+			<h4 id="org088c74d">Dist Measure 2 to Point 2</h4>
+		  </div>
+		  <div id="outline-container-org7fb6f04" class="outline-4">
+			<h4 id="org7fb6f04">Measure 3 X Dist</h4>
+			<div class="outline-text-4" id="text-org7fb6f04">
+			  <p>
+				Placement of Measure 3 from Measure 1
+			  </p>
+			</div>
+		  </div>
+		  <div id="outline-container-org5579934" class="outline-4">
+			<h4 id="org5579934">Dist Measure 3 to Point 1</h4>
+		  </div>
+		  <div id="outline-container-org2f420fd" class="outline-4">
+			<h4 id="org2f420fd">Dist Measure 3 to Point 2</h4>
+		  </div>
+		  <div id="outline-container-org3e1a58b" class="outline-4">
+			<h4 id="org3e1a58b">Result Points 1 &amp; 2</h4>
+			<div class="outline-text-4" id="text-org3e1a58b">
+			  <p>
+				<b>Note: These values are set by the object.</b><br />
+			  </p>
+
+			  <p>
+				Displays the coordinates of the resulting points.
+			  </p>
+			  <ul class="org-ul">
+				<li>If not all necessary fields have a non-zero value, this will display <code>Incomplete Dimensions</code>.</li>
+				<li>If distance measurements have incompatible values, this will display <code>ERROR! Invalid Dimensions</code>.
+				  The same message will be placed on the drawing in red, and red spheres will be drawn in 3D to indicate that new measurements need to be taken.</li>
+			  </ul>
+			</div>
+		  </div>
+		  <div class="outline-text-3" id="text-orgd66b971">
+		  </div>
+		</div>
+	  </div>
+	  <div id="outline-container-MenuCommands" class="outline-2">
+		<h2 id="MenuCommands"><span class="section-number-2">21.</span> Menu Commands</h2>
+		<div class="outline-text-2" id="text-MenuCommands">
+		  <p>
+			These are included to help with workflow when using the Salutz Tools Plug-in Objects and integrating with Worksheet reports.<br />
+		  </p>
+		</div>
+
+		<div id="outline-container-org354145f" class="outline-3">
+		  <h3 id="org354145f">Refresh Selected</h3>
+		  <div class="outline-text-3" id="text-org354145f">
+			<p>
+			  Refreshes the selected objects on the active layer with the <code>ResetObject</code> command. Particularly useful for getting out-of-date plug-in objects to update.<br />
+			</p>
+		  </div>
+		</div>
+
+		<div id="outline-container-orgab07389" class="outline-3">
+		  <h3 id="orgab07389">Refresh Worksheets</h3>
+		  <div class="outline-text-3" id="text-orgab07389">
+			<p>
+			  Refreshes and recalculates the selected worksheets on the active layer. While there is a right-click menu item for "Recalculate" and menu items for "Recalculate Active" or "All Worksheets" in the worksheet editor, this exists to quickly recalculate multiple worksheets with a simple select and menu command from the main drawing.<br />
+			  This also allows for custom keyboard shortcuts.<br />
+			</p>
+		  </div>
+		</div>
+
+		<div id="outline-container-orgab4116d" class="outline-3">
+		  <h3 id="orgab4116d">Refresh Section VP</h3>
+		  <div class="outline-text-3" id="text-orgab4116d">
+			<p>
+			  Refreshes all Section and Elevation Viewports in the entire drawing.<br />
+			</p>
+
+			<p>
+			  <b>Use with caution</b> Depending on rendering options for the various viewports, this process could take a very long time. Generally most useful when dealing with a drawing with multiple Section/Elevation Design Layer Viewports (particularly referencing other files), this menu command can be a time-saver if run right after opening the file.
+			</p>
+		  </div>
+		</div>
+
+		<div id="outline-container-org81f6f55" class="outline-3">
+		  <h3 id="org81f6f55">UnFlip Selected</h3>
+		  <div class="outline-text-3" id="text-org81f6f55">
+			<p>
+			  Checks selected text, symbol, and plug-in objects on the active layer to see if their <code>Flip</code> state is true, and if so removes the <code>Flip</code>. This is particularly useful if you have Mirrored a collection of plug-in objects and want them to maintain their original orientation.
+			</p>
+		  </div>
+		</div>
+
+		<div id="outline-container-org11266a4" class="outline-3">
+		  <h3 id="org11266a4">Hydra</h3>
+		  <div class="outline-text-3" id="text-org11266a4">
+			<p>
+			  Initiates a hotkey process for switching/setting classes, layers and saved views. Once placed in the workspace this command can have a keyboard shortcut defined to make the process simpler.
+			</p>
+		  </div>
+
+		  <div id="outline-container-org7523ddc" class="outline-4">
+			<h4 id="org7523ddc">Syntax / Tags</h4>
+			<div class="outline-text-4" id="text-org7523ddc">
+			  <p>
+				In order to be recalled by <code>Hydra</code>, Layers and Classes must have a Tag assigned to them with the syntax <b>"Hydra-"</b> followed by the single keyboard key the user wishes to use to recall that Layer or Class.
+			  </p>
+
+			  <p>
+				Saved Views must have <b>"Hydra-&lt;key&gt;"</b> somewhere in their name.
+			  </p>
+
+			  <p>
+				<b>NOTE:</b> Only one resource may be assigned to a particular key. Having multiple resources tagged with the same key can lead to unexpected results.
+			  </p>
+			</div>
+		  </div>
+
+		  <div id="outline-container-org77c8065" class="outline-4">
+			<h4 id="org77c8065">Step 1: Calling the <code>Hydra</code> Command</h4>
+			<div class="outline-text-4" id="text-org77c8065">
+			  <p>
+				The <code>Hydra</code> command must be added to a menu in the workspace in order to be used. It can also have a keyboard shortcut assigned. On a Mac I've found that Command-semicolon is unused by Vectorworks and is fairly ergonomic.
+			  </p>
+
+			  <p>
+				The <b>&lt;Escape&gt;</b> key may be pressed at any time to cancel the command.
+			  </p>
+			</div>
+		  </div>
+
+		  <div id="outline-container-orgd6e04fa" class="outline-4">
+			<h4 id="orgd6e04fa">Step 2: Select Command type</h4>
+			<div class="outline-text-4" id="text-orgd6e04fa">
+			  <p>
+				Type a single key to select the action to perform. This is case-insensitive.
+			  </p>
+			</div>
+
+			<ul class="org-ul">
+			  <li><a id="orgf174c3a"></a>L : Switch active layer to chosen layer<br /></li>
+
+			  <li><a id="org8731033"></a>C : Switch active class to chosen class<br /></li>
+
+			  <li><a id="org8e3db1d"></a>S : Assign selected objects to chosen class<br /></li>
+
+			  <li><a id="orgbc730a2"></a>V : Recalled Saved View<br /></li>
+			</ul>
+		  </div>
+
+		  <div id="outline-container-org7e85809" class="outline-4">
+			<h4 id="org7e85809">Step 3: Choose resource</h4>
+			<div class="outline-text-4" id="text-org7e85809">
+			  <p>
+				Type a single key to select the resource (Layer, Class, Saved View) assigned to that key. If no resource is assigned, <code>Hydra</code> will deliver an error message. 
+			  </p>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	<div id="postamble" class="status">
+	  <p class="date">Date: 2023-07-26 Wed 00:00</p>
+	  <p class="author">Author: <b>John Salutz</b> | <i><a href="https://www.johnsalutzdesigns.com">John Salutz Designs</a></i> | <a href="mailto:john.salutz@gmail.com"><code>john.salutz@gmail.com</code></a></p>
+	</div>
+  </body>
+</html>
