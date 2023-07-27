@@ -1,0 +1,997 @@
+ ________________________________________________________________________
+
+                        SALUTZ TOOLS GUIDE, V0.6.7
+
+ *John Salutz* | /[John Salutz Designs] (<https://www.johnsalutzdesigns.com>)/ | [`john.salutz@gmail.com'] (<mailto:john.salutz@gmail.com>)
+ ________________________________________________________________________
+
+
+                             [2023-07-26 Wed]
+
+
+ Table of Contents
+ _________________
+
+ 1. Overview
+ 2. Text+Box Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 3. DoubleBox Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 4. Lineset Label Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 5. Position Label Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 6. Boom Marker Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 7. LED Tape Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 8. MagicSheet Header Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 9. MagicSheet Number Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 10. RackObject Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 11. RackEquip Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 12. SBD Family
+ .. Size
+ 13. SBD Device Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 14. SBD In-Out Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 15. SBD Amp Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 16. SBD Speaker-Mic Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 17. SBD Flyoff
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 18. SBD Line Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 19. SBD Path Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 20. Survey 3D Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 21. Menu Commands
+ .. Refresh Selected
+ .. Refresh Worksheets
+ .. Refresh Section VP
+ .. UnFlip Selected
+ .. Hydra
+
+
+ 1 Overview
+ ==========
+   Salutz Tools are a series of un-encrypted, free and open source
+   Vectorscript Plug-In Objects for use in Vectorworks software,
+   primarily for use by theatrical designers and technicians.
+
+   All objects have normal Vectorworks parameters for X & Y coordinates
+   and rotation. Objects must be on the Layer Plane (not Screen Plane)
+   to use the Z coordinate.
+
+   See [README] file for installation and license information.
+
+
+ [README] <https://github.com/john-salutz/Salutz-Tools-VW>
+ 2 Text+Box Object
+ =================
+ Description
+   `Text+Box' is a point-object that places a user defined text label
+   and draws 1 or 2 rectangles around the text, automatically adjusting
+   the rectangle size based on text size.
+
+   					  <./img-style/TextBox.png>
+   					<./img-style/TextBoxOIP.png>
+
+ User Editable Attributes
+ Fill/Pen/Color
+   Fill and Pen may be set on a per-object basis via the VW Attribute
+   Palette. Hatches, Gradients, etc. may be used, but can not have local
+   settings per object.
+ Text
+   Font options can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box. Change color by
+   using the `Text Color Paramenter' and object Pen Color.
+ Parameters
+ Label
+ Underline
+ Offset to outer edge
+   Gap from the inner rectangle to the outer rectangle.
+ Pad to Text
+   Gap from the text to the inner rectangle.
+ Use Rounded Rectangles?
+   Draws both rectangles as rounded rectangles.
+ Inner Rectangle?
+   Toggles visibility of the inner rectangle. If visible, the inner
+   rectangle will always have a white fill and a line style set by the
+   `Inner Rectangle Line Style' parameter.
+ Inner Rectangle Line Style
+   Choices: `Solid', `Dashed', `Dashed Spaced', `Dotted', `None'.
+ Text Color
+   Choose whether to `Keep Text Black' or `Follow Object Pen Color'.
+ Arrow Placement
+   Options: `No Arrow, Left, Right, Top, Bottom'
+ Arrow Scale (Separate Length & Width)
+   Scaled as `1' = 100% scale, `2' = 200% scale, etc.
+ 3 DoubleBox Object
+ ==================
+ Description
+   `DoubleBox' is a rectangle-object that draws two inset rectangles and
+   can place `Label' and `Notes' text in the object.
+
+   *Note:* Inner rectangle will always have a solid, white fill and a
+    thin line with linetype set by the `Inner Rectangle Line Style'
+    unless `Inner Rectangle Line Style' is set to `Cut-Out'.
+   					 <./img-style/DoubleBox.png>
+   				   <./img-style/DoubleBoxOIP.png>
+ User Editable Attributes
+ Fill/Pen/Color
+   Fill and Pen may be set on a per-object basis via the VW Attribute
+   Palette. Hatches, Gradients, etc. may be used, but can not have local
+   settings per object.
+ Text
+   Font options can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box. Change color by
+   using the `Text Color Paramenter' and object Pen Color. `Notes' text
+   size is set by `Notes Text Size Parameter'.
+ Handles
+   The object has the standard 8 Vectorworks handles for re-shaping with
+   the mouse.
+ Parameters
+ Height
+ Width
+ Offset Direction
+ * Inward:
+   draws the rectangles inward from the object handles and `Height' /
+   `Width'.
+ * Outward:
+   draws the rectangles outward from the object handles and `Height' /
+   `Width'. (ie. The object draws larger than that size specified).
+ Use Rounded Rectangle?
+   Draws both rectangles as rounded rectangles.
+ Offset to outer edge
+   Gap from the inner rectangle to the outer rectangle.
+ Pad to Contents
+   Gap from the contents to the inner rectangle.
+ Text Color
+   Choose whether to `Keep Text Black' or `Follow Object Pen Color'.
+ Inner Rectangle Line Style
+   Choices: `Solid', `Dashed', `Dashed Spaced', `Dotted', `None',
+   `Cut-Out'.
+ Show Label Text
+ Label Text
+ Label Container
+   Choices: `None', `Underline', `Box'.
+ Label Position
+   Places Label Text `Inside' or `Outside' the rectangles. Alignment is
+   set to centered.
+ Show Notes Text
+ Note Text Size
+ Note Horiz. Align
+   Choices: `Left', `Center', `Right', `Justify'.
+ Resize Box to Note?
+ * None: Draws box at user specified size.
+ * Box Expands to `Note' Height: If `Note' is larger than the box height, box will automatically increase in height to fit `Note' text inside the box boundary.
+ * Box Follows `Note' Height: Box will increase or decrease its height to match the height of the `Note' text.
+ Click here to edit notes
+   This brings up a dialog box to edit the notes text.
+   - Alignment is set to left-aligned in the dialog box, but will align
+     on drawing based on `Note Horiz. Align' parameter.
+   - Newline/paragraph breaks are allowed.
+   - Tabs may be entered on a Mac with key sequence <Alt>-<Shift>-<Tab>.
+   - Currently limited to 2,047 characters.
+ Notes Tab Size (Page)
+   This sets the width of tab characters in the `Notes' text. The object
+   is set to default to 1/2" because that is the spacing the VW dialog
+   box shows as a default.
+
+   Tab characters may be entered on a Mac with key sequence
+   <Alt>-<Shift>-<Tab>.
+
+   Bullet Lists may be entered on a Mac with <Alt>-<Tab>.
+
+   *NOTE: This functionality is not tested on Windows.*
+ 4 Lineset Label Object
+ ======================
+ Description
+   `Lineset Label' is a point-object that inserts a bi-directional label
+   for creating lineset schedules on a drawing.
+   					  <./img-style/Lineset.png>
+   					<./img-style/LinesetOIP.png>
+ User Editable Attributes
+ Fill
+   Sets the color of the `Type' flag.
+ Pen
+   Sets the color of the `Purpose'. This is useful for using class
+   coloring for different types of positions/departments.
+ Text
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box. All other font
+   attributes (aside from color) are dictated by the object.
+ Parameters
+ LS #
+   A text string for the lineset number. It is set as a string to allow
+   for letter modifiers (eg. "Lineset 25a").
+
+   The `Spotlight Numbering Command' can be used to automatically number
+   this field.
+ Direction
+   Sets whether label points left or right.
+ Purpose
+   The Name or Label or contents of the Lineset.
+ Type
+   Dropdown list of common departments that might put equipment on
+   linesets. This information does not display on the drawing; it is
+   mainly used for displaying in worksheet summaries.
+
+   If the field is set to anything other than `blank', a flag will be
+   drawn at the point of the label. This flag's color can be altered by
+   the `Fill' attribute. If the field is set to `LX', the `Purpose'
+   field will be bolded.
+ Use Object Y position for Plasterline Distance?
+ Distance from PL
+   This field is only used if `Use Object Y position for Plasterline
+   Distance?' is deselected.
+ Use Object Z position for Trim?
+   If `Object Z' is 0", value does not display on drawing.
+ Trim
+   This field is only used if `Use Object Z position for Trim?' is
+   deselected. If `Trim' is 0", value does not display on drawing.
+ Show in 3D views?
+ Weight
+   Set the weight load of the lineset as a number. This value will only
+   appear on the drawing if it is non-zero.
+ Weight Units
+   Units used for the weight load (ie. lbs, kg, bricks).
+ Notes
+   Any additional notes for the lineset. This information does not
+   display on the drawing; it is mainly used for displaying in worksheet
+   summaries.
+ 5 Position Label Object
+ =======================
+ Description
+   `Position Label' is a point-object that inserts a multi-directional
+   label for labeling hanging positions/truss/etc for lighting and audio
+   applications.
+   				   <./img-style/PositionLabel.png>
+   				 <./img-style/PositionLabelOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   Sets the color of the decorative arrow shape and the color/linetype
+   of the `Leader Line'.
+ Text
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box. All other font
+   attributes are dictated by the object.
+ Parameters
+ Label Style
+   Choices: `Regular', `Small', or `Micro'
+
+   Sets the size and style of the label.
+ Position Name
+   *Note*: In `Small' and `Micro' styles, if `Position Name' is more
+    than 2 characters it will overshoot the edges of the object,
+    therefore the text will be scaled down to fit inside the circle. In
+    `Regular' style the shape is responsive to `Position Name' length.
+ Show z-Trim Height
+   Draws an extra line of text with "TRIM@ " and the z-coordinate height
+   of the object.
+ Text Line 1
+   A line of text for user notes.
+ Text Line 2
+   Another line of text for user notes.
+ Label Direction
+   Choose left-pointing, right-pointing, or centered-line.
+ Use Leader Line?
+   Engages a leader line from the object to a point set by the user with
+   the mouse. Potentially useful if the label has to be a fair distance
+   from the hanging position.
+ Scale
+   In addition to the 3 size/styles in `Label Style', the object can be
+   individually scaled to user preference.
+ Drawing Usage
+   Choices: `Plot', `Section', or `Other'. Used for worksheets or Custom
+   Selection to differentiate what the label is being used for.
+ Wrap Text?
+ Text Wrap Width
+   If `Wrap Text?' is engaged, sets the width of text wrap for all text
+   lines.
+ 6 Boom Marker Object
+ ====================
+ Description
+   `Boom Marker' is a point-object that inserts a compass style
+   directional label for labeling vertical hanging positions.
+   					<./img-style/BoomMarker.png>
+   				   <./img-style/BoomMarkerOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   Sets the Pen color of the `Label' text and the directional
+   arrows. All other Fill/Pen attributes are dictated by the object.
+ Text
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box. The object's font
+   size affects the size of the `Label' text. All other font attributes
+   are dictated by the object.
+ Parameters
+ Label
+ Underline Label?
+ "West" Label
+   The text on the "West"/Left side of the label compass.
+ "East" Label
+   The text on the "East"/Right side of the label compass.
+ "South" Label
+   IF `South Label' is left blank the "South"/Downward arrow will not be
+   drawn.
+ Dimension From
+   If not blank, adds "DIMENSION FROM: <user text>" text under compass.
+ Notes
+   If not blank, adds "NOTE: <user text>" text under compass.
+ 7 LED Tape Object
+ =================
+ Description
+   `LED Tape' is a path-object that allows the user to draw and edit a
+   poly-line with the normal Vectorworks methods, calculates length and
+   wattage, and places `Type/Channel/Address' labels along the length of
+   the polyline.
+   					  <./img-style/LEDTape.png>
+   					<./img-style/LEDTapeOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   Fill/Pen attributes only affect the polyline drawing. All other
+   Fill/Pen attributes are dictated by the object.
+ Text
+   Font typeface and style can be changed by altering the text
+   attributes of the object via the Text menu or the Format Text
+   box. Text size is set by the `Text Label Height' parameter. All other
+   font attributes are dictated by the object.
+ Parameters
+ Type of Tape (Label)
+ Channel
+ Address
+
+   These values will be combined into a single label with the format:
+
+   *Type of Tape (Channel) [Address]*
+
+   If any field is left blank, that field and its parentheses/brackets
+   will be excluded from the drawn label. Labels are placed at the
+   midpoint between two polyline vertices. For curves, Cubic Spline or
+   Radius (Point on Arc) are recommended.
+ Text Label Height
+   Set text height as a dimension, eg. 2".
+ Tape Width
+   Sets the width of the LED Tape polyline on the drawing. If set to
+   `0"', the drawing will default to 12mm.
+
+   *Note:* The `Tape Width' parameter is a dimension. This means that
+    you can enter a value of inches or millimeters, regardless of your
+    document units setting. Simply type `1.5in' or `12mm' into the
+    field.
+
+ Watts per `Length Unit'
+
+ Length Unit
+   *Note:* The `Length Unit' parameter is a dimension. This means that
+    you can enter a value of feet or meters, regardless of your document
+    units setting.
+
+ Total Tape Length
+
+ Total Wattage
+
+ Type of Tape (Long)
+   This parameter is an additional field for a more detailed description
+   of the type of tape. This information does not display on the
+   drawing; it is mainly used for displaying in worksheet summaries.
+ 8 MagicSheet Header Object
+ ==========================
+ Description
+   `MagicSheet Header' is a point-object for creating lighting magic
+   sheets on a sheet layer or a 1:1 design layer. It is intended as a
+   label for a system of channels on a magic sheet.
+   					<./img-style/MagicHeader.png>
+   				  <./img-style/MagicHeaderOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   Sets the color of the box around the text. Gradients and Tiles may be
+   used (eg. for RGB or CMY systems), but local settings per object are
+   unreliable.
+ Text
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box. All other font
+   attributes are dictated by the object.
+ Parameters
+ System
+   Label for the lighting system (eg. Front, Side, Practicals, etc).
+ Color
+   Label for the gel color or color-mixing method for that system of
+   fixtures.
+
+   *Note:* this does not automatically change the color of the box
+    around the text. That must be set by the `Fill' or `Pen Attribute'.
+ Scale
+   *Note:* A value of 1 equals 100% scale.
+ 9 MagicSheet Number Object
+ ==========================
+ Description
+   `MagicSheet Number' is a point-object for creating lighting magic
+   sheets on a sheet layer or a 1:1 design layer. It is intended as a
+   label for channels or groups.
+   					<./img-style/MagicNumber.png>
+   				  <./img-style/MagicNumberOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   Fill may be set on a per-object basis via the VW Attribute
+   Palette. All Pen attributes are set by the plug-in object.
+ Text
+   Font typeface and size can be changed by altering the text attributes
+   of the object via the Text menu or the Format Text box. All other
+   font attributes are dictated by the object.
+ Parameters
+ Number
+   The channel or group number. Does support decimal values for
+   multi-cell fixtures. The `Spotlight Numbering Command' can be used to
+   automatically number this field.
+ Prefix
+   A value before the channel number to allow labeling (eg. Groups)
+   without interfering with automatic-numbering.
+ Style
+   Choices: `Plain', `Bold', `Invert Bold'
+ Container
+   Draws a container around the number value. The container re-sizes as
+   the value gets longer/shorter.  Choices: `None', `Rectangle',
+   `Circle', `Oval', `< <' (sidelight), `> >' (sidelight).
+ 10 RackObject Object
+ ====================
+ Description
+   `RackObject' is a point-object for drawing 19" A/V racks for mounting
+   gear. Built to interface with `RackEquip' plug-in
+   objects. `RackObject' will re-draw/re-size based on the `Number of
+   Rack Spaces' parameter.
+   					<./img-style/RackObject.png>
+   				   <./img-style/RackObjectOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   Sets the attributes of the frame around the Rack Object. `Pen' also
+   sets the color of the `Rack Name/ID' text.
+ Text
+   Font attributes of the `Rack Name' can be changed by altering the
+   text attributes of the object via the Text menu or the Format Text
+   box. The space numbers are affected by the changes in typeface, but
+   no other attributes including size because they are scaled to fit in
+   1 rack space to avoid overlap.
+
+ Parameters
+   *Note:* Rack uses the bottom of the bottom-most rack space as its
+    origin point and draws upward. If you change the frame size or
+    number of rack spaces, you will likely have to check its alignment
+    with other racks.
+ Rack Name/ID
+ Rack ID Position
+   Choices: `None', `Top', or `Bottom'
+ Number of Rack Spaces
+ Number Spaces From
+   Choices: `Bottom' or `Top'
+ Front or Back?
+   Added to the Rack label on drawing.  Choices: `blank', `Front',
+   `Rear'
+ Frame Size
+   Specifies the outside offset drawn from the rack spaces in inches,
+   not the overall width or height.
+ Show Rack Space Numbers
+   Choices: `None', `Left', `Right', `Both'
+ 11 RackEquip Object
+ ===================
+ Description
+   `RackEquip' is a point-object for drawing rack-mounted gear. Built to
+   interface with `RackObject' plug-in objects. `RackEquip' will pick up
+   its `Rack ID' and `Position in Rack' parameters from the `RackObject'
+   it is placed over. However, it will not automatically move or rotate
+   with its parent `RackObject', they must be selected and moved
+   together.
+   					 <./img-style/RackEquip.png>
+   				   <./img-style/RackEquipOIP.png>
+ User Editable Attributes
+ Fill
+   Sets the fill of Rack Ears or whole unit based on `Object color
+   affects' attribute.
+ Pen
+   Sets the color of the text labels.
+ Text
+ * Font typeface
+   can be changed by altering the text attributes of the object via the
+   Text menu or the Format Text box.
+ * Style changes (Bold, Italic, etc)
+   affect the `Manufacturer' & `Model' but not the `Purpose'.
+ * Size
+   will attempt to follow the user text size settings, but the plug-in
+   will scale the text to fit inside the equipment.
+ Parameters
+ Purpose Label
+ Manufacturer
+ Model
+ Number of Rack Spaces
+   Note: Uses the top of the equipment piece as its origin point.
+ Width
+   Choices: `Full', `Half', `Quarter', `Fifth'.
+
+   `Half' width will render a `-L' or `-R' at the end of `Position in
+   Rack' depending on whether it is on the left or right side of the
+   rack.
+
+   `Quarter' or `Fifth' will add a decimal point number to the end of
+   `Position in Rack' based on left/right position.
+ Object color affects
+   Choices: `Rack Ears Only' or `Entire Object'
+ Rack ID
+   (CAN NOT BE EDITED)
+
+   Automatically finds the `Rack Object' it is placed in and displays
+   its ID. Objects must be on the same layer and may not be in a Symbol.
+
+   Can be useful for Custom Selection and Worksheet displays.
+ Position in Rack
+   (CAN NOT BE EDITED)
+
+   Automatically finds its position in the `Rack Object' and displays
+   the space number. Objects must be on the same layer and may not be in
+   a Symbol.
+
+   Can be useful for Custom Selection and Worksheet displays.
+ 12 SBD Family
+ =============
+   `SBD Objects' are for use in preparing a *System Block Diagram* for
+   audio, video, or networking systems. They are intended for use in
+   design layers, with the intention of using viewports and sheet layers
+   for printing/exporting.
+   <file:img-style/SBD Group.png>
+ Size
+ Size in `SBD Objects' uses the following convention for `Size' fields:
+ * Regular= 12 inches
+ * Small= 9 inches
+ * Micro= 6 inches (This also applies to `USITT' style objects)
+ 13 SBD Device Object
+ ====================
+ Description
+   `SBD Device' is a point-object for drawing a general piece of
+   equipment in an SBD drawing.
+   					<./img-style/SBD-Device.png>
+   				   <./img-style/SBD-DeviceOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   All attributes are set by the object.
+ Text
+ * Font typeface
+   can be changed by altering the text attributes of the object via the
+   Text menu or the Format Text box.
+ Parameters
+ Type
+   Choices: `Console', `Rack', `Multi', `FX Process', `Mixer', `DAC',
+   `Computer', `Com', `Amp', `Other'
+ Header Size
+   Sets the height of the object box and dictates which parameter fields
+   are placed on the drawing.
+ Column Width
+   Choices:
+   - `Double':Standard two columns for inputs and outputs.
+   - `Single':One column, ideal for a Pass Thru configuration.
+   - `Break':Draws a break line at the selected position to indicate
+     multiple instances of this piece of equipment.
+     - `Bottom'
+     - `Left'
+     - `Right'
+ Manufacturer
+ Model
+ ID#
+ Prefix
+   Precedes the `ID#'.
+ Location
+ Purpose
+ IP Address
+ Size of Spaces
+   Affects the size of spaces drawn under the Device header. These
+   spaces are for placement of `SBD In-Out' Objects.
+ Number of Spaces
+ Notes
+ Show Notes on Drawing?
+ 14 SBD In-Out Object
+ ====================
+ Description
+   `SBD In-Out' is a point-object for drawing the inputs or outputs of a
+   piece of equipment in an SBD drawing.
+   					 <./img-style/SBD-InOut.png>
+   				   <./img-style/SBD-InOutOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   All attributes are set by the object.
+ Text
+ * Font typeface
+   can be changed by altering the text attributes of the object via the
+   Text menu or the Format Text box.
+ Parameters
+ Type
+   Choices: `Input', `Output', `Header', `Spacer', `Thru'
+ Size
+ ID#
+ Prefix
+   Precedes the `ID#'.
+ Routing
+ Routing Label Class
+ Purpose
+ Purpose Label Class
+ Parent Device
+   *NOTE:* This field is filled by the object based on the `SBD Device'
+    boundary that the `SBD In-Out' object is placed within.
+ Connector
+   *Note:* This field does not appear on the drawing. It is mainly used
+    for worksheets or Custom Selection.
+ Notes
+ 15 SBD Amp Object
+ =================
+ Description
+   `SBD Amp' is a point-object for drawing an amplifier in an SBD
+   drawing.
+   					  <./img-style/SBD-Amp.png>
+   					<./img-style/SBD-AmpOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   Fill/Pen affects the `Model' label text. All other attributes are set
+   by the object.
+ Text
+ * Font typeface
+   can be changed by altering the text attributes of the object via the
+   Text menu or the Format Text box.
+ Parameters
+ Type
+   Automatically set to 'Amp'.
+ Number of Channels
+   `SBD Amp' will re-draw with the specified number of channels at Size:
+   `Regular'.
+ Manufacturer
+ Model
+ ID#
+ Prefix
+   Precedes the `ID#'.
+ Location
+ Purpose
+ IP Address
+ Notes
+ Show Notes on Drawing?
+ 16 SBD Speaker-Mic Object
+ =========================
+ Description
+   `SBD Speaker-Mic' is a point-object for drawing a speaker,
+   microphone, or signal source in an SBD drawing.
+   				  <./img-style/SBD-SpeakerMic.png>
+   				 <./img-style/SBD-SpeakerMicOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   All attributes are set by the object.
+ Text
+ * Font typeface
+   can be changed by altering the text attributes of the object via the
+   Text menu or the Format Text box.
+ Parameters
+ Type
+   Choices: `Speaker', `Microphone', `Source'.
+ ID#
+ Prefix
+   Precedes the `ID#'.
+ Manufacturer
+ Model
+ Active or Passive
+ Purpose
+ Purpose Label Class
+ Notes
+ 17 SBD Flyoff
+ =============
+ Description
+   `SBD Flyoff' is a point-object for drawing a flyoff indicator in an
+   SBD drawing.
+   					<./img-style/SBD-Flyoff.png>
+   				   <./img-style/SBD-FlyoffOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   All attributes are set by the object.
+ Text
+ * Font typeface
+   can be changed by altering the text attributes of the object via the
+   Text menu or the Format Text box.
+ Parameters
+ Type
+   Currently `Flyoff' is the only choice. This is being held for
+   possible future expansion.
+ Size
+   Choices: `Regular', `Small', or `Micro'
+
+
+   *Note:* currently `Regular' and `Small' draw the same shape on the
+    drawing. This may have more options in a future expansion.
+ ID#
+ Prefix
+   Precedes the `ID#'.
+ Purpose
+ Notes
+ 18 SBD Line Object
+ ==================
+ Description
+   `SBD Line' is a point-object which draws a multi-segment polyline
+   between two points. It has 3 ControlPoint handles to set the
+   begin-point, the end-point, and the position at which with line
+   curves in the middle. The beginning point is also the origin point of
+   the object.
+   					 <./img-style/SBD-Line.png>
+   					<./img-style/SBD-LineOIP.png>
+ User Editable Attributes
+ Pen
+   Sets all relevant pen attributes of the drawn line except for
+   beginning & end markers.
+ Parameters
+ Corner Style
+   *Note:* all styles adjust their sizing to fit in the geometry of
+    their path.
+ * Square:
+   Right-angle square curves
+ * Rounded:
+   Rounded curves
+ Initial Rounded Radius
+ Start to Midpoint Distance
+   Corresponds to the middle ControlPoint handle. Useful as a
+   measurement or to type in a value when using the handle would not be
+   most effective (eg. adjusting multiple selected lines at once).
+ Start to Endpoint Distance
+   Corresponds to the end ControlPoint handle. Useful as a measurement
+   or to type in a value when using the handle would not be most
+   effective (eg. adjusting multiple selected lines at once).
+ Beginning Marker
+   Sets the style of the Beginning Marker.
+
+   Choices: `None', `Dot', `Arrow', `Box'
+ # of Beginning Duplicates
+   Creates multiple inputs at the beginning of the line for instances
+   where multiple sources are combining. Use positive numbers to place
+   duplicates above the line start point and use negative numbers to
+   place duplicates under.
+ Beginning Duplicates Size
+   Choices: `Regular', `Small', `Micro'.
+ Ending Marker
+   Sets the style of the Ending Marker.
+
+   Choices: `None', `Dot', `Arrow', `Box'
+ # of End Duplicates
+   Creates multiple inputs at the end of the line for instances where
+   multiple sources are splitting. Use positive numbers to place
+   duplicates above the line end point and use negative numbers to place
+   duplicates under.
+ End Duplicates Size
+   Choices: `Regular', `Small', `Micro'.
+ 19 SBD Path Object
+ ==================
+ Description
+   `SBD Path' is a path-object that allows the user to draw and edit a
+   poly-line with the normal Vectorworks methods. The plug-in object
+   just takes care of the beginning and end markers and stylizing the
+   corners based on the `Corner Style' parameter.
+
+   `SBD Path' largely exists for situations where a `SBD Line' object is
+   insufficient for a task, and more complicated geometry or control is
+   needed.
+   					 <./img-style/SBD-Path.png>
+   					<./img-style/SBD-PathOIP.png>
+ User Editable Attributes
+ Pen
+   Sets all relevant pen attributes of the drawn line except for
+   beginning & end markers.
+ Parameters
+ Corner Style
+   *Note:* all styles adjust their sizing to fit in the geometry of
+    their path.
+ * Square:
+   Right-angle square curves
+ * Rounded:
+   Rounded curves
+ Initial Rounded Radius
+ Beginning Marker
+   Sets the style of the Beginning Marker.
+
+   Choices: `None', `Dot', `Arrow', `Box'
+ Ending Marker
+   Sets the style of the Ending Marker.
+
+   Choices: `None', `Dot', `Arrow', `Box'
+ 20 Survey 3D Object
+ ===================
+ Description
+   `Survey 3D' is a point-object that allows the user to calculate one
+   or two points in 3D space based on measurements (likely taken with a
+   laser distance meter) in order to locate hanging positions or
+   architectural features in 3D space while only having access to a
+   limited amount of a stage deck.
+
+   - Measurement point placements can be set to negative values to flip
+     the side of the origin point on which they are placed.
+
+   - Make sure `Vectorworks Preferences>Display>Display 3D Loci' is set
+     correctly to allow the result points to display properly in 3D.
+
+   - Result points will not be drawn until all related measurements and
+     distances have non-zero values.
+
+   - It is not recommended to rotate the object. While the point may
+     still be drawn correctly in space, the measurements and coordinates
+     will not be accurate.
+
+     - `Measure 1' is set at the origin of the object.
+     - `Measure 2' is set on the Y-axis on the opposite side of `Measure
+       1' from the result points.
+     - `Measure 3' is set on the X-axis if `Measurement Style' is set to
+       `Off Axis'.
+
+   					 <./img-style/Survey3D1.png>
+   					 <./img-style/Survey3D2.png>
+   					<./img-style/Survey3DOIP.png>
+ User Editable Attributes
+ Fill/Pen/Color
+   Fill and Pen may be set on a per-object basis via the VW Attribute
+   Palette. Hatches, Gradients, etc. may be used, but can not have local
+   settings per object. 3D Guide Lines receive their color from the Fill
+   attribute, while 3D Loci receive color from the Pen attribute.
+ Text
+   Font options can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box. Alignment is set to
+   `Center' by the object.
+ Parameters
+ Label
+   This will be drawn over the result points to differentiate between
+   multiple `Survey 3D' objects.
+ Measurement Style
+ * On Axis
+
+   This style only uses `Measure 1' & `2' to locate result points that
+   are directly in-line and on-axis in the X/Y plane with those two
+   points.
+ * Off Axis
+
+   This style uses all three `Measure' points, and can locate result
+   points that are anywhere in 3D space with a Z-height greater than the
+   `Measure' points.
+ Number of Result Points
+   Choices: `1' or `2'. The `2' points can be useful when trying to
+   describe multiple points on an object without having to
+   re-measure. Examples would be the two ends of a hanging pipe or the
+   two extreme sightlines of a balcony seating area.
+ Draw 3D Guide Lines?
+ Draw Coordinates?
+ Dist Measure 1 to Point 1
+ Dist Measure 1 to Point 2
+ Measure 2 Y Dist
+   Placement of Measure 2 from Measure 1
+ Dist Measure 2 to Point 1
+ Dist Measure 2 to Point 2
+ Measure 3 X Dist
+   Placement of Measure 3 from Measure 1
+ Dist Measure 3 to Point 1
+ Dist Measure 3 to Point 2
+ Result Points 1 & 2
+   *Note: These values are set by the object.*
+
+   Displays the coordinates of the resulting points.
+   - If not all necessary fields have a non-zero value, this will
+     display `Incomplete Dimensions'.
+   - If distance measurements have incompatible values, this will
+     display `ERROR! Invalid Dimensions'.  The same message will be
+     placed on the drawing in red, and red spheres will be drawn in 3D
+     to indicate that new measurements need to be taken.
+ 21 Menu Commands
+ ================
+   These are included to help with workflow when using the Salutz Tools
+   Plug-in Objects and integrating with Worksheet reports.
+
+ Refresh Selected
+   Refreshes the selected objects on the active layer with the
+   `ResetObject' command. Particularly useful for getting out-of-date
+   plug-in objects to update.
+
+ Refresh Worksheets
+   Refreshes and recalculates the selected worksheets on the active
+   layer. While there is a right-click menu item for "Recalculate" and
+   menu items for "Recalculate Active" or "All Worksheets" in the
+   worksheet editor, this exists to quickly recalculate multiple
+   worksheets with a simple select and menu command from the main
+   drawing.
+   This also allows for custom keyboard shortcuts.
+
+ Refresh Section VP
+   Refreshes all Section and Elevation Viewports in the entire drawing.
+
+   *Use with caution* Depending on rendering options for the various
+    viewports, this process could take a very long time. Generally most
+    useful when dealing with a drawing with multiple Section/Elevation
+    Design Layer Viewports (particularly referencing other files), this
+    menu command can be a time-saver if run right after opening the
+    file.
+
+ UnFlip Selected
+   Checks selected text, symbol, and plug-in objects on the active layer
+   to see if their `Flip' state is true, and if so removes the
+   `Flip'. This is particularly useful if you have Mirrored a collection
+   of plug-in objects and want them to maintain their original
+   orientation.
+
+ Hydra
+   Initiates a hotkey process for switching/setting classes, layers and
+   saved views. Once placed in the workspace this command can have a
+   keyboard shortcut defined to make the process simpler.
+
+ Syntax / Tags
+   In order to be recalled by `Hydra', Layers and Classes must have a
+   Tag assigned to them with the syntax *"Hydra-"* followed by the
+   single keyboard key the user wishes to use to recall that Layer or
+   Class.
+
+   Saved Views must have *"Hydra-<key>"* somewhere in their name.
+
+   *NOTE:* Only one resource may be assigned to a particular key. Having
+    multiple resources tagged with the same key can lead to unexpected
+    results.
+
+ Step 1: Calling the `Hydra' Command
+   The `Hydra' command must be added to a menu in the workspace in order
+   to be used. It can also have a keyboard shortcut assigned. On a Mac
+   I've found that Command-semicolon is unused by Vectorworks and is
+   fairly ergonomic.
+
+   The *<Escape>* key may be pressed at any time to cancel the command.
+
+ Step 2: Select Command type
+   Type a single key to select the action to perform. This is
+   case-insensitive.
+
+ * L : Switch active layer to chosen layer
+
+ * C : Switch active class to chosen class
+
+ * S : Assign selected objects to chosen class
+
+ * V : Recalled Saved View
+
+ Step 3: Choose resource
+   Type a single key to select the resource (Layer, Class, Saved View)
+   assigned to that key. If no resource is assigned, `Hydra' will
+   deliver an error message.
