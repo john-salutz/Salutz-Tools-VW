@@ -39,6 +39,16 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
+PROCEDURE Scale_Fit_Width_Dim (toScale : HANDLE; fitToDim : REAL);
+VAR p1 : POINT;
+BEGIN
+	HCenter(toScale,p1.X,p1.Y);
+	HScale2D(
+	         toScale, p1.X, p1.Y, fitToDim/HWidth(toScale),
+	         fitToDim/HWidth(toScale), TRUE
+	         );
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -106,6 +116,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		CreateText(Num2StrF(y_coor));
 		SetParameterVisibility(h_Obj,'PLDist',FALSE);
 	END ELSE CreateText(Num2StrF(PPLDIST));
+	IF HWidth(LNewObj)>7.75in THEN Scale_Fit_Width_Dim(LNewObj,7.75in);
 	{Lineset Number}
 	TextSize(5*r_TextScaler);
 	Pen_WtoB(1);
@@ -129,10 +140,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF PWEIGHT>0 THEN BEGIN
 		TextFace([]);
 		Fill_WtoB(0);
-		TextOrigin(1in*i_Flip,0);
+		TextOrigin(3in*i_Flip,0);
 		CreateText(Concat(PWEIGHT,' ',PWEIGHTUNITS));
-		IF PDIRECTION = '>>' THEN SetTextJust(LNewObj,1)
-		ELSE SetTextJust(LNewObj,3);
+		h_Weight := LNewObj;
+		IF PDIRECTION = '>>' THEN SetTextJust(h_Weight,1)
+		ELSE SetTextJust(h_Weight,3);
 	END;
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
@@ -158,6 +170,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Draw Custom Load Depth //}
 	IF PLOADDEPTH <> 0 THEN BEGIN
+		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+		Pen_WtoB(1);
+		Fill_WtoB(0);
 		BeginPoly;
 		Add2DVertex(6in*i_Flip,-PLOADDEPTH/2,0,0);
 		Add2DVertex(2in*i_Flip,-PLOADDEPTH/2,0,0);
@@ -167,6 +182,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Add2DVertex(2in*i_Flip,PLOADDEPTH/2,0,0);
 		Add2DVertex(6in*i_Flip,PLOADDEPTH/2,0,0);
 		EndPoly;
+		HMoveForward(h_Weight,TRUE);
+		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
 
 	{// Hide/Show in 3D Views //}

@@ -21,8 +21,8 @@
 
 PROCEDURE Hydra;
 CONST
-	PREFIX		   = 'Hydra-';
-	ESCAPE		   = Chr(27);
+	PREFIX = 'Hydra-';
+	ESCAPE = Chr(27);
 VAR
 	c_Key1,c_Key2                                           : CHAR;
 	s_Search                                                : STRING;
@@ -143,12 +143,38 @@ END;
 {====================================}
 
 BEGIN
+	ProgressDlgOpen('Hydra (Salutz)',FALSE);
+	ProgressDlgSetTopMsg(Concat(
+	                     '  C for Activate Class',Chr(13),
+						 '  L for Activate Layer'));
+	ProgressDlgSetBotMsg(Concat(
+	                     '  S for Set Object Class',Chr(13),
+	                     '  V for Saved View'));
+	ProgressDlgSetMeter('Select type of action.');
+	ProgressDlgStart(0.0, 1);
+	ProgressDlgYield(1);
+	ProgressDlgEnd;
+
+	ProgressDlgStart(50.0, 1);
 	s_Search := '';
 	c_Key1 := Get_Key_Simple;
+
+	ProgressDlgSetTopMsg('Layers and classes tagged "Hydra-<key>"');
+	ProgressDlgSetBotMsg('Saved Views need "Hydra-<key>" in the View name');
+	ProgressDlgSetMeter('Select Hydra key of resource.');
+	ProgressDlgYield(1);
+	ProgressDlgEnd;
+
 	CASE c_Key1 OF
 	  'c','C' : Hydra_Name_Class;
 	  's','S' : Hydra_Set_Class;
 	  'l','L' : Hydra_Name_Layer;
 	  'v','V' : Hydra_Restore_SavedView;
 	END;
+
+	ProgressDlgStart(100.0, 1);
+	ProgressDlgYield(1);
+	ProgressDlgEnd;
+
+	ProgressDlgClose;
 END; Run(Hydra);

@@ -39,12 +39,12 @@ VAR
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
 
-FUNCTION Get_Zcoor(h : HANDLE) : REAL;
+FUNCTION Get_Zcoor(h : HANDLE) : STRING;
 VAR
 	x,y,z : REAL;
 BEGIN
 	GetSymLoc3D(h_Obj,x,y,z);
-	Get_Zcoor := z;
+	Get_Zcoor := Num2StrF(z);
 END;
 
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
@@ -98,6 +98,132 @@ BEGIN
 	        );
 END;
 
+PROCEDURE Draw_Poly_Small_Arrow;
+BEGIN
+	BeginPoly;
+	Add2DVertex(-3in*i_Flip,-5.196in,0,0);
+	Add2DVertex(-3in*i_Flip,-6in,0,0);
+	Add2DVertex(-9in*i_Flip,0,0,0);
+	Add2DVertex(-3in*i_Flip,6in,0,0);
+	Add2DVertex(-3in*i_Flip,5.196in,0,0);
+	Add2DVertex(6in*i_Flip,0,4,6in);
+	Add2DVertex(-3in*i_Flip,-5.196in,0,0);
+	EndPoly;
+END;
+
+PROCEDURE Draw_Poly_Micro_Arrow;
+BEGIN
+	BeginPoly;
+	Add2DVertex(0,-3.75in,0,0);
+	Add2DVertex(0,-5.5in,0,0);
+	Add2DVertex(-6in*i_Flip,0,0,0);
+	Add2DVertex(0,5.5in,0,0);
+	Add2DVertex(0,3.75in,0,0);
+	Add2DVertex(3.75in*i_Flip,0,4,3.75in);
+	Add2DVertex(0,-3.75in,0,0);
+	EndPoly;
+END;
+
+PROCEDURE Draw_Poly_Regular_Line;
+BEGIN
+	BeginPoly;
+	Add2DVertex(0,-4.5in,0,0);
+	Add2DVertex((HWidth(h_PosiName)+2in)/2,-4.5in,0,0);
+	Add2DVertex((HWidth(h_PosiName)+1in)/2,-5.25in,0,0);
+	Add2DVertex(0,-6in,0,0);
+	Add2DVertex((-HWidth(h_PosiName)-1in)/2,-5.25in,0,0);
+	Add2DVertex((-HWidth(h_PosiName)-2in)/2,-4.5in,0,0);
+	Add2DVertex(0,-4.5in,0,0);
+	EndPoly;
+END;
+
+PROCEDURE Draw_Poly_Regular_Arrow;
+BEGIN
+	BeginPoly;
+	Add2DVertex(0,-4.5in,0,0);
+	Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,-4.5in,0,0);
+	Add2DVertex((HWidth(h_PosiName)+1in)*i_Flip,-5.25in,0,0);
+	Add2DVertex(0,-5.25in,0,0);
+	Add2DVertex(0,-6in,0,0);
+	Add2DVertex(-6in*i_Flip,0,0,0);
+	Add2DVertex(0,6in,0,0);
+	Add2DVertex(0,4.5in,0,0);
+	Add2DVertex(-2.5in*i_Flip,0,4,5.3in);
+	Add2DVertex(0,-4.5in,0,0);
+	EndPoly;
+END;
+
+PROCEDURE Draw_Poly_RegularArrowBack;
+BEGIN
+	BeginPoly;
+	Add2DVertex(0,-4.5in,0,0);
+	Add2DVertex(-2.5in*i_Flip,0,4,5.3in);
+	Add2DVertex(0,4.5in,0,0);
+	Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,4.5in,0,0);
+	Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,-4.5in,0,0);
+	Add2DVertex(0,-4.5in,0,0);
+	EndPoly;
+END;
+
+PROCEDURE Draw_Text_Regular_Notes (sNote : STRING);
+BEGIN
+	TextOrigin(p_OffsetLine1.X,p_OffsetLine1.Y);
+	CreateText(sNote);
+	Set_Tight_TextFill(LNewObj,TRUE);
+	IF (PWRAPTEXT) THEN BEGIN
+		SetTextWidth(LNewObj,PWRAPWIDTH/PSCALE);
+		SetTextLeading(LNewObj,GetTextSize(LNewObj,0)*0.9);
+	END;
+	p_OffsetLine1.Y := p_OffsetLine1.Y - HHeight(LNewObj);
+END;
+
+PROCEDURE Draw_Poly_Bubble;
+BEGIN
+	BeginPoly;
+	IF (PLABELDIRECTION = '<<') THEN BEGIN {Left Side Arrow}
+		Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
+		Add2DVertex(p_Tmp1.X,p_Tmp2.Y-2in, 0,0);
+		Add2DVertex(p_Tmp1.X-(r_TextHeight*0.75),
+		            (p_Tmp1.Y+p_Tmp2.Y)/2, 0,0);
+		Add2DVertex(p_Tmp1.X,p_Tmp1.Y+2in, 0,0);
+		Add2DVertex(p_Tmp1.X,p_Tmp1.Y+0.5in,0,0);
+	END ELSE BEGIN {Left Side Round}
+		Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-0.5in,0,0);
+		Add2DVertex(p_Tmp1.X-(r_TextHeight/2.5),
+		            (p_Tmp1.Y+p_Tmp2.Y)/2,4,r_TextHeight/2.5);
+		Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+0.5in,0,0);
+	END;
+	IF (PLABELDIRECTION = '>>') THEN BEGIN {Right Side Arrow}
+		Add2DVertex(p_Tmp2.X,p_Tmp1.Y+0.5in,0,0);
+		Add2DVertex(p_Tmp2.X,p_Tmp1.Y+2in,0,0);
+		Add2DVertex(p_Tmp2.X+(r_TextHeight*0.75),
+		            (p_Tmp1.Y+p_Tmp2.Y),0,0);
+		Add2DVertex(p_Tmp2.X,p_Tmp2.Y-2in,0,0);
+		Add2DVertex(p_Tmp2.X,p_Tmp2.Y-0.5in,0,0);
+	END ELSE BEGIN {Right Side Round}
+		Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+0.5in,0,0);
+		Add2DVertex(p_Tmp2.X+(r_TextHeight/2.5),
+		            (p_Tmp1.Y+p_Tmp2.Y),4,r_TextHeight/2.5);
+		Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-0.5in,0,0);
+	END;
+	EndPoly;
+END;
+
+PROCEDURE Draw_Poly_Bubble_Circle;
+BEGIN
+	BeginPoly;
+	Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
+	Add2DVertex(p_Tmp1.X-(r_TextHeight/2.5)-1in,
+	            (p_Tmp1.Y+p_Tmp2.Y)/2,4,r_TextHeight/2.5);
+	Add2DVertex(p_Tmp1.X,p_Tmp1.Y+0.5in,0,0);
+	Add2DVertex(p_Tmp2.X,p_Tmp1.Y+0.5in,0,0);
+	Add2DVertex(p_Tmp2.X+(r_TextHeight/2.5)+1in,
+	            (p_Tmp1.Y+p_Tmp2.Y),4,r_TextHeight/2.5);
+	Add2DVertex(p_Tmp2.X,p_Tmp2.Y-0.5in,0,0);
+	Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
+	EndPoly;
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -110,12 +236,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
 	SetParameterVisibility(h_Obj,'WrapWidth',PWRAPTEXT);
-	IF ((PLABELSTYLE='Bubble') OR (PSHOWINNERCIRCLE = FALSE))
-		THEN SetParameterVisibility(h_Obj,'NameColor',TRUE)
-	ELSE SetParameterVisibility(h_Obj,'NameColor',FALSE);
-	IF (PLABELSTYLE = 'Regular')
-		THEN SetParameterVisibility(h_Obj,'ShowInnerCircle',FALSE)
-	ELSE SetParameterVisibility(h_Obj,'ShowInnerCircle',TRUE);
+	IF (PLABELSTYLE = 'Regular') THEN BEGIN
+		SetParameterVisibility(h_Obj,'ShowInnerCircle',FALSE);
+		SetParameterVisibility(h_Obj,'NameColor',FALSE);
+	END ELSE BEGIN
+		SetParameterVisibility(h_Obj,'ShowInnerCircle',TRUE);
+		SetParameterVisibility(h_Obj,'NameColor',TRUE);
+	END;
 
 	{===== Parameter Limits =====}
 	IF (PSCALE<=0) THEN BEGIN
@@ -126,9 +253,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF (PLABELSTYLE='Billington') THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'LabelStyle','Bubble');
 		ResetObject(h_Obj);
+		ResetObject(h_Obj);
 	END;
 	IF PLABELSTYLE = 'Smaller' THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'LabelStyle','Micro');
+		ResetObject(h_Obj);
 		ResetObject(h_Obj);
 	END;
 
@@ -154,17 +283,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				ELSE i_Flip := -1;
 				p_LineOrig.X := -9in*i_Flip;
 				p_LineOrig.Y := 0;
-
-				{// Create Poly Shape Small //}
-				BeginPoly;
-				Add2DVertex(-3in*i_Flip,-5.196in,0,0);
-				Add2DVertex(-3in*i_Flip,-6in,0,0);
-				Add2DVertex(-9in*i_Flip,0,0,0);
-				Add2DVertex(-3in*i_Flip,6in,0,0);
-				Add2DVertex(-3in*i_Flip,5.196in,0,0);
-				Add2DVertex(6in*i_Flip,0,4,6in);
-				Add2DVertex(-3in*i_Flip,-5.196in,0,0);
-				EndPoly;
+				Draw_Poly_Small_Arrow; {// Create Poly Shape Small //}
 			END ELSE BEGIN {PLABELDIRECTION = '---'}
 				p_LineOrig.X := 0;
 				p_LineOrig.Y := 0;
@@ -187,17 +306,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				ELSE i_Flip := -1;
 				p_LineOrig.X := -6in*i_Flip;
 				p_LineOrig.Y := 0;
-
-				{// Create Poly Shape Micro //}
-				BeginPoly;
-				Add2DVertex(0,-3.75in,0,0);
-				Add2DVertex(0,-5.5in,0,0);
-				Add2DVertex(-6in*i_Flip,0,0,0);
-				Add2DVertex(0,5.5in,0,0);
-				Add2DVertex(0,3.75in,0,0);
-				Add2DVertex(3.75in*i_Flip,0,4,3.75in);
-				Add2DVertex(0,-3.75in,0,0);
-				EndPoly;
+				Draw_Poly_Micro_Arrow; {// Create Poly Shape Micro //}
 			END ELSE BEGIN {PLABELDIRECTION = '---'}
 				p_LineOrig.X := 0;
 				p_LineOrig.Y := 0;
@@ -216,8 +325,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 		{// Create Position Name Label Small/Micro //}
 		TextOrigin(0,0);
-		IF PSHOWINNERCIRCLE THEN Pen_WtoB(1)
-		ELSE IF (PNAMECOLOR = 'Black') THEN Pen_WtoB(1)
+		{ IF PSHOWINNERCIRCLE THEN Pen_WtoB(1) }
+		{ ELSE }
+		IF (PNAMECOLOR = 'Black') THEN Pen_WtoB(1)
 		ELSE IF (PNAMECOLOR = 'White') THEN Pen_WtoB(0);
 		FillPat(0);
 		TextFace([Bold]);
@@ -239,7 +349,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			IF (PLABELSTYLE = 'Small') THEN TextSize(5*r_TextScaler)
 			ELSE TextSize(4*r_TextScaler);
 			TextOrigin(0,p_Tmp2.Y);
-			CreateText(Concat('TRIM@ ',Num2StrF(Get_Zcoor(h_Obj))));
+			CreateText(Concat('TRIM@ ',Get_Zcoor(h_Obj)));
 			HMoveBackward(LNewObj,TRUE);
 		END;
 	END {"Small" & "Micro"} ELSE
@@ -285,50 +395,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			{// Create Poly Shape //}
 			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 			IF (PLABELSTYLE <>'Bubble') THEN BEGIN
-				BeginPoly;
-				Add2DVertex(0,-4.5in,0,0);
-				Add2DVertex((HWidth(h_PosiName)+2in)/2,-4.5in,0,0);
-				Add2DVertex((HWidth(h_PosiName)+1in)/2,-5.25in,0,0);
-				Add2DVertex(0,-6in,0,0);
-				Add2DVertex((-HWidth(h_PosiName)-1in)/2,-5.25in,0,0);
-				Add2DVertex((-HWidth(h_PosiName)-2in)/2,-4.5in,0,0);
-				Add2DVertex(0,-4.5in,0,0);
-				EndPoly;
+				Draw_Poly_Regular_Line;
 				h_Shape := LNewObj;
 			END ELSE BEGIN {// Bubble Style //}
 				GetBBox(h_PosiName,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 				p_LineOrig.Y := (p_Tmp1.Y+p_Tmp2.Y);
 				p_OffsetLine1.Y := (p_Tmp2.Y-1in);
 				r_TextHeight := HHeight(h_PosiName);
-
-				BeginPoly;
-				IF (PLABELDIRECTION = '<<') THEN BEGIN {Left Side}
-					Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
-					Add2DVertex(p_Tmp1.X,p_Tmp2.Y-2in, 0,0);
-					Add2DVertex(p_Tmp1.X-(r_TextHeight*0.75),
-					            (p_Tmp1.Y+p_Tmp2.Y)/2, 0,0);
-					Add2DVertex(p_Tmp1.X,p_Tmp1.Y+2in, 0,0);
-					Add2DVertex(p_Tmp1.X,p_Tmp1.Y+0.5in,0,0);
-				END ELSE BEGIN
-					Add2DVertex(p_Tmp1.X+1in,p_Tmp2.Y-0.5in,0,0);
-					Add2DVertex(p_Tmp1.X-(r_TextHeight/2.5),
-					            (p_Tmp1.Y+p_Tmp2.Y)/2,4,r_TextHeight/2.5);
-					Add2DVertex(p_Tmp1.X+1in,p_Tmp1.Y+0.5in,0,0);
-				END;
-				IF (PLABELDIRECTION = '>>') THEN BEGIN {Right Side}
-					Add2DVertex(p_Tmp2.X,p_Tmp1.Y+0.5in,0,0);
-					Add2DVertex(p_Tmp2.X,p_Tmp1.Y+2in,0,0);
-					Add2DVertex(p_Tmp2.X+(r_TextHeight*0.75),
-					            (p_Tmp1.Y+p_Tmp2.Y),0,0);
-					Add2DVertex(p_Tmp2.X,p_Tmp2.Y-2in,0,0);
-					Add2DVertex(p_Tmp2.X,p_Tmp2.Y-0.5in,0,0);
-				END ELSE BEGIN
-					Add2DVertex(p_Tmp2.X-1in,p_Tmp1.Y+0.5in,0,0);
-					Add2DVertex(p_Tmp2.X+(r_TextHeight/2.5),
-					            (p_Tmp1.Y+p_Tmp2.Y),4,r_TextHeight/2.5);
-					Add2DVertex(p_Tmp2.X-1in,p_Tmp2.Y-0.5in,0,0);
-				END;
-				EndPoly;
+				Draw_Poly_Bubble;
 				h_Shape := LNewObj;
 				SetPolyClosed(h_Shape,TRUE);
 
@@ -336,17 +410,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 					Fill_WtoB(0);
 					p_Tmp1.X := (p_Tmp1.X+1in);
 					p_Tmp2.X := (p_Tmp2.X-1in);
-					BeginPoly;
-					Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
-					Add2DVertex(p_Tmp1.X-(r_TextHeight/2.5)-1in,
-					            (p_Tmp1.Y+p_Tmp2.Y)/2,4,r_TextHeight/2.5);
-					Add2DVertex(p_Tmp1.X,p_Tmp1.Y+0.5in,0,0);
-					Add2DVertex(p_Tmp2.X,p_Tmp1.Y+0.5in,0,0);
-					Add2DVertex(p_Tmp2.X+(r_TextHeight/2.5)+1in,
-					            (p_Tmp1.Y+p_Tmp2.Y),4,r_TextHeight/2.5);
-					Add2DVertex(p_Tmp2.X,p_Tmp2.Y-0.5in,0,0);
-					Add2DVertex(p_Tmp1.X,p_Tmp2.Y-0.5in,0,0);
-					EndPoly;
+					Draw_Poly_Bubble_Circle;
 					h_Circle := LNewObj;
 				END;
 			END;
@@ -397,18 +461,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			END;
 
 			{// Create Poly Shape //}
-			BeginPoly;
-			Add2DVertex(0,-4.5in,0,0);
-			Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,-4.5in,0,0);
-			Add2DVertex((HWidth(h_PosiName)+1in)*i_Flip,-5.25in,0,0);
-			Add2DVertex(0,-5.25in,0,0);
-			Add2DVertex(0,-6in,0,0);
-			Add2DVertex(-6in*i_Flip,0,0,0);
-			Add2DVertex(0,6in,0,0);
-			Add2DVertex(0,4.5in,0,0);
-			Add2DVertex(-2.5in*i_Flip,0,4,5.3in);
-			Add2DVertex(0,-4.5in,0,0);
-			EndPoly;
+			Draw_Poly_Regular_Arrow;
 			h_Shape := LNewObj;
 
 			{// Create Background Poly Shape //}
@@ -416,14 +469,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Fill_WtoB(0);
 			PenSize(0);
 			PenPatN(0);
-			BeginPoly;
-			Add2DVertex(0,-4.5in,0,0);
-			Add2DVertex(-2.5in*i_Flip,0,4,5.3in);
-			Add2DVertex(0,4.5in,0,0);
-			Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,4.5in,0,0);
-			Add2DVertex((HWidth(h_PosiName)+2in)*i_Flip,-4.5in,0,0);
-			Add2DVertex(0,-4.5in,0,0);
-			EndPoly;
+			Draw_Poly_RegularArrowBack;
 			HMoveBackward(LNewObj,TRUE);
 			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
@@ -442,39 +488,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Fill_WtoB(0);
 
 		{// Create Trim Text //}
-		IF PSHOWTRIM THEN BEGIN
-			TextOrigin(p_OffsetLine1.X,p_OffsetLine1.Y);
-			CreateText(Concat('TRIM@ ',Num2StrF(Get_Zcoor(h_Obj))));
-			Set_Tight_TextFill(LNewObj,TRUE);
-			IF (PWRAPTEXT) THEN BEGIN
-				SetTextWidth(LNewObj,PWRAPWIDTH/PSCALE);
-				SetTextLeading(LNewObj,GetTextSize(LNewObj,0)*0.9);
-			END;
-			p_OffsetLine1.Y := p_OffsetLine1.Y - HHeight(LNewObj);
-		END;
-
+		IF PSHOWTRIM
+			THEN Draw_Text_Regular_Notes(Concat('TRIM@ ',Get_Zcoor(h_Obj)));
 		{// Create Line 1 Text //}
-		IF PLINE1<>'' THEN BEGIN
-			TextOrigin(p_OffsetLine1.X,p_OffsetLine1.Y);
-			CreateText(PLINE1);
-			Set_Tight_TextFill(LNewObj,TRUE);
-			IF (PWRAPTEXT) THEN BEGIN
-				SetTextWidth(LNewObj,PWRAPWIDTH/PSCALE);
-				SetTextLeading(LNewObj,GetTextSize(LNewObj,0)*0.9);
-			END;
-			p_OffsetLine1.Y := p_OffsetLine1.Y - HHeight(LNewObj);
-		END;
-
+		IF PLINE1<>'' THEN Draw_Text_Regular_Notes(PLINE1);
 		{// Create Line 2 Text //}
-		IF PLINE2<>'' THEN BEGIN
-			TextOrigin(p_OffsetLine1.X,p_OffsetLine1.Y);
-			CreateText(PLINE2);
-			Set_Tight_TextFill(LNewObj,TRUE);
-			IF (PWRAPTEXT) THEN BEGIN
-				SetTextWidth(LNewObj,PWRAPWIDTH/PSCALE);
-				SetTextLeading(LNewObj,GetTextSize(LNewObj,0)*0.9);
-			END;
-		END;
+		IF PLINE2<>'' THEN Draw_Text_Regular_Notes(PLINE2);
+
 		IF (PLABELSTYLE = 'Bubble') THEN BEGIN
 			HMoveBackward(h_Circle,TRUE);
 			HMoveBackward(h_Shape,TRUE)

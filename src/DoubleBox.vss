@@ -50,7 +50,7 @@ FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
 VAR r_RRectDiam : REAL;
 BEGIN
 	IF roundTrue THEN BEGIN
-		r_RRectDiam := POFFSET_EDGE*2;
+		r_RRectDiam := POFFSET_EDGE*2.25;
 		RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
 	END {IF roundTrue} ELSE BEGIN
 		r_RRectDiam := 0;
@@ -72,6 +72,7 @@ BEGIN
 	                              Pt2.X+offset, Pt2.Y-offset, roundTrue
 	                              );
 END;
+
 
 PROCEDURE Set_DashStyle_Cust(h : HANDLE; style : STRING);
 VAR li_Dash : LONGINT;
@@ -98,13 +99,63 @@ BEGIN
 	SetLSN(h,li_Dash);
 END;
 
+
+PROCEDURE DrawDuplicateOffset(h : HANDLE; limit : REAL);
+VAR
+	i     : INTEGER;
+	hCopy : HANDLE;
+BEGIN
+	hCopy := h;
+	FOR i:=1 TO Round(limit) DO BEGIN
+		hCopy := DrawOffsetRect(hCopy,POFFSET_EDGE/(limit+1),PISROUNDED);
+		IF (PDASH<>'Cut-Out') THEN Set_DashStyle_Cust(hCopy,PDASH);
+	END;
+END;
+
+PROCEDURE Note_Resize;
+VAR
+	p1,p2,p3,p4 : POINT;
+BEGIN
+	GetBBox(h_PadRect,p1.X,p1.Y,p2.X,p2.Y);
+	GetBBox(h_Note,p3.X,p3.Y,p4.X,p4.Y);
+	r_HeightDiff := p2.X - p4.X;
+	IF ((PNOTERESIZE = 'Box Expands to Note Height') AND
+		(r_HeightDiff < 0)) OR
+		(PNOTERESIZE = 'Box Follows Note Height') THEN BEGIN
+			SetRField(h_Obj,s_ObjName,'LineLength',
+			          Num2StrF(PLINELENGTH-r_HeightDiff));
+			ResetObject(h_Obj);
+		END;
+END;
+
+PROCEDURE Set_Note_Text_Origin;
+VAR
+	p1,p2,p3,p4,pResult : POINT;
+BEGIN
+	pResult.X := 0;
+	pResult.Y := 0;
+	IF (PLABEL_POSITION='Inside')
+		OR (PLABEL_POSITION='Pad')
+		OR (PLABEL_POSITION='Offset') THEN BEGIN
+			GetBBox(h_Text,p1.X,p1.Y,p2.X,p2.Y);
+			GetBBox(h_PadRect,p3.X,p3.Y,p4.X,p4.Y);
+			pResult.X := Max(p2.X,p3.X)+(HWidth(h_Text)*0.1);
+	END ELSE IF (PLABEL_POSITION='Outside')
+		OR (NOT PSHOWLABEL)
+		OR (GetTextLength(h_Text)=0)THEN BEGIN
+			GetBBox(h_PadRect,p1.X,p1.Y,p2.X,p2.Y);
+			pResult.X := p1.X;
+	END;
+	TextOrigin(pResult.X,pResult.Y);
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 5');
+	Set_Version_Info('0 . 6 . 7');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -122,6 +173,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		AlrtDialog('Pad Out of Bounds, Pad may not be less than 0 (zero).');
 		ResetObject(h_Obj);
 	END;
+
+	IF (PTEXTCOLOR='Keep Text Black') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'TextColor', 'Black');
+		ResetObject(h_Obj);
+		ResetObject(h_Obj);
+	END;
+
 	IF (PSHOWLABEL) THEN BEGIN
 		SetParameterVisibility(h_Obj,'Label',TRUE);
 		SetParameterVisibility(h_Obj,'Label Position',TRUE);
@@ -155,8 +213,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Create foreground rectangle //}
 	Fill_WtoB(0);
-	PenSize(7);
+	PenSize(Round(GetLW(h_Obj)*0.5));
 	h_FrontRect := DrawOffsetRect(h_BackRect,-POFFSET_EDGE,PISROUNDED);
+
+	{// Create foreground rectangle duplicates //}
+	PenSize(Round(GetLW(h_Obj)*0.25));
+	FillPat(0);
+	IF (PINNERDUP<>'0')
+		THEN DrawDuplicateOffset(h_FrontRect,Str2Num(PINNERDUP));
 
 	{// Create pad rectangle //}
 	FillPat(0);
@@ -165,10 +229,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	h_PadRect := DrawOffsetRect(h_FrontRect,-PPAD,PISROUNDED);
 
 	{// foreground rectangle style //}
+		{ Keep this here. Needs to be called after "Create pad rect" }
+		{ because it needs h_FrontRect to exist for reference }
 	IF PDASH = 'Cut-Out' THEN BEGIN
 		IF (POFFSET_EDGE > 0)
 			THEN h_BackRect := ClipSurfaceN(h_BackRect,h_FrontRect);
 		DelObject(h_FrontRect);
+		HMoveBackward(h_BackRect,TRUE);
 	END ELSE Set_DashStyle_Cust(h_FrontRect,PDASH);
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
@@ -178,18 +245,29 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		TextJust(2);
 		TextRotate(90);
-		IF (PTEXTCOLOR='Keep Text Black') THEN Pen_WtoB(1);
+		IF (PTEXTCOLOR='Black') THEN Pen_WtoB(1)
+		ELSE IF (PTEXTCOLOR='White') THEN Pen_WtoB(0);
 		PenPatN(2);
 		PenSize(7);
 		IF (PLABEL_POSITION='Inside') THEN BEGIN
 			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextOrigin(p_Tmp1.X,0);
 			TextVerticalAlign(1);
-			FillPat(0);
+			Fill_WtoB(0);
 		END ELSE IF (PLABEL_POSITION='Outside') THEN BEGIN
 			GetBBox(h_BackRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextOrigin(p_Tmp1.X+((-POFFSET_EDGE-PPAD)/4),0);
 			TextVerticalAlign(5);
+			Fill_WtoB(0);
+		END ELSE IF (PLABEL_POSITION='Pad') THEN BEGIN
+			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			TextOrigin(p_Tmp1.X-(PPAD/2),0);
+			TextVerticalAlign(3);
+			Fill_WtoB(0);
+		END ELSE IF (PLABEL_POSITION='Offset') THEN BEGIN
+			GetBBox(h_BackRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			TextOrigin(p_Tmp1.X+(POFFSET_EDGE/2),0);
+			TextVerticalAlign(3);
 			Fill_WtoB(0);
 		END;
 		CreateText(Concat(PLABEL,'  '));
@@ -223,16 +301,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'TabSize',TRUE);
 		SetTextVertAlignN(h_Text,1);
 		MoveTo(0,0);
-		IF (PLABEL_POSITION='Inside') THEN BEGIN
-			GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-			TextOrigin(p_Tmp2.X+(HWidth(h_Text)*0.1),0);
-		END;
-		IF (PLABEL_POSITION='Outside')
-			OR (NOT PSHOWLABEL)
-			OR (GetTextLength(h_Text)=0)THEN BEGIN
-				GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-				TextOrigin(p_Tmp1.X,0);
-			END;
+		Set_Note_Text_Origin;
+
 		s_NoteText := P__NOTESTRING; {get default or current value}
 
 		{=== Edit Notes Dialog ===}
@@ -250,15 +320,14 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-
-
 		TextRotate(90);
 		TextSize(PNOTESIZE);
 		TextFace([]);
 		TextVerticalAlign(1);
 		TextJust(2);
 		FillPat(0);
-		IF (PTEXTCOLOR='Keep Text Black') THEN Pen_WtoB(1);
+		IF (PTEXTCOLOR='Black') THEN Pen_WtoB(1)
+		ELSE IF (PTEXTCOLOR='White') THEN Pen_WtoB(0);
 		CreateText(s_NoteText);
 		IF s_NoteText <> '' THEN h_Note := LNewObj;
 		SetObjectVariableReal(
@@ -273,20 +342,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ELSE IF PNOTEHORIZ = 'Center' THEN SetTextJustN(h_Note,2)
 		ELSE IF PNOTEHORIZ = 'Right' THEN SetTextJustN(h_Note,3)
 		ELSE IF PNOTEHORIZ = 'Justify' THEN SetTextJustN(h_Note,4);
-
-		IF PNOTERESIZE <> 'None' THEN BEGIN
-			IF ((PLABEL_POSITION = 'Inside') AND PSHOWLABEL) THEN
-				r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note)-(HWidth(h_Text)*1.1)
-			ELSE r_HeightDiff := HWidth(h_PadRect)-HWidth(h_Note);
-			IF ((PNOTERESIZE = 'Box Expands to Note Height') AND
-				(r_HeightDiff < 0)) OR
-				(PNOTERESIZE = 'Box Follows Note Height') THEN BEGIN
-					SetRField(h_Obj,s_ObjName,'LineLength',
-					          Num2StrF(PLINELENGTH-r_HeightDiff));
-					ResetObject(h_Obj);
-				END;
-
-		END;
+		IF (PNOTERESIZE <> 'None') AND (s_NoteText<>'')
+			THEN Note_Resize;
 
 	END ELSE BEGIN
 		SetParameterVisibility(h_Obj,'EditNotes',FALSE);

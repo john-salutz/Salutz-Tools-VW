@@ -183,6 +183,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			PenFore(RGBmax,0,0);
 			Fill_WtoB(1);
 			TextFace([Bold]);
+			TextJust(2);
+			TextVerticalAlign(1);
 			CreateText('ERROR! Invalid Dimensions');
 			FillPat(1);
 			FillBack(RGBmax,0,0);
@@ -216,6 +218,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			PenFore(RGBmax,0,0);
 			Fill_WtoB(1);
 			TextFace([Bold]);
+			TextJust(2);
+			TextVerticalAlign(1);
 			CreateText('ERROR! Invalid Dimensions');
 			FillPat(1);
 			FillBack(RGBmax,0,0);

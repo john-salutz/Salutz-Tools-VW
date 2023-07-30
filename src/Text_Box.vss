@@ -87,13 +87,24 @@ BEGIN
 	DashStyle_Cust := li_Dash;
 END;
 
+PROCEDURE DrawDuplicateOffset(h : HANDLE; limit : REAL);
+VAR
+	i     : INTEGER;
+	hCopy : HANDLE;
+BEGIN
+	hCopy := h;
+	FOR i:=1 TO Round(limit) DO BEGIN
+		hCopy := DrawOffsetRect(hCopy,POFFSET_EDGE/(limit+1),PISROUNDED);
+	END;
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 5');
+	Set_Version_Info('0 . 6 . 7');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -120,6 +131,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		            );
 		ResetObject(h_Obj);
 	END;
+	IF (PTEXTCOLOR='Keep Text Black') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'TextColor', 'Black');
+		ResetObject(h_Obj);
+		ResetObject(h_Obj);
+	END;
+
 
 	{===== Hide Additional Arrow Settings =====}
 	IF PARROWPLACE='No Arrow' THEN BEGIN
@@ -143,7 +160,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Text creation and background =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	FillPat(0);
-	IF (PTEXTCOLOR='Keep Text Black') THEN Pen_WtoB(1);
+	IF (PTEXTCOLOR='Black') THEN Pen_WtoB(1)
+	ELSE IF (PTEXTCOLOR='White') THEN Pen_WtoB(0);
 	CreateText(PLABEL);
 	h_Text := LNewObj;
 	{// Underline //}
@@ -161,17 +179,28 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{// Set front rectangle fill & pen to none based on PINRECOP parameter //}
 	IF (PINRECOP=TRUE) THEN BEGIN
 		Fill_WtoB(0);
-		PenSize(7);
+		PenSize(Round(GetLW(h_Obj)*0.5));
 		SetParameterVisibility(h_Obj,'Dash',TRUE);
+		SetParameterVisibility(h_Obj,'InnerDup',TRUE);
 		PenPatN(DashStyle_Cust(PDASH));
 	END ELSE BEGIN
 		SetParameterVisibility(h_Obj,'Dash',FALSE);
+		SetParameterVisibility(h_Obj,'InnerDup',FALSE);
 		FillPat(0);
 		PenSize(0);
 		PenPatN(0);
 	END;
 	h_FrontRect := DrawOffsetRect(h_Text,PPAD,PISROUNDED);
 	HMoveBackward(h_FrontRect,TRUE);
+
+	IF (PINRECOP=TRUE) THEN BEGIN
+		PenSize(Round(GetLW(h_Obj)*0.25));
+		PenPatN(DashStyle_Cust(PDASH));
+		FillPat(0);
+		IF (PINNERDUP<>'0')
+			THEN DrawDuplicateOffset(h_FrontRect,Str2Num(PINNERDUP));
+	END;
+
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 	{===== Create background rectangle =====}
