@@ -228,7 +228,7 @@ END;
 {------------- < MAIN > -------------}
 {====================================}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 8');
+	Set_Version_Info('0 . 6 . 7');
 	Use_PIO_Text_Attributes(h_Obj);
 
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
@@ -236,12 +236,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
 	SetParameterVisibility(h_Obj,'WrapWidth',PWRAPTEXT);
-	IF ((PLABELSTYLE='Bubble') OR (PSHOWINNERCIRCLE = FALSE))
-		THEN SetParameterVisibility(h_Obj,'NameColor',TRUE)
-	ELSE SetParameterVisibility(h_Obj,'NameColor',FALSE);
-	IF (PLABELSTYLE = 'Regular')
-		THEN SetParameterVisibility(h_Obj,'ShowInnerCircle',FALSE)
-	ELSE SetParameterVisibility(h_Obj,'ShowInnerCircle',TRUE);
+	IF (PLABELSTYLE = 'Regular') THEN BEGIN
+		SetParameterVisibility(h_Obj,'ShowInnerCircle',FALSE);
+		SetParameterVisibility(h_Obj,'NameColor',FALSE);
+	END ELSE BEGIN
+		SetParameterVisibility(h_Obj,'ShowInnerCircle',TRUE);
+		SetParameterVisibility(h_Obj,'NameColor',TRUE);
+	END;
 
 	{===== Parameter Limits =====}
 	IF (PSCALE<=0) THEN BEGIN
@@ -324,8 +325,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 		{// Create Position Name Label Small/Micro //}
 		TextOrigin(0,0);
-		IF PSHOWINNERCIRCLE THEN Pen_WtoB(1)
-		ELSE IF (PNAMECOLOR = 'Black') THEN Pen_WtoB(1)
+		{ IF PSHOWINNERCIRCLE THEN Pen_WtoB(1) }
+		{ ELSE }
+		IF (PNAMECOLOR = 'Black') THEN Pen_WtoB(1)
 		ELSE IF (PNAMECOLOR = 'White') THEN Pen_WtoB(0);
 		FillPat(0);
 		TextFace([Bold]);

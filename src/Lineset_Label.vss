@@ -170,6 +170,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Draw Custom Load Depth //}
 	IF PLOADDEPTH <> 0 THEN BEGIN
+		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+		Pen_WtoB(1);
+		Fill_WtoB(0);
 		BeginPoly;
 		Add2DVertex(6in*i_Flip,-PLOADDEPTH/2,0,0);
 		Add2DVertex(2in*i_Flip,-PLOADDEPTH/2,0,0);
@@ -180,6 +183,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Add2DVertex(6in*i_Flip,PLOADDEPTH/2,0,0);
 		EndPoly;
 		HMoveForward(h_Weight,TRUE);
+		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
 
 	{// Hide/Show in 3D Views //}

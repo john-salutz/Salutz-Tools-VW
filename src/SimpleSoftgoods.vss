@@ -79,7 +79,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	p_TopL.X := -PLENGTH/2;
 	p_TopL.Y := PDEPTH-(PDEPTH*PHANGPOINT);
 	p_BotR.X := PLENGTH/2;
-	p_BotR.Y := -PDEPTH+(PDEPTH*PHANGPOINT);
+	p_BotR.Y := -(PDEPTH*PHANGPOINT);
 
 	{===== Parameter Limits =====}
 	IF (PHANGPOINT<0) THEN BEGIN
