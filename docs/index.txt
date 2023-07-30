@@ -33,61 +33,65 @@
  .. Description
  .. User Editable Attributes
  .. Parameters
- 7. LED Tape Object
+ 7. Simple Softgoods Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 8. MagicSheet Header Object
+ 8. LED Tape Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 9. MagicSheet Number Object
+ 9. MagicSheet Header Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 10. RackObject Object
+ 10. MagicSheet Number Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 11. RackEquip Object
+ 11. RackObject Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 12. SBD Family
+ 12. RackEquip Object
+ .. Description
+ .. User Editable Attributes
+ .. Parameters
+ 13. SBD Family
  .. Size
- 13. SBD Device Object
+ 14. SBD Device Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 14. SBD In-Out Object
+ 15. SBD In-Out Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 15. SBD Amp Object
+ 16. SBD Amp Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 16. SBD Speaker-Mic Object
+ 17. SBD Speaker-Mic Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 17. SBD Flyoff
+ 18. SBD Flyoff
  .. Description
  .. User Editable Attributes
  .. Parameters
- 18. SBD Line Object
+ 19. SBD Line Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 19. SBD Path Object
+ 20. SBD Path Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 20. Survey 3D Object
+ 21. Survey 3D Object
  .. Description
  .. User Editable Attributes
  .. Parameters
- 21. Menu Commands
+ 22. Menu Commands
  .. Refresh Selected
  .. Refresh Worksheets
  .. Refresh Section VP
@@ -116,8 +120,8 @@
    and draws 1 or 2 rectangles around the text, automatically adjusting
    the rectangle size based on text size.
 
-   					  <./img-style/TextBox.png>
-   					<./img-style/TextBoxOIP.png>
+   <./img-style/TextBox.png>
+   <./img-style/TextBoxOIP.png>
 
  User Editable Attributes
  Fill/Pen/Color
@@ -143,8 +147,15 @@
    `Inner Rectangle Line Style' parameter.
  Inner Rectangle Line Style
    Choices: `Solid', `Dashed', `Dashed Spaced', `Dotted', `None'.
+ Inner Rectangle Duplicates
+   Draws between `1' and `4' duplicate rectangles within the gap between
+   `Inner' and `Offset' rectangles.
  Text Color
-   Choose whether to `Keep Text Black' or `Follow Object Pen Color'.
+   Choose whether text should be `Black', `White', or `Follow Object Pen
+   Color'.
+ Alignment
+   Choose whether the object's insertion point is at its `Center' or at
+   the tip of the `Arrow'.
  Arrow Placement
    Options: `No Arrow, Left, Right, Top, Bottom'
  Arrow Scale (Separate Length & Width)
@@ -158,8 +169,8 @@
    *Note:* Inner rectangle will always have a solid, white fill and a
     thin line with linetype set by the `Inner Rectangle Line Style'
     unless `Inner Rectangle Line Style' is set to `Cut-Out'.
-   					 <./img-style/DoubleBox.png>
-   				   <./img-style/DoubleBoxOIP.png>
+   <./img-style/DoubleBox.png>
+   <./img-style/DoubleBoxOIP.png>
  User Editable Attributes
  Fill/Pen/Color
    Fill and Pen may be set on a per-object basis via the VW Attribute
@@ -190,17 +201,27 @@
  Pad to Contents
    Gap from the contents to the inner rectangle.
  Text Color
-   Choose whether to `Keep Text Black' or `Follow Object Pen Color'.
+   Choose whether text should be `Black', `White', or `Follow Object Pen
+   Color'.
  Inner Rectangle Line Style
    Choices: `Solid', `Dashed', `Dashed Spaced', `Dotted', `None',
    `Cut-Out'.
+ Inner Rectangle Duplicates
+   Draws between `1' and `4' duplicate rectangles within the gap between
+   `Inner' and `Offset' rectangles.
  Show Label Text
  Label Text
  Label Container
    Choices: `None', `Underline', `Box'.
  Label Position
-   Places Label Text `Inside' or `Outside' the rectangles. Alignment is
-   set to centered.
+   Places `Label Text' at one of the following positions. Alignment is
+   always set to centered.
+   - `Inside'
+   - `Outside'
+   - `Pad': In the middle of the gap between `Inner' rectangle and
+     contents.
+   - `Offset': In the middle of the gap between `Offset' and `Inner'
+     rectangles.
  Show Notes Text
  Note Text Size
  Note Horiz. Align
@@ -232,14 +253,17 @@
  Description
    `Lineset Label' is a point-object that inserts a bi-directional label
    for creating lineset schedules on a drawing.
-   					  <./img-style/Lineset.png>
-   					<./img-style/LinesetOIP.png>
+   <./img-style/Lineset.png>
+   <./img-style/LinesetOIP.png>
  User Editable Attributes
  Fill
-   Sets the color of the `Type' flag.
- Pen
-   Sets the color of the `Purpose'. This is useful for using class
+   Sets the color of the `Type' flag. This can be useful for using class
    coloring for different types of positions/departments.
+ Pen
+   Sets the color of the `Purpose'. This can be useful for using class
+   coloring for different types of positions/departments.
+
+   Lineweight can be set by the user.
  Text
    Font typeface can be changed by altering the text attributes of the
    object via the Text menu or the Format Text box. All other font
@@ -260,10 +284,12 @@
    linesets. This information does not display on the drawing; it is
    mainly used for displaying in worksheet summaries.
 
-   If the field is set to anything other than `blank', a flag will be
-   drawn at the point of the label. This flag's color can be altered by
-   the `Fill' attribute. If the field is set to `LX', the `Purpose'
-   field will be bolded.
+   If the field is set to `LX', the `Purpose' field will be bolded.
+
+ Custom Load Depth
+   If this field in non-zero, it will draw a box extension past the
+   point of the label. This can serve as a visual guide if a particular
+   hanging piece would block nearby battens or cause interference.
  Use Object Y position for Plasterline Distance?
  Distance from PL
    This field is only used if `Use Object Y position for Plasterline
@@ -289,8 +315,8 @@
    `Position Label' is a point-object that inserts a multi-directional
    label for labeling hanging positions/truss/etc for lighting and audio
    applications.
-   				   <./img-style/PositionLabel.png>
-   				 <./img-style/PositionLabelOIP.png>
+   <./img-style/PositionLabel.png>
+   <./img-style/PositionLabelOIP.png>
  User Editable Attributes
  Fill/Pen
    Sets the color of the decorative arrow shape and the color/linetype
@@ -301,17 +327,30 @@
    attributes are dictated by the object.
  Parameters
  Label Style
-   Choices: `Regular', `Small', or `Micro'
+   Choices: `Regular', `Bubble', `Small', or `Micro'
 
    Sets the size and style of the label.
  Position Name
    *Note*: In `Small' and `Micro' styles, if `Position Name' is more
     than 2 characters it will overshoot the edges of the object,
     therefore the text will be scaled down to fit inside the circle. In
-    `Regular' style the shape is responsive to `Position Name' length.
+    `Regular' and `Bubble' styles the shape is responsive to `Position
+    Name' length.
+ Name Color
+   Choose whether text should be `Black', `White', or `Follow Object Pen
+   Color'. This will only be available as a choice when `Label Style' is
+   not `Regular'.
+
+   *NOTE:* This can cause text to render invisible eg. white text on a
+    white background.
+ Show Inner Bubble?
+   This will only be available as a choice when `Label Style' is not
+   `Regular'.
  Show z-Trim Height
    Draws an extra line of text with "TRIM@ " and the z-coordinate height
    of the object.
+
+ Show in 3D views?
  Text Line 1
    A line of text for user notes.
  Text Line 2
@@ -323,7 +362,7 @@
    the mouse. Potentially useful if the label has to be a fair distance
    from the hanging position.
  Scale
-   In addition to the 3 size/styles in `Label Style', the object can be
+   In addition to the size/styles in `Label Style', the object can be
    individually scaled to user preference.
  Drawing Usage
    Choices: `Plot', `Section', or `Other'. Used for worksheets or Custom
@@ -337,12 +376,13 @@
  Description
    `Boom Marker' is a point-object that inserts a compass style
    directional label for labeling vertical hanging positions.
-   					<./img-style/BoomMarker.png>
-   				   <./img-style/BoomMarkerOIP.png>
+   <./img-style/BoomMarker.png>
+   <./img-style/BoomMarkerOIP.png>
  User Editable Attributes
  Fill/Pen
-   Sets the Pen color of the `Label' text and the directional
-   arrows. All other Fill/Pen attributes are dictated by the object.
+   Sets the Pen color of the `Label' text, `Label Container', and the
+   directional arrows. Fill sets the fill of the `Label Container'. All
+   other Fill/Pen attributes are dictated by the object.
  Text
    Font typeface can be changed by altering the text attributes of the
    object via the Text menu or the Format Text box. The object's font
@@ -350,7 +390,14 @@
    are dictated by the object.
  Parameters
  Label
- Underline Label?
+ Label Container
+   Choices: `None', `Underline', `Rectangle', or `Bubble'.
+ Label Pen Color
+   Choose whether text should be `Black', `White', or `Follow Object Pen
+   Color'.
+
+   *NOTE:* This can cause text to render invisible eg. white text on a
+    white background.
  "West" Label
    The text on the "West"/Left side of the label compass.
  "East" Label
@@ -362,15 +409,67 @@
    If not blank, adds "DIMENSION FROM: <user text>" text under compass.
  Notes
    If not blank, adds "NOTE: <user text>" text under compass.
- 7 LED Tape Object
+ 7 Simple Softgoods Object
+ =========================
+ Description
+   `Simple Softgoods' is a point-object that inserts a simple 2D/3D
+   hanging softgood or scenic object, generally for placing on
+   battens. At the moment `Simple Softgoods' do not associate with
+   Vectorworks rigging objects.
+   <./img-style/SimpleSoftgoods.png>
+   <./img-style/SimpleSoftgoodsOIP.png>
+ User Editable Attributes
+ Fill/Pen
+   User Fill/Pen affects the object. `Label' and `Opening' properties
+   can be customized via `Opening/Portal Line Style', `Label Text
+   Color', and `Label Background Color' parameters.
+ Text
+   Font typeface, size, and style can be changed by altering the text
+   attributes of the object via the Text menu or the Format Text box.
+ Parameters
+ Label
+ Horizontal Length
+ Opening
+   Horizontal width of the opening.
+ Vertical Height
+   Overall height of the object.
+ Portal Header Height
+   This specifies the distance from the top of the object to the top of
+   the portal opening.
+ Opening/Portal Line Style
+   Choices: `Solid', `Dashed', `Dashed Spaced', `Dotted', `None'.
+ Depth
+   Drawn depth of the object. To draw a simple line, set this to `0"'.
+ Material Type
+   This makes no visual difference in 2D.
+   - Soft: Draws the 3D with a taper to the top (triangle in section).
+   - Hard: Draws the 3D with a square top (rectangle in section).
+ Hang Position in Depth
+   Allows positioning the object offset from the hanging position based
+   on a percentage of the object's depth. For example: a scenic piece
+   with a Depth of 2ft is hung from a batten, but 6inches are downstage
+   of the batten and 18inches are upstage of the batten. A value of
+   `0.25' would accomplish this while allowing the plug-in object to
+   maintain a Y position that matches the batten.
+
+   Must be a value between `0' and `1'. `0.5' sets the hang to the
+   center of the object.
+ Label Text Color
+   Choices: `Black' or `Follow Object Color'
+ Label Background Color
+   Choices: `White', `Follow Object Color', or `None' (ie. no fill).
+ Label Position
+   Choices: `Center', `Legs', or `Both'.
+ Notes
+ 8 LED Tape Object
  =================
  Description
    `LED Tape' is a path-object that allows the user to draw and edit a
    poly-line with the normal Vectorworks methods, calculates length and
    wattage, and places `Type/Channel/Address' labels along the length of
    the polyline.
-   					  <./img-style/LEDTape.png>
-   					<./img-style/LEDTapeOIP.png>
+   <./img-style/LEDTape.png>
+   <./img-style/LEDTapeOIP.png>
  User Editable Attributes
  Fill/Pen
    Fill/Pen attributes only affect the polyline drawing. All other
@@ -393,6 +492,11 @@
    will be excluded from the drawn label. Labels are placed at the
    midpoint between two polyline vertices. For curves, Cubic Spline or
    Radius (Point on Arc) are recommended.
+ Type of Tape (Long)
+   This parameter is an additional field for a more detailed description
+   of the type of tape. This information does not display on the
+   drawing; it is mainly used for displaying in worksheet summaries.
+
  Text Label Height
    Set text height as a dimension, eg. 2".
  Tape Width
@@ -404,29 +508,26 @@
     document units setting. Simply type `1.5in' or `12mm' into the
     field.
 
- Watts per `Length Unit'
+ Watts per *`Length Unit'*
 
  Length Unit
    *Note:* The `Length Unit' parameter is a dimension. This means that
-    you can enter a value of feet or meters, regardless of your document
-    units setting.
+    you can enter a value of feet (1') or meters (1m), regardless of
+    your document units setting.
 
  Total Tape Length
+   This is calculated by the object and can not be edited.
 
  Total Wattage
-
- Type of Tape (Long)
-   This parameter is an additional field for a more detailed description
-   of the type of tape. This information does not display on the
-   drawing; it is mainly used for displaying in worksheet summaries.
- 8 MagicSheet Header Object
+   This is calculated by the object and can not be edited.
+ 9 MagicSheet Header Object
  ==========================
  Description
    `MagicSheet Header' is a point-object for creating lighting magic
    sheets on a sheet layer or a 1:1 design layer. It is intended as a
    label for a system of channels on a magic sheet.
-   					<./img-style/MagicHeader.png>
-   				  <./img-style/MagicHeaderOIP.png>
+   <./img-style/MagicHeader.png>
+   <./img-style/MagicHeaderOIP.png>
  User Editable Attributes
  Fill/Pen
    Sets the color of the box around the text. Gradients and Tiles may be
@@ -446,19 +547,24 @@
    *Note:* this does not automatically change the color of the box
     around the text. That must be set by the `Fill' or `Pen Attribute'.
  Scale
-   *Note:* A value of 1 equals 100% scale.
- 9 MagicSheet Number Object
- ==========================
+   *Note:* A value of 1 equals 100% scale. By default the object is
+    drawn to be 2 inches wide.
+ 10 MagicSheet Number Object
+ ===========================
  Description
    `MagicSheet Number' is a point-object for creating lighting magic
    sheets on a sheet layer or a 1:1 design layer. It is intended as a
    label for channels or groups.
-   					<./img-style/MagicNumber.png>
-   				  <./img-style/MagicNumberOIP.png>
+   <./img-style/MagicNumber.png>
+   <./img-style/MagicNumberOIP.png>
  User Editable Attributes
  Fill/Pen
    Fill may be set on a per-object basis via the VW Attribute
-   Palette. All Pen attributes are set by the plug-in object.
+   Palette. Pen affects the text color. All other Pen attributes are set
+   by the plug-in object.
+
+   If `Style' is `Invert Bold', all colors will be set by the plug-in
+   object.
  Text
    Font typeface and size can be changed by altering the text attributes
    of the object via the Text menu or the Format Text box. All other
@@ -471,21 +577,43 @@
  Prefix
    A value before the channel number to allow labeling (eg. Groups)
    without interfering with automatic-numbering.
+
+ Suffix
+   A value after the channel number to allow labeling without
+   interfering with automatic-numbering.
  Style
    Choices: `Plain', `Bold', `Invert Bold'
  Container
    Draws a container around the number value. The container re-sizes as
    the value gets longer/shorter.  Choices: `None', `Rectangle',
-   `Circle', `Oval', `< <' (sidelight), `> >' (sidelight).
- 10 RackObject Object
+   `Circle', `Oval', `North', `South', `East', `West'.
+
+ Label
+   Places accompanying label text on the drawing for a list style magic
+   sheet.
+
+ Label Text Color
+   Choices: `Black' or `Follow Object Color'.
+ Label Fill Color
+   Choices: `White' or `Follow Object Color'.
+
+ Label Scale
+   Adjusts `Label' text as a percentage of the `Number' text size.
+
+ Label Position
+   Choices: `Right' or `Left'.
+
+ Distance to Label
+   Gap distance from `Number' to `Label'.
+ 11 RackObject Object
  ====================
  Description
    `RackObject' is a point-object for drawing 19" A/V racks for mounting
    gear. Built to interface with `RackEquip' plug-in
    objects. `RackObject' will re-draw/re-size based on the `Number of
    Rack Spaces' parameter.
-   					<./img-style/RackObject.png>
-   				   <./img-style/RackObjectOIP.png>
+   <./img-style/RackObject.png>
+   <./img-style/RackObjectOIP.png>
  User Editable Attributes
  Fill/Pen
    Sets the attributes of the frame around the Rack Object. `Pen' also
@@ -516,7 +644,7 @@
    not the overall width or height.
  Show Rack Space Numbers
    Choices: `None', `Left', `Right', `Both'
- 11 RackEquip Object
+ 12 RackEquip Object
  ===================
  Description
    `RackEquip' is a point-object for drawing rack-mounted gear. Built to
@@ -525,8 +653,8 @@
    it is placed over. However, it will not automatically move or rotate
    with its parent `RackObject', they must be selected and moved
    together.
-   					 <./img-style/RackEquip.png>
-   				   <./img-style/RackEquipOIP.png>
+   <./img-style/RackEquip.png>
+   <./img-style/RackEquipOIP.png>
  User Editable Attributes
  Fill
    Sets the fill of Rack Ears or whole unit based on `Object color
@@ -534,14 +662,12 @@
  Pen
    Sets the color of the text labels.
  Text
- * Font typeface
-   can be changed by altering the text attributes of the object via the
-   Text menu or the Format Text box.
- * Style changes (Bold, Italic, etc)
-   affect the `Manufacturer' & `Model' but not the `Purpose'.
- * Size
-   will attempt to follow the user text size settings, but the plug-in
-   will scale the text to fit inside the equipment.
+   - Font typeface can be changed by altering the text attributes of the
+     object via the Text menu or the Format Text box.
+   - Style changes (Bold, Italic, etc) affect the `Manufacturer' &
+     `Model' but not the `Purpose'.
+   - Size will attempt to follow the user text size settings, but the
+     plug-in will scale the text to fit inside the equipment.
  Parameters
  Purpose Label
  Manufacturer
@@ -574,7 +700,7 @@
    a Symbol.
 
    Can be useful for Custom Selection and Worksheet displays.
- 12 SBD Family
+ 13 SBD Family
  =============
    `SBD Objects' are for use in preparing a *System Block Diagram* for
    audio, video, or networking systems. They are intended for use in
@@ -582,24 +708,23 @@
    for printing/exporting.
    <file:img-style/SBD Group.png>
  Size
- Size in `SBD Objects' uses the following convention for `Size' fields:
- * Regular= 12 inches
- * Small= 9 inches
- * Micro= 6 inches (This also applies to `USITT' style objects)
- 13 SBD Device Object
+ Size in *`SBD Objects'* uses the following convention for *`Size'* fields:
+ * Regular = 12 inches
+ * Small = 9 inches
+ * Micro = 6 inches (This also applies to `USITT' style objects)
+ 14 SBD Device Object
  ====================
  Description
    `SBD Device' is a point-object for drawing a general piece of
    equipment in an SBD drawing.
-   					<./img-style/SBD-Device.png>
-   				   <./img-style/SBD-DeviceOIP.png>
+   <./img-style/SBD-Device.png>
+   <./img-style/SBD-DeviceOIP.png>
  User Editable Attributes
  Fill/Pen
    All attributes are set by the object.
  Text
- * Font typeface
-   can be changed by altering the text attributes of the object via the
-   Text menu or the Format Text box.
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box.
  Parameters
  Type
    Choices: `Console', `Rack', `Multi', `FX Process', `Mixer', `DAC',
@@ -630,20 +755,19 @@
  Number of Spaces
  Notes
  Show Notes on Drawing?
- 14 SBD In-Out Object
+ 15 SBD In-Out Object
  ====================
  Description
    `SBD In-Out' is a point-object for drawing the inputs or outputs of a
    piece of equipment in an SBD drawing.
-   					 <./img-style/SBD-InOut.png>
-   				   <./img-style/SBD-InOutOIP.png>
+   <./img-style/SBD-InOut.png>
+   <./img-style/SBD-InOutOIP.png>
  User Editable Attributes
  Fill/Pen
    All attributes are set by the object.
  Text
- * Font typeface
-   can be changed by altering the text attributes of the object via the
-   Text menu or the Format Text box.
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box.
  Parameters
  Type
    Choices: `Input', `Output', `Header', `Spacer', `Thru'
@@ -662,21 +786,20 @@
    *Note:* This field does not appear on the drawing. It is mainly used
     for worksheets or Custom Selection.
  Notes
- 15 SBD Amp Object
+ 16 SBD Amp Object
  =================
  Description
    `SBD Amp' is a point-object for drawing an amplifier in an SBD
    drawing.
-   					  <./img-style/SBD-Amp.png>
-   					<./img-style/SBD-AmpOIP.png>
+   <./img-style/SBD-Amp.png>
+   <./img-style/SBD-AmpOIP.png>
  User Editable Attributes
  Fill/Pen
    Fill/Pen affects the `Model' label text. All other attributes are set
    by the object.
  Text
- * Font typeface
-   can be changed by altering the text attributes of the object via the
-   Text menu or the Format Text box.
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box.
  Parameters
  Type
    Automatically set to 'Amp'.
@@ -693,20 +816,19 @@
  IP Address
  Notes
  Show Notes on Drawing?
- 16 SBD Speaker-Mic Object
+ 17 SBD Speaker-Mic Object
  =========================
  Description
    `SBD Speaker-Mic' is a point-object for drawing a speaker,
    microphone, or signal source in an SBD drawing.
-   				  <./img-style/SBD-SpeakerMic.png>
-   				 <./img-style/SBD-SpeakerMicOIP.png>
+   <./img-style/SBD-SpeakerMic.png>
+   <./img-style/SBD-SpeakerMicOIP.png>
  User Editable Attributes
  Fill/Pen
    All attributes are set by the object.
  Text
- * Font typeface
-   can be changed by altering the text attributes of the object via the
-   Text menu or the Format Text box.
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box.
  Parameters
  Type
    Choices: `Speaker', `Microphone', `Source'.
@@ -719,20 +841,20 @@
  Purpose
  Purpose Label Class
  Notes
- 17 SBD Flyoff
+   Not shown on drawing.
+ 18 SBD Flyoff
  =============
  Description
    `SBD Flyoff' is a point-object for drawing a flyoff indicator in an
    SBD drawing.
-   					<./img-style/SBD-Flyoff.png>
-   				   <./img-style/SBD-FlyoffOIP.png>
+   <./img-style/SBD-Flyoff.png>
+   <./img-style/SBD-FlyoffOIP.png>
  User Editable Attributes
  Fill/Pen
    All attributes are set by the object.
  Text
- * Font typeface
-   can be changed by altering the text attributes of the object via the
-   Text menu or the Format Text box.
+   Font typeface can be changed by altering the text attributes of the
+   object via the Text menu or the Format Text box.
  Parameters
  Type
    Currently `Flyoff' is the only choice. This is being held for
@@ -748,7 +870,7 @@
    Precedes the `ID#'.
  Purpose
  Notes
- 18 SBD Line Object
+ 19 SBD Line Object
  ==================
  Description
    `SBD Line' is a point-object which draws a multi-segment polyline
@@ -756,8 +878,8 @@
    begin-point, the end-point, and the position at which with line
    curves in the middle. The beginning point is also the origin point of
    the object.
-   					 <./img-style/SBD-Line.png>
-   					<./img-style/SBD-LineOIP.png>
+   <./img-style/SBD-Line.png>
+   <./img-style/SBD-LineOIP.png>
  User Editable Attributes
  Pen
    Sets all relevant pen attributes of the drawn line except for
@@ -801,7 +923,7 @@
    duplicates under.
  End Duplicates Size
    Choices: `Regular', `Small', `Micro'.
- 19 SBD Path Object
+ 20 SBD Path Object
  ==================
  Description
    `SBD Path' is a path-object that allows the user to draw and edit a
@@ -812,8 +934,8 @@
    `SBD Path' largely exists for situations where a `SBD Line' object is
    insufficient for a task, and more complicated geometry or control is
    needed.
-   					 <./img-style/SBD-Path.png>
-   					<./img-style/SBD-PathOIP.png>
+   <./img-style/SBD-Path.png>
+   <./img-style/SBD-PathOIP.png>
  User Editable Attributes
  Pen
    Sets all relevant pen attributes of the drawn line except for
@@ -835,7 +957,7 @@
    Sets the style of the Ending Marker.
 
    Choices: `None', `Dot', `Arrow', `Box'
- 20 Survey 3D Object
+ 21 Survey 3D Object
  ===================
  Description
    `Survey 3D' is a point-object that allows the user to calculate one
@@ -864,8 +986,6 @@
        `Off Axis'.
 
    					 <./img-style/Survey3D1.png>
-   					 <./img-style/Survey3D2.png>
-   					<./img-style/Survey3DOIP.png>
  User Editable Attributes
  Fill/Pen/Color
    Fill and Pen may be set on a per-object basis via the VW Attribute
@@ -876,18 +996,18 @@
    Font options can be changed by altering the text attributes of the
    object via the Text menu or the Format Text box. Alignment is set to
    `Center' by the object.
+   <./img-style/Survey3D2.png>
  Parameters
+   <./img-style/Survey3DOIP.png>
  Label
    This will be drawn over the result points to differentiate between
    multiple `Survey 3D' objects.
  Measurement Style
  * On Axis
-
    This style only uses `Measure 1' & `2' to locate result points that
-   are directly in-line and on-axis in the X/Y plane with those two
+   are directly in-line and on-axis in the Y plane with those two
    points.
  * Off Axis
-
    This style uses all three `Measure' points, and can locate result
    points that are anywhere in 3D space with a Z-height greater than the
    `Measure' points.
@@ -918,7 +1038,7 @@
      display `ERROR! Invalid Dimensions'.  The same message will be
      placed on the drawing in red, and red spheres will be drawn in 3D
      to indicate that new measurements need to be taken.
- 21 Menu Commands
+ 22 Menu Commands
  ================
    These are included to help with workflow when using the Salutz Tools
    Plug-in Objects and integrating with Worksheet reports.
