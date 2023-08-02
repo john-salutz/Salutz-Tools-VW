@@ -925,7 +925,7 @@
 	#+LATEX: \hfill
 ** Parameters
    # #+ATTR_LATEX: :height 3.5in :center
-   #+ATTR_HTML: :style float: right
+   #+ATTR_HTML: :style float: right; max-height: 600px;
    [[./img-style/Survey3DOIP.png]] 
 *** ///// Start Multicols 2 /////                                    :ignore:
 	#+LATEX: \begin{multicols}{2}
