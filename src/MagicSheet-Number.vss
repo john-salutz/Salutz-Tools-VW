@@ -170,6 +170,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF PLABELPEN = 'Black' THEN Pen_WtoB(1);
 		IF PLABELFILL = 'White' THEN Fill_WtoB(0);
 		CreateText(PLABEL);
+		HMoveBackward(LNewObj,TRUE);
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
 
