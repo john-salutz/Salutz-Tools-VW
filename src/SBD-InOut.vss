@@ -73,7 +73,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Parameter Limits =====}
 	{===== Variable Setup =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-	Fill_WtoB(0);
+	{ Fill_WtoB(0); }
 	Pen_WtoB(1);
 	TextVerticalAlign(1);
 	TextFace([]);
@@ -192,7 +192,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		{===== Draw Text =====}
 		{// Draw ID/Number Text //}
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-		
 		TextSize(r_TextLarge);
 		FillPat(0);
 		IF (PPREFIX <> '') AND (PSIZE <> 'USITT') THEN BEGIN
@@ -202,6 +201,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 		{===== Draw Poly =====}
+		{// Draw Poly Outline //}
+		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+		FillPat(0);
 		BeginPoly;
 		Add2DVertex(p_Leader.X,p_Leader.Y,0,0);
 		Add2DVertex(p_Origin.X,0,0,0);
@@ -216,6 +218,19 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Add2DVertex(p_Origin.X,p_End.Y,0,0);
 		Add2DVertex(p_Origin.X,0,0,0);
 		EndPoly;
+		HMoveBackward(LNewObj,TRUE);
+		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+
+		{// Draw Poly Color Flag //}
+		PenPatN(0);
+		IF PTYPE = 'Output'
+			THEN Rect(p_Origin.X,p_Origin.Y,p_Origin.X-1in,p_End.Y)
+		ELSE Rect(p_Origin.X,p_Origin.Y,p_Origin.X+1in,p_End.Y);
+		HMoveBackward(LNewObj,TRUE);
+
+		{// Draw Poly Background //}
+		Fill_WtoB(0);
+		Rect(p_Origin.X,p_Origin.Y,p_End.X,p_End.Y);
 		HMoveBackward(LNewObj,TRUE);
 
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
