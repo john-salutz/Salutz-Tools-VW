@@ -32,6 +32,7 @@ VAR
 	r_DrawLength                                            : REAL;
 	h_Softgood,h_Softgood2,h_Label,h_Label2,h_Rect1,h_Rect2 : HANDLE;
 	p_TopL,p_BotR                                           : POINT;
+	b_Curves                                                : BOOLEAN;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -63,6 +64,29 @@ BEGIN
 	SetLSN(h,li_Dash);
 END;
 
+PROCEDURE Draw_Fullness_Line(p1X,p1Y,p2X,p2Y : REAL);
+VAR
+	iFlip : INTEGER;
+	pHalfDepth,pTopDepth,pBotDepth,pMid,pEnd  : REAL;
+BEGIN
+	iFlip := 1;
+	pEnd := p1X;
+	pMid := (p1Y+p2Y)/2;
+	pHalfDepth := PDEPTH/2;
+	pTopDepth := PDEPTH-(PDEPTH*PHANGPOINT);
+	pBotDepth := -PDEPTH*PHANGPOINT;
+	BeginPoly;
+	Add2DVertex(p1X,pMid,0,0);
+	WHILE (pEnd < p2X) DO BEGIN
+		IF iFlip > 0 THEN CurveThrough(pEnd+pHalfDepth,pTopDepth)
+		ELSE CurveThrough(pEnd+pHalfDepth,pBotDepth);
+		iFlip := -iFlip;
+		pEnd := pEnd + PDEPTH;
+	END;
+	Add2DVertex(p2X,pMid,0,0);
+	EndPoly;
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -80,6 +104,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	p_TopL.Y := PDEPTH-(PDEPTH*PHANGPOINT);
 	p_BotR.X := PLENGTH/2;
 	p_BotR.Y := -(PDEPTH*PHANGPOINT);
+
+	IF ((PSOFTORHARD = 'Soft Curves Only') OR (PSOFTORHARD = 'Soft w/Curves'))
+		THEN b_Curves := TRUE
+	ELSE b_Curves := FALSE;
 
 	{===== Parameter Limits =====}
 	IF (PHANGPOINT<0) THEN BEGIN
@@ -99,7 +127,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	BeginXtrd(0,PLENGTH);
 	BeginPoly;
 	Add2DVertex(0,p_BotR.Y,0,0);
-	IF PSOFTORHARD = 'Soft' THEN Add2DVertex(-PHEIGHT,0,0,0)
+	IF ((PSOFTORHARD = 'Soft') OR (b_Curves)) THEN Add2DVertex(-PHEIGHT,0,0,0)
 	ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
 		Add2DVertex(-PHEIGHT,p_BotR.Y,0,0);
 		Add2DVertex(-PHEIGHT,p_TopL.Y,0,0);
@@ -129,12 +157,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		LineTo(PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT));
 	END;
 	h_Rect1 := LNewObj;
+	IF (PSOFTORHARD = 'Soft Curves Only') THEN SetLW(h_Rect1,0);
 
 	IF (POPENING > 0) THEN BEGIN
 		IF (PDEPTH > 0) THEN BEGIN
 			Rect(-POPENING/2,p_TopL.Y,POPENING/2,p_BotR.Y);
 			h_Rect2 := LNewObj;
 			ClipSurface(h_Rect1,h_Rect2);
+			IF b_Curves THEN BEGIN
+				Draw_Fullness_Line(-PLENGTH/2,p_TopL.Y,-POPENING/2,p_BotR.Y);
+				Draw_Fullness_Line(POPENING/2,p_TopL.Y,PLENGTH/2,p_BotR.Y);
+			END;
 		END ELSE BEGIN
 			{// Draw Lines for Legs //}
 			DelObject(h_Rect1);
@@ -149,7 +182,15 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 		Set_DashStyle_Cust(h_Rect2,POPENPORTALPEN);
 		SetFPat(h_Rect2,0);
-	END;
+	END ELSE
+	{ BEGIN }
+		IF b_Curves
+			THEN Draw_Fullness_Line(-PLENGTH/2,p_TopL.Y,PLENGTH/2,p_BotR.Y);
+			{ THEN Draw_Fullness_Line( }
+			{ 						-PLENGTH/2,PDEPTH*PHANGPOINT, }
+			{ 						PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT)); }
+	{ END; }
+	{ Draw_Fullness_Line(p_TopL.X,p_TopL.Y,p_BotR.X,p_BotR.Y); }
 
 	{// Draw Text //}
 	IF PLABEL <> '' THEN BEGIN
