@@ -31,13 +31,24 @@ VAR
 	{Script specific variables}
 	r_DrawLength                                            : REAL;
 	h_Softgood,h_Softgood2,h_Label,h_Label2,h_Rect1,h_Rect2 : HANDLE;
+	h_Section                                               : HANDLE;
+	h_temp01,h_temp02                                       : HANDLE;
 	p_TopL,p_BotR                                           : POINT;
 	b_Curves                                                : BOOLEAN;
+	s_LabelPlan,s_LabelSec,s_TrimLabel                      : STRING;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
+
+FUNCTION Get_Zcoor_Num(h : HANDLE) : REAL;
+VAR
+	x,y,z : REAL;
+BEGIN
+	GetSymLoc3D(h_Obj,x,y,z);
+	Get_Zcoor_Num := z;
+END;
 
 PROCEDURE Set_DashStyle_Cust(h : HANDLE; style : STRING);
 VAR li_Dash : LONGINT;
@@ -87,14 +98,35 @@ BEGIN
 	EndPoly;
 END;
 
+PROCEDURE Draw_Section_Poly(rHeight : REAL);
+BEGIN
+	BeginPoly;
+	Add2DVertex(0,p_BotR.Y,0,0);
+	IF ((PSOFTORHARD = 'Soft') OR (b_Curves)) THEN Add2DVertex(-rHeight,0,0,0)
+	ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
+		Add2DVertex(-rHeight,p_BotR.Y,0,0);
+		Add2DVertex(-rHeight,p_TopL.Y,0,0);
+	END;
+	Add2DVertex(0,p_TopL.Y,0,0);
+	Add2DVertex(0,p_BotR.Y,0,0);
+	EndPoly;
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 7');
+	Set_Version_Info('0 . 6 . 8');
 	Use_PIO_Text_Attributes(h_Obj);
+
+	SetTexMapIntN(h_Obj,3,0,1,0); {Sets map type to Plane}
+	SetTexMapBoolN(h_Obj,3,0,7,TRUE); {Sets map to Auto-Align}
+	{ IF (PSOFTORHARD <> 'Hard') THEN }
+	{ 	SetTexMapReal(h_Obj, 3, 4, (45)); {\Rotates texture 90 degrees!{\ }
+	{ SetObjExpandTexture(h_Obj,TRUE); }
+	{ SetTexMapReal(h_Obj, 3, 4, 90); }
 
 	{===== Variable Assignment =====}
 	IF (POPENING > 0) THEN r_DrawLength := (PLENGTH-POPENING)/2
@@ -108,6 +140,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF ((PSOFTORHARD = 'Soft Curves Only') OR (PSOFTORHARD = 'Soft w/Curves'))
 		THEN b_Curves := TRUE
 	ELSE b_Curves := FALSE;
+
+	{// Label and Trim setup //}
+	IF (Get_Zcoor_Num(h_Obj)<>0)
+		THEN s_TrimLabel := Concat(' @',Num2StrF(Get_Zcoor_Num(h_Obj)))
+	ELSE s_TrimLabel := '';
+	s_LabelPlan := PLABEL;
+	s_LabelSec := PLABEL;
+	IF ((PSHOWTRIM = 'Plan') OR (PSHOWTRIM = 'Both'))
+		THEN s_LabelPlan := Concat(PLABEL,s_TrimLabel);
+	IF ((PSHOWTRIM = 'Section') OR (PSHOWTRIM = 'Both'))
+		THEN s_LabelSec := Concat(PLABEL,s_TrimLabel);
 
 	{===== Parameter Limits =====}
 	IF (PHANGPOINT<0) THEN BEGIN
@@ -123,7 +166,24 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ResetObject(h_Obj);
 	END;
 
+	SetParameterVisibility(h_Obj,'SecOffset',PDRAWSECTION);
+	SetParameterVisibility(h_Obj,'SecLabel',PDRAWSECTION);
+	IF (POPENING=0) THEN BEGIN
+		SetParameterVisibility(h_Obj,'Portal',FALSE);
+		SetParameterVisibility(h_Obj,'OpenPortalPen',FALSE);
+	END;
+
 	{// Draw Extrude //}
+
+
+
+	{ BeginXtrd(0,PHEIGHT); }
+	{ Rect(p_TopL.X,p_TopL.Y,p_BotR.X,p_BotR.Y); }
+	{ EndXtrd; }
+	{ h_temp02 := LNewObj; }
+
+
+
 	BeginXtrd(0,PLENGTH);
 	BeginPoly;
 	Add2DVertex(0,p_BotR.Y,0,0);
@@ -135,19 +195,62 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Add2DVertex(0,p_TopL.Y,0,0);
 	Add2DVertex(0,p_BotR.Y,0,0);
 	EndPoly;
+	SetPolyClosed(LNewObj,TRUE);
 	EndXtrd;
 	h_Softgood := LNewObj;
-	SetTextureRefN(h_Softgood,0,3,0);
+	
+	ResetOrientation3D;
+	{ SetTexMapIntN(h_Softgood, 3, 0, 1, 0); }
+	{ SetTexMapIntN(h_Softgood,3,0,1,0); {\Sets map type to Plane!{\ }
+	{ SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {\Sets map to Auto-Align!{\ }
+	{ SetTexMapReal(h_Softgood, 3, 4, 90); {\Rotates texture 90 degrees!{\ }
 
 	{// Rotate, Move, and Duplicate //}
 	SetRot3D(h_Softgood,0,90,0,0,0,0);
+	SetTextureRefN(h_Softgood,0,3,0);
+	SetTexMapIntN(h_Softgood,3,0,1,0); {Sets map type to Plane}
+	SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {Sets map to Auto-Align}
 	Move3DObj(h_Softgood,-PLENGTH/2,0,0);
+	{ SetObjectVariableReal(h_Softgood,544,Deg2Rad(45)); }
+
+	{ h_temp01 := h_Softgood; }
+
+	{ IF (PSOFTORHARD <> 'Hard') THEN }
+	{ 	{\ SetObjectVariableReal(h_Softgood,544,Deg2Rad(90)); !{\ }
+		{ SetTexMapReal(h_Softgood, 3, 4, 90); {\Rotates texture 90 degrees!{\ }
+
+	ResetBBox(h_Softgood);
+
 	IF (POPENING > 0) THEN BEGIN
 		BeginXtrd(0,PHEIGHT-PPORTAL);
 		Rect(-POPENING/2,p_TopL.Y+1,POPENING/2,p_BotR.Y-1);
 		EndXtrd;
 		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
+		{ h_temp01 := h_Softgood2; }
+	END ELSE BEGIN
+		BeginXtrd(0,-1in);
+		Rect(-1in,1in,1in,-1in);
+		EndXtrd;
+		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
 	END;
+
+
+	
+
+	
+	
+	{ i_Counter := IntersectSolid(h_temp01,h_temp02,h_Softgood); }
+	{ DelObject(h_temp01); }
+	{ DelObject(h_temp02); }
+	{ SetTextureRefN(h_Softgood,0,3,0); }
+	{ SetTexMapIntN(h_Softgood,3,0,1,0); {\Sets map type to Plane!{\ }
+	{ SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {\Sets map to Auto-Align!{\ }
+	{ SetObjectVariableInt(h_Softgood,540,0); }
+
+	{ SetTexMapIntN(h_Softgood,3,0,1,0); {\Sets map type to Plane!{\ }
+	{ SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {\Sets map to Auto-Align!{\ }
+	{ SetTexMapReal(h_Softgood, 3, 4, 90); {\Rotates texture 90 degrees!{\ }
+	
 
 	{// Draw 2D Components //}
 	IF (PDEPTH > 0)
@@ -182,15 +285,25 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 		Set_DashStyle_Cust(h_Rect2,POPENPORTALPEN);
 		SetFPat(h_Rect2,0);
-	END ELSE
-	{ BEGIN }
-		IF b_Curves
-			THEN Draw_Fullness_Line(-PLENGTH/2,p_TopL.Y,PLENGTH/2,p_BotR.Y);
-			{ THEN Draw_Fullness_Line( }
-			{ 						-PLENGTH/2,PDEPTH*PHANGPOINT, }
-			{ 						PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT)); }
-	{ END; }
-	{ Draw_Fullness_Line(p_TopL.X,p_TopL.Y,p_BotR.X,p_BotR.Y); }
+	END ELSE IF b_Curves
+		THEN Draw_Fullness_Line(-PLENGTH/2,p_TopL.Y,PLENGTH/2,p_BotR.Y);
+
+	IF (PDRAWSECTION AND (PSECOFFSET<>0)) THEN BEGIN {// Section 2D //}
+		BeginGroup;
+		Draw_Section_Poly(PHEIGHT);
+		IF ((PPORTAL>0) AND (POPENING>0)) THEN BEGIN
+			Draw_Section_Poly(PPORTAL);
+			HMove(LNewObj,-PHEIGHT+PPORTAL,0);
+		END;
+		EndGroup;
+		h_Section := LNewObj;
+
+		IF (PSECOFFSET>0) THEN BEGIN {"Positive/East/Right"}
+			HRotate(h_Section,0,0,180);
+			HMove(h_Section,PSECOFFSET+Get_Zcoor_Num(h_Obj),p_TopL.Y+p_BotR.Y);
+		END ELSE {"Negative/West/Left"}
+			HMove(h_Section,PSECOFFSET-Get_Zcoor_Num(h_Obj),0);
+	END;
 
 	{// Draw Text //}
 	IF PLABEL <> '' THEN BEGIN
@@ -204,15 +317,29 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			OR (PLABELPOSI = 'Both')
 			OR (POPENING = 0) THEN BEGIN
 				TextOrigin(0,0);
-				CreateText(PLABEL);
+				{ IF ((PSHOWTRIM = 'Plan') OR (PSHOWTRIM = 'Both')) }
+				{ 	THEN CreateText(Concat(PLABEL,s_TrimLabel)) }
+				{ ELSE CreateText(PLABEL); }
+				CreateText(s_LabelPlan);
 				h_Label := LNewObj;
 		END;
 		IF (POPENING > 0)
 			AND ((PLABELPOSI = 'Legs') OR (PLABELPOSI = 'Both')) THEN BEGIN
 				TextOrigin((-POPENING/2)-(r_DrawLength/2),0);
-				CreateText(PLABEL);
+				CreateText(s_LabelPlan);
 				TextOrigin((POPENING/2)+(r_DrawLength/2),0);
-				CreateText(PLABEL);
+				CreateText(s_LabelPlan);
+		END;
+		{//// Section Label ////}
+		IF PSECLABEL THEN BEGIN
+			IF (PSECOFFSET>0) THEN BEGIN {"Positive/East/Right"}
+				TextJust(1);
+				TextOrigin(PSECOFFSET+Get_Zcoor_Num(h_Obj)+PHEIGHT+3in,0);
+			END ELSE BEGIN {"Negative/West/Left"}
+				TextJust(3);
+				TextOrigin(PSECOFFSET-Get_Zcoor_Num(h_Obj)-PHEIGHT-3in,0);
+			END;
+			CreateText(s_LabelSec);
 		END;
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
