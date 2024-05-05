@@ -120,13 +120,8 @@ END;
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Set_Version_Info('0 . 6 . 8');
 	Use_PIO_Text_Attributes(h_Obj);
-
 	SetTexMapIntN(h_Obj,3,0,1,0); {Sets map type to Plane}
 	SetTexMapBoolN(h_Obj,3,0,7,TRUE); {Sets map to Auto-Align}
-	{ IF (PSOFTORHARD <> 'Hard') THEN }
-	{ 	SetTexMapReal(h_Obj, 3, 4, (45)); {\Rotates texture 90 degrees!{\ }
-	{ SetObjExpandTexture(h_Obj,TRUE); }
-	{ SetTexMapReal(h_Obj, 3, 4, 90); }
 
 	{===== Variable Assignment =====}
 	IF (POPENING > 0) THEN r_DrawLength := (PLENGTH-POPENING)/2
@@ -175,15 +170,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Draw Extrude //}
 
-
-
-	{ BeginXtrd(0,PHEIGHT); }
-	{ Rect(p_TopL.X,p_TopL.Y,p_BotR.X,p_BotR.Y); }
-	{ EndXtrd; }
-	{ h_temp02 := LNewObj; }
-
-
-
 	BeginXtrd(0,PLENGTH);
 	BeginPoly;
 	Add2DVertex(0,p_BotR.Y,0,0);
@@ -198,12 +184,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetPolyClosed(LNewObj,TRUE);
 	EndXtrd;
 	h_Softgood := LNewObj;
-	
 	ResetOrientation3D;
-	{ SetTexMapIntN(h_Softgood, 3, 0, 1, 0); }
-	{ SetTexMapIntN(h_Softgood,3,0,1,0); {\Sets map type to Plane!{\ }
-	{ SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {\Sets map to Auto-Align!{\ }
-	{ SetTexMapReal(h_Softgood, 3, 4, 90); {\Rotates texture 90 degrees!{\ }
 
 	{// Rotate, Move, and Duplicate //}
 	SetRot3D(h_Softgood,0,90,0,0,0,0);
@@ -211,14 +192,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetTexMapIntN(h_Softgood,3,0,1,0); {Sets map type to Plane}
 	SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {Sets map to Auto-Align}
 	Move3DObj(h_Softgood,-PLENGTH/2,0,0);
-	{ SetObjectVariableReal(h_Softgood,544,Deg2Rad(45)); }
-
-	{ h_temp01 := h_Softgood; }
-
-	{ IF (PSOFTORHARD <> 'Hard') THEN }
-	{ 	{\ SetObjectVariableReal(h_Softgood,544,Deg2Rad(90)); !{\ }
-		{ SetTexMapReal(h_Softgood, 3, 4, 90); {\Rotates texture 90 degrees!{\ }
-
 	ResetBBox(h_Softgood);
 
 	IF (POPENING > 0) THEN BEGIN
@@ -226,31 +199,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		Rect(-POPENING/2,p_TopL.Y+1,POPENING/2,p_BotR.Y-1);
 		EndXtrd;
 		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
-		{ h_temp01 := h_Softgood2; }
 	END ELSE BEGIN
 		BeginXtrd(0,-1in);
 		Rect(-1in,1in,1in,-1in);
 		EndXtrd;
 		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
 	END;
-
-
-	
-
-	
-	
-	{ i_Counter := IntersectSolid(h_temp01,h_temp02,h_Softgood); }
-	{ DelObject(h_temp01); }
-	{ DelObject(h_temp02); }
-	{ SetTextureRefN(h_Softgood,0,3,0); }
-	{ SetTexMapIntN(h_Softgood,3,0,1,0); {\Sets map type to Plane!{\ }
-	{ SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {\Sets map to Auto-Align!{\ }
-	{ SetObjectVariableInt(h_Softgood,540,0); }
-
-	{ SetTexMapIntN(h_Softgood,3,0,1,0); {\Sets map type to Plane!{\ }
-	{ SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {\Sets map to Auto-Align!{\ }
-	{ SetTexMapReal(h_Softgood, 3, 4, 90); {\Rotates texture 90 degrees!{\ }
-	
 
 	{// Draw 2D Components //}
 	IF (PDEPTH > 0)
@@ -317,9 +271,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			OR (PLABELPOSI = 'Both')
 			OR (POPENING = 0) THEN BEGIN
 				TextOrigin(0,0);
-				{ IF ((PSHOWTRIM = 'Plan') OR (PSHOWTRIM = 'Both')) }
-				{ 	THEN CreateText(Concat(PLABEL,s_TrimLabel)) }
-				{ ELSE CreateText(PLABEL); }
 				CreateText(s_LabelPlan);
 				h_Label := LNewObj;
 		END;
