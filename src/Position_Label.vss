@@ -47,6 +47,13 @@ BEGIN
 	Get_Zcoor := Num2StrF(z);
 END;
 
+FUNCTION Get_PIO_Text_Size(h : HANDLE) : REAL;
+BEGIN
+	Get_PIO_Text_Size := (GetObjectVariableReal(h_Obj,17)
+	                                           /GetLScale(GetLayer(h_Obj)))
+	                                           *72/25.4;
+END;
+
 {Sets Object Begin and End Markers to custom, 'Dot' OR 'Arrow'}
 PROCEDURE Set_Markers_Cust (h : HANDLE;sBeg:STRING;sEnd:STRING);
 VAR b     : BOOLEAN;
@@ -170,8 +177,9 @@ BEGIN
 	TextOrigin(p_OffsetLine1.X,p_OffsetLine1.Y);
 	CreateText(sNote);
 	Set_Tight_TextFill(LNewObj,TRUE);
+	SetTextVerticalAlign(LNewObj,1);
 	IF (PWRAPTEXT) THEN BEGIN
-		SetTextWidth(LNewObj,PWRAPWIDTH/PSCALE);
+		SetTextWidth(LNewObj,PWRAPWIDTH/r_Scale);
 		SetTextLeading(LNewObj,GetTextSize(LNewObj,0)*0.9);
 	END;
 	p_OffsetLine1.Y := p_OffsetLine1.Y - HHeight(LNewObj);
@@ -235,6 +243,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
+	SetParameterVisibility(h_Obj,'Scale',FALSE);
 	SetParameterVisibility(h_Obj,'WrapWidth',PWRAPTEXT);
 	IF (PLABELSTYLE = 'Regular') THEN BEGIN
 		SetParameterVisibility(h_Obj,'ShowInnerCircle',FALSE);
@@ -263,6 +272,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{===== Variable Setup =====}
 	r_TextScaler := 48/GetLScale(Find_Layer(h_Obj));
+	r_Scale := PSCALE;
 	p_RePosition.X := 0;
 	p_RePosition.Y := 0;
 
@@ -331,8 +341,13 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ELSE IF (PNAMECOLOR = 'White') THEN Pen_WtoB(0);
 		FillPat(0);
 		TextFace([Bold]);
-		IF (PLABELSTYLE = 'Small') THEN TextSize(10*r_TextScaler)
-		ELSE TextSize(7*r_TextScaler);
+		IF (PLABELSTYLE = 'Small') THEN BEGIN
+			TextSize(10*r_TextScaler);
+			r_Scale := Get_PIO_Text_Size(h_Obj)/10;
+		END ELSE BEGIN
+			TextSize(7*r_TextScaler);
+			r_Scale := Get_PIO_Text_Size(h_Obj)/7;
+		END;
 		TextVerticalAlign(3);
 		CreateText(PPOSINAME);
 		h_PosiName := LNewObj;
@@ -346,8 +361,11 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			Fill_WtoB(0);
 			Pen_WtoB(1);
 			TextFace([]);
-			IF (PLABELSTYLE = 'Small') THEN TextSize(5*r_TextScaler)
-			ELSE TextSize(4*r_TextScaler);
+			IF (PLABELSTYLE = 'Small') THEN BEGIN
+				TextSize(5*r_TextScaler);
+			END ELSE BEGIN
+				TextSize(4*r_TextScaler);
+			END;
 			TextOrigin(0,p_Tmp2.Y);
 			CreateText(Concat('TRIM@ ',Get_Zcoor(h_Obj)));
 			HMoveBackward(LNewObj,TRUE);
@@ -357,6 +375,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	BEGIN {===== "Regular" size =====}
 		TextFace([Bold]);
 		TextSize(10*r_TextScaler);
+		r_Scale := Get_PIO_Text_Size(h_Obj)/10;
 		TextVerticalAlign(3);
 		PenPatN(2);
 		PenSize(5);
@@ -364,6 +383,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF (PLABELDIRECTION='---') OR (PLABELSTYLE='Bubble') THEN
 		BEGIN {// Direction "---" & Style "Bubble" //}
 			TextSize(10*r_TextScaler);
+			r_Scale := Get_PIO_Text_Size(h_Obj)/10;
 			TextJust(2);
 			PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 			IF (PLABELSTYLE = 'Bubble') THEN BEGIN
@@ -388,7 +408,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			p_LineOrig.X := 0;
 			p_LineOrig.Y := -4.5in;
 			IF (PWRAPTEXT) THEN BEGIN
-				SetTextWidth(h_PosiName,PWRAPWIDTH/PSCALE);
+				SetTextWidth(h_PosiName,PWRAPWIDTH/r_Scale);
 				SetTextLeading(h_PosiName,GetTextSize(h_PosiName,0)*0.9);
 			END;
 
@@ -456,7 +476,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			SetTextVertAlignN(h_PosiName,5);
 			PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 			IF (PWRAPTEXT) THEN BEGIN
-				SetTextWidth(h_PosiName,PWRAPWIDTH/PSCALE);
+				SetTextWidth(h_PosiName,PWRAPWIDTH/r_Scale);
 				SetTextLeading(h_PosiName,GetTextSize(h_PosiName,0)*0.9);
 			END;
 
@@ -504,7 +524,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	EndGroup;
 	HMove(LNewObj,-p_RePosition.X,0);
-	HScale2D(LNewObj,0,0,PSCALE,PSCALE,TRUE);
+	r_Scale := r_Scale/r_TextScaler;
+	HScale2D(LNewObj,0,0,r_Scale,r_Scale,TRUE);
 
 	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
@@ -512,7 +533,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetCntrlPtVis(h_Obj,1,PUSEPOINT);
 	IF PUSEPOINT THEN BEGIN
 		Draw_Squiggle(
-					  (p_LineOrig.X)*PSCALE, p_LineOrig.Y*PSCALE,
+		              (p_LineOrig.X)*r_Scale, p_LineOrig.Y*r_Scale,
 		              PCONTROLPOINT01X, PCONTROLPOINT01Y
 		              );
 		HMoveBackward(LNewObj,TRUE);
