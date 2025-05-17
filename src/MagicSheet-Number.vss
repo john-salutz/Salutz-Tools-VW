@@ -55,6 +55,11 @@ BEGIN
 	END;
 END;
 
+FUNCTION Get_Rotation_Scaler : REAL;
+BEGIN
+	Get_Rotation_Scaler := 1.1+(Abs(GetSymRot(h_Obj))/90);
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
@@ -102,17 +107,21 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF PSTYLE='Bold'
 			THEN SetTextStyle(h_MagicText,0,GetTextLength(h_MagicText),1);
 	END;
-	IF PLABEL<>'' THEN BEGIN
-		IF PLABELPOSI ='Right'
-			THEN HMove(h_MagicText,-HWidth(h_MagicText)/2,0)
-		ELSE IF PLABELPOSI ='Left'
-			THEN HMove(h_MagicText,HWidth(h_MagicText)/2,0);
-	END;
+	{ IF PLABEL<>'' THEN BEGIN }
+	{ 	IF PLABELPOSI ='Right' }
+	{ 		THEN HMove(h_MagicText,-HWidth(h_MagicText)/2,0) }
+	{ 	ELSE IF PLABELPOSI ='Left' }
+	{ 		THEN HMove(h_MagicText,HWidth(h_MagicText)/2,0); }
+	{ END; }
 
 	{===== Draw Containers =====}
 	IF (PCONTAINER<>'None') THEN BEGIN
 		GetBBox(h_MagicText,pt1.X,pt1.Y,pt2.X,pt2.Y);
 		HCenter(h_MagicText,ptC.X,ptC.Y);
+		IF PRIGHTREADING THEN BEGIN
+			pt1.Y := pt1.Y*Get_Rotation_Scaler;
+			pt2.Y := pt2.Y*Get_Rotation_Scaler;
+		END;
 		IF (PCONTAINER='Circle') THEN BEGIN
 			ArcByCenter(ptC.X,ptC.Y,HWidth(h_MagicText)/2,0,360);
 			h_Container := LNewObj;
@@ -129,6 +138,19 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			HScale2D(h_Container,ptC.X,ptC.Y,1,1.075,FALSE);
 		END ELSE IF (PCONTAINER='Rectangle') THEN BEGIN
 			Rect(pt1.X,pt1.Y,pt2.X,pt2.Y);
+			h_Container := LNewObj;
+		END ELSE IF (PCONTAINER='Octagon') THEN BEGIN
+			BeginPoly;
+			Add2DVertex(pt1.X*0.9,pt1.Y*1.15,0,0);
+			Add2DVertex(pt2.X*0.9,pt1.Y*1.15,0,0);
+			Add2DVertex(pt2.X+(pt1.Y-ptC.Y)/2.5,ptC.Y+(pt1.Y/2),0,0);
+			Add2DVertex(pt2.X+(pt1.Y-ptC.Y)/2.5,ptC.Y+(pt2.Y/2),0,0);
+			Add2DVertex(pt2.X*0.9,pt2.Y*1.15,0,0);
+			Add2DVertex(pt1.X*0.9,pt2.Y*1.15,0,0);
+			Add2DVertex(pt1.X-(pt1.Y-ptC.Y)/2.5,ptC.Y+(pt2.Y/2),0,0);
+			Add2DVertex(pt1.X-(pt1.Y-ptC.Y)/2.5,ptC.Y+(pt1.Y/2),0,0);
+			Add2DVertex(pt1.X*0.9,pt1.Y*1.15,0,0);
+			EndPoly;
 			h_Container := LNewObj;
 		END ELSE BEGIN
 			BeginPoly;
@@ -149,22 +171,37 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				THEN InsertVertex(h_Container,pt1.X-(pt1.Y-ptC.Y)/1.5,ptC.Y,5,0,0);
 		END;
 		Set_Pen_WtoB(h_Container,1);
-		SetLW(h_Container,7);
+		{ SetLW(h_Container,7); }
 		Copy_Fill_Color(h_MagicText,h_Container);
 		SetFPat(h_MagicText,0);
 		HMoveBackward(h_Container,TRUE);
+		IF PRIGHTREADING
+			THEN HRotate(h_MagicText, ptC.X,ptC.Y,-GetSymRot(h_Obj));
 	END;
 
 	IF Len(PLABEL)>0 THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		IF PLABELPOSI='Right' THEN BEGIN
+			HMove(h_MagicText,-HWidth(h_MagicText)/2,0);
+			HMove(h_Container,-HWidth(h_MagicText)/2,0);
 			TextOrigin(PLABELDIST,0);
 			TextJust(1);
+			TextVerticalAlign(3);
 		END ELSE IF PLABELPOSI='Left' THEN BEGIN
+			HMove(h_MagicText,HWidth(h_MagicText)/2,0);
+			HMove(h_Container,HWidth(h_MagicText)/2,0);
 			TextOrigin(-PLABELDIST,0);
 			TextJust(3);
+			TextVerticalAlign(3);
+		END ELSE IF PLABELPOSI='Top' THEN BEGIN
+			TextOrigin(0,(HHeight(h_MagicText)/2)+PLABELDIST);
+			TextJust(2);
+			TextVerticalAlign(5);
+		END ELSE IF PLABELPOSI='Bottom' THEN BEGIN
+			TextOrigin(0,-(HHeight(h_MagicText)/2)-PLABELDIST);
+			TextJust(2);
+			TextVerticalAlign(1);
 		END;
-		TextVerticalAlign(3);
 		TextFace([]);
 		TextSize(GetTextSize(h_MagicText,0)*PLABELSCALE);
 		IF PLABELPEN = 'Black' THEN Pen_WtoB(1);

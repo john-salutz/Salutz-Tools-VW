@@ -73,9 +73,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{===== Boundary Setup =====}
 	pt1.X := -1in*PSCALE;
-	pt1.Y := 0in*PSCALE;
+	pt1.Y := 0in*PSCALEY;
 	pt2.X := 1in*PSCALE;
-	pt2.Y := -0.25in*PSCALE;
+	pt2.Y := -0.25in*PSCALEY;
 
 	{===== Draw Objects =====}
 	{Outer Rectangle}
@@ -85,9 +85,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{Inner Rectangle}
 	RRect(
-	      pt1.X+0.025in*PSCALE,pt1.Y-0.05in*PSCALE,
-	      pt2.X-0.025in*PSCALE,pt2.Y+0.025in*PSCALE,
-	      0.125in*PSCALE,0.125in*PSCALE
+	      pt1.X+(0.025in)*PSCALE,pt1.Y-(0.05in)*PSCALEY,
+	      pt2.X-(0.025in)*PSCALE,pt2.Y+(0.025in)*PSCALEY,
+	      0.125in*PSCALEY,0.125in*PSCALEY
 	      );
 	Set_Background_WtoB(LNewObj,0);
 	SetLW(LNewObj,0);
@@ -98,7 +98,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Text Setup //}
 	TextVerticalAlign(3);
-	TextSize(9*PSCALE);
+	TextSize(9*PSCALEY);
 	FillPat(0);
 	Pen_WtoB(1);
 	TextFace([]);
