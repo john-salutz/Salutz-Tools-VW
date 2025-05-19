@@ -83,7 +83,8 @@ BEGIN
 	iFlip := 1;
 	pEnd := p1X;
 	pMid := (p1Y+p2Y)/2;
-	pHalfDepth := PDEPTH/2;
+	{ pHalfDepth := PDEPTH/2; }
+	pHalfDepth := PDEPTH;
 	pTopDepth := PDEPTH-(PDEPTH*PHANGPOINT);
 	pBotDepth := -PDEPTH*PHANGPOINT;
 	BeginPoly;
@@ -92,7 +93,8 @@ BEGIN
 		IF iFlip > 0 THEN CurveThrough(pEnd+pHalfDepth,pTopDepth)
 		ELSE CurveThrough(pEnd+pHalfDepth,pBotDepth);
 		iFlip := -iFlip;
-		pEnd := pEnd + PDEPTH;
+		{ pEnd := pEnd + PDEPTH; }
+		pEnd := pEnd + (PDEPTH*2);
 	END;
 	Add2DVertex(p2X,pMid,0,0);
 	EndPoly;
@@ -170,29 +172,37 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{// Draw Extrude //}
 
-	BeginXtrd(0,PLENGTH);
-	BeginPoly;
-	Add2DVertex(0,p_BotR.Y,0,0);
-	IF ((PSOFTORHARD = 'Soft') OR (b_Curves)) THEN Add2DVertex(-PHEIGHT,0,0,0)
-	ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
-		Add2DVertex(-PHEIGHT,p_BotR.Y,0,0);
-		Add2DVertex(-PHEIGHT,p_TopL.Y,0,0);
+	IF (PDEPTH = 0) THEN BEGIN
+		BeginXtrd(0,PHEIGHT);
+		MoveTo(-PLENGTH/2,0);
+		LineTo(PLENGTH/2,0);
+		EndXtrd;
+		h_Softgood := LNewObj;
+	END ELSE BEGIN
+		BeginXtrd(0,PLENGTH);
+		BeginPoly;
+		Add2DVertex(0,p_BotR.Y,0,0);
+		IF ((PSOFTORHARD = 'Soft') OR (b_Curves))
+			THEN Add2DVertex(-PHEIGHT,0,0,0)
+		ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
+			Add2DVertex(-PHEIGHT,p_BotR.Y,0,0);
+			Add2DVertex(-PHEIGHT,p_TopL.Y,0,0);
+		END;
+		Add2DVertex(0,p_TopL.Y,0,0);
+		Add2DVertex(0,p_BotR.Y,0,0);
+		EndPoly;
+		SetPolyClosed(LNewObj,TRUE);
+		EndXtrd;
+		h_Softgood := LNewObj;
+		{// Rotate and Move //}
+		SetRot3D(h_Softgood,0,90,0,0,0,0);
+		Move3DObj(h_Softgood,-PLENGTH/2,0,0);
 	END;
-	Add2DVertex(0,p_TopL.Y,0,0);
-	Add2DVertex(0,p_BotR.Y,0,0);
-	EndPoly;
-	SetPolyClosed(LNewObj,TRUE);
-	EndXtrd;
-	h_Softgood := LNewObj;
-	ResetOrientation3D;
 
-	{// Rotate, Move, and Duplicate //}
-	SetRot3D(h_Softgood,0,90,0,0,0,0);
+	{// Texture Setup //}
 	SetTextureRefN(h_Softgood,0,3,0);
 	SetTexMapIntN(h_Softgood,3,0,1,0); {Sets map type to Plane}
 	SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {Sets map to Auto-Align}
-	Move3DObj(h_Softgood,-PLENGTH/2,0,0);
-	ResetBBox(h_Softgood);
 
 	IF (POPENING > 0) THEN BEGIN
 		BeginXtrd(0,PHEIGHT-PPORTAL);
@@ -200,11 +210,12 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		EndXtrd;
 		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
 	END ELSE BEGIN
-		BeginXtrd(0,-1in);
+		BeginXtrd(-1in,-2in);
 		Rect(-1in,1in,1in,-1in);
 		EndXtrd;
 		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
 	END;
+
 
 	{// Draw 2D Components //}
 	IF (PDEPTH > 0)
@@ -282,7 +293,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				CreateText(s_LabelPlan);
 		END;
 		{//// Section Label ////}
-		IF PSECLABEL THEN BEGIN
+		IF (PSECLABEL AND PDRAWSECTION) THEN BEGIN
 			IF (PSECOFFSET>0) THEN BEGIN {"Positive/East/Right"}
 				TextJust(1);
 				TextOrigin(PSECOFFSET+Get_Zcoor_Num(h_Obj)+PHEIGHT+3in,0);
