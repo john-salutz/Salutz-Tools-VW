@@ -181,7 +181,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				TextOrigin(-1in,0);
 			END;
 		END ELSE IF PTYPE = 'Thru' THEN BEGIN
-			TextJust(2);
+			IF PSIZE = 'USITT' THEN TextJust(1)
+			ELSE TextJust(2);
 			TextOrigin(0,p_Origin.Y);
 			p_Leader.X := -21in;
 			p_Origin.X := -12in;
@@ -197,7 +198,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF (PPREFIX <> '') AND (PSIZE <> 'USITT') THEN BEGIN
 			CreateText(Concat(PPREFIX,' ',PIDNUM));
 			SetTextSize(LNewObj,0,Len(PPREFIX)+1,GetTextSize(LNewObj,0)-1);
-		END ELSE CreateText(PIDNUM);
+		END ELSE BEGIN
+			IF PTYPE='Thru' THEN TextOrigin(p_Origin.X+1in,p_Origin.Y);
+			CreateText(PIDNUM);
+		END;
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 
 		{===== Draw Poly =====}
@@ -269,6 +273,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 			TextVerticalAlign(5);
 			FillPat(0);
+			Pen_WtoB(1);
 			IF PTYPE <> 'Thru' THEN BEGIN {In & Out}
 				MoveTo((p_End.X/4),p_Origin.Y);
 				LineTo((p_End.X/4),p_End.Y);
@@ -279,21 +284,36 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 				TextOrigin((p_End.X/4),0);
 			END ELSE BEGIN {Thru}
 				TextOrigin(0,p_End.Y);
-				TextJust(2);
+				{ TextJust(2); }
+				TextJust(1);
 				TextSize(r_TextSmall);
+				
+				
+				MoveTo((p_Origin.X/2),p_Origin.Y);
+				LineTo((p_Origin.X/2),p_End.Y);
+				SetLW(LNewObj,2);
+				TextSize(r_TextLarge*0.8);
+				TextVerticalAlign(3);
+				{ TextOrigin((p_End.X/4),p_Origin.Y); }
+				TextOrigin(p_Origin.X/2,0);
 			END;
-			Pen_WtoB(0.5);
+			{ Pen_WtoB(0.5); }
 		END;
 
-		TextFace([Italic]);
+		{ TextFace([Italic]); }
+		TextFace([]);
 		NameClass(PCLASSPURP);
 		IF PPURPOSE <> '' THEN BEGIN
-			IF PSIZE = 'USITT' THEN CreateText(Concat('',PPURPOSE,' '))
+			IF PSIZE = 'USITT' THEN CreateText(Concat(' ',PPURPOSE,' '))
 			ELSE CreateText(Concat(PPURPOSE,' '));
 			IF PSIZE <> 'USITT' THEN HMoveBackward(LNewObj,TRUE);
 			Set_Tight_TextFill(LNewObj,FALSE);
+			IF (PSIZE = 'USITT') AND (HWidth(LNewObj)>(p_End.X*0.75))
+				THEN HScale2D(
+							  LNewObj, p_End.X/4, 0, (p_End.X*0.75)/HWidth(LNewObj),
+							  (p_End.X*0.75)/HWidth(LNewObj), TRUE
+							  );
 		END;
-
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
 

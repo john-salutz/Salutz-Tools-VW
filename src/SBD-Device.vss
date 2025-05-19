@@ -132,6 +132,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextOrigin(0,p_Tmp2.Y);
 		IF (PLOCATION <> '') THEN CreateText(Concat('@',PLOCATION))
 		ELSE CreateText(' ');
+		IF HWidth(LNewObj)>r_Width THEN Scale_Fit_Width_Real(LNewObj,r_Width,0.95);
 		IF PSIZE <> 'Small' THEN BEGIN
 			TextFace([]);
 			Pen_WtoB(0.5);

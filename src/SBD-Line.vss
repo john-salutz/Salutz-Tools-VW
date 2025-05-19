@@ -37,7 +37,7 @@ VAR
 	h_Poly                                                  : HANDLE;
 	r_CornerSize,r_test                                     : REAL;
 	i_CornerStyle,i_FlipX1,i_FlipX2                         : INTEGER;
-	i_BegDupSize,i_EndDupSize                               : INTEGER;
+	r_BegDupSize,r_EndDupSize                               : REAL;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -182,6 +182,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	SetParameterVisibility(h_Obj,'ControlPoint02Y',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint03X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint03Y',FALSE);
+	IF PBEGDUPSIZE = 'Custom'
+		THEN SetParameterVisibility(h_Obj,'PBEGDUPSIZECUST',TRUE);
+	IF PENDDUPSIZE = 'Custom'
+		THEN SetParameterVisibility(h_Obj,'PENDDUPSIZECUST',TRUE);
 	b_ResetObj := FALSE;
 
 	{===== Parameter checking =====}
@@ -206,13 +210,15 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'RoundRadius',TRUE);
 	END;
 
-	IF PBEGDUPSIZE = 'Regular' THEN i_BegDupSize := RegularH
-	ELSE IF PBEGDUPSIZE = 'Small' THEN i_BegDupSize := SmallH
-	ELSE IF PBEGDUPSIZE = 'Micro' THEN i_BegDupSize := MicroH;
+	IF PBEGDUPSIZE = 'Regular' THEN r_BegDupSize := RegularH
+	ELSE IF PBEGDUPSIZE = 'Small' THEN r_BegDupSize := SmallH
+	ELSE IF PBEGDUPSIZE = 'Micro' THEN r_BegDupSize := MicroH
+	ELSE IF PBEGDUPSIZE = 'Custom' THEN r_BegDupSize := PBEGDUPSIZECUST;
 
-	IF PENDDUPSIZE = 'Regular' THEN i_EndDupSize := RegularH
-	ELSE IF PENDDUPSIZE = 'Small' THEN i_EndDupSize := SmallH
-	ELSE IF PENDDUPSIZE = 'Micro' THEN i_EndDupSize := MicroH;
+	IF PENDDUPSIZE = 'Regular' THEN r_EndDupSize := RegularH
+	ELSE IF PENDDUPSIZE = 'Small' THEN r_EndDupSize := SmallH
+	ELSE IF PENDDUPSIZE = 'Micro' THEN r_EndDupSize := MicroH
+	ELSE IF PENDDUPSIZE = 'Custom' THEN r_EndDupSize := PENDDUPSIZECUST;
 
 	{// Corner Sizing //}
 	r_CornerSize := PROUNDRADIUS;
@@ -235,10 +241,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Draw Beginning Duplicates =====}
 	IF PNUMBEGINDUP > 0 THEN FOR i_Counter := 1 TO PNUMBEGINDUP DO BEGIN
 		BeginPoly;
-		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
-		Add2DVertex(p_Start.X+3in,p_Start.Y+(i_Counter*i_BegDupSize),
-		            i_CornerStyle,3in);
-		Add2DVertex(p_Start.X+3in,p_Start.Y,i_CornerStyle,3in);
+		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*r_BegDupSize),0,0);
+		Add2DVertex(p_Start.X+3in,p_Start.Y+(i_Counter*r_BegDupSize),
+		            i_CornerStyle,r_BegDupSize/2);
+		Add2DVertex(p_Start.X+3in,p_Start.Y,i_CornerStyle,r_BegDupSize/2);
 		IF p_Midpoint.X > (p_Start.X+3in) THEN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
@@ -247,10 +253,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	END ELSE FOR i_Counter := -1 DOWNTO PNUMBEGINDUP DO BEGIN
 		BeginPoly;
-		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*i_BegDupSize),0,0);
-		Add2DVertex(p_Start.X+3in,p_Start.Y+(i_Counter*i_BegDupSize),
-		            i_CornerStyle,3in);
-		Add2DVertex(p_Start.X+3in,p_Start.Y,i_CornerStyle,3in);
+		Add2DVertex(p_Start.X,p_Start.Y+(i_Counter*r_BegDupSize),0,0);
+		Add2DVertex(p_Start.X+3in,p_Start.Y+(i_Counter*r_BegDupSize),
+		            i_CornerStyle,r_BegDupSize/2);
+		Add2DVertex(p_Start.X+3in,p_Start.Y,i_CornerStyle,r_BegDupSize/2);
 		IF p_Midpoint.X > (p_Start.X+3in) THEN
 			Add2DVertex(p_Midpoint.X-r_CornerSize,p_Start.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
@@ -261,10 +267,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{===== Draw End Duplicates =====}
 	IF PNUMENDDUP > 0 THEN FOR i_Counter := 1 TO PNUMENDDUP DO BEGIN
 		BeginPoly;
-		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
-		Add2DVertex(p_End.X-3in,p_End.Y+(i_Counter*i_EndDupSize),
-		            i_CornerStyle,3in);
-		Add2DVertex(p_End.X-3in,p_End.Y,i_CornerStyle,3in);
+		Add2DVertex(p_End.X,p_End.Y+(i_Counter*r_EndDupSize),0,0);
+		Add2DVertex(p_End.X-3in,p_End.Y+(i_Counter*r_EndDupSize),
+		            i_CornerStyle,r_EndDupSize/2);
+		Add2DVertex(p_End.X-3in,p_End.Y,i_CornerStyle,r_EndDupSize/2);
 		IF p_Midpoint.X < (p_End.X+3in) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
@@ -273,10 +279,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	END ELSE FOR i_Counter := -1 DOWNTO PNUMENDDUP DO BEGIN
 		BeginPoly;
-		Add2DVertex(p_End.X,p_End.Y+(i_Counter*i_EndDupSize),0,0);
-		Add2DVertex(p_End.X-3in,p_End.Y+(i_Counter*i_EndDupSize),
-		            i_CornerStyle,3in);
-		Add2DVertex(p_End.X-3in,p_End.Y,i_CornerStyle,3in);
+		Add2DVertex(p_End.X,p_End.Y+(i_Counter*r_EndDupSize),0,0);
+		Add2DVertex(p_End.X-3in,p_End.Y+(i_Counter*r_EndDupSize),
+		            i_CornerStyle,r_EndDupSize/2);
+		Add2DVertex(p_End.X-3in,p_End.Y,i_CornerStyle,r_EndDupSize/2);
 		IF p_Midpoint.X < (p_End.X+3in) THEN
 			Add2DVertex(p_Midpoint.X+r_CornerSize,p_End.Y,0,0)
 		ELSE Add2DVertex(p_Midpoint.X,p_Midpoint.Y,0,0);
