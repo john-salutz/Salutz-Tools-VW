@@ -86,6 +86,10 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetRField(h_Obj,s_ObjName,'Container', 'East');
 		ResetObject(h_Obj);
 	END;
+	IF (PCONTAINER='None') THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'Container', '<None>');
+		ResetObject(h_Obj);
+	END;
 	TextOrigin(0,0);
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 	TextJust(2);
@@ -115,7 +119,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{ END; }
 
 	{===== Draw Containers =====}
-	IF (PCONTAINER<>'None') THEN BEGIN
+	IF (PCONTAINER<>'<None>') THEN BEGIN
 		GetBBox(h_MagicText,pt1.X,pt1.Y,pt2.X,pt2.Y);
 		HCenter(h_MagicText,ptC.X,ptC.Y);
 		IF PRIGHTREADING THEN BEGIN

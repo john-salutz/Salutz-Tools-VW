@@ -1,0 +1,235 @@
+{//////////////////////////////////////////////////////////////////////////////
+//  Developed by John Salutz, (c) 2020. Please share freely.
+//
+//  Fixture Legend pulls data from a Lighting Device symbol for a Key label.
+//////////////////////////////////////////////////////////////////////////////}
+
+{//////////////////////////////////////////////////////////////////////////////
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU Lesser General Public License as published by
+//  the Free Software Foundation, either version 2.1 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//  See the GNU Lesser General Public License for more details.
+//  <https://www.gnu.org/licenses/>
+//////////////////////////////////////////////////////////////////////////////}
+
+PROCEDURE Fixture_Legend;
+
+CONST
+	RGBmax      = 65535;    {Max value for setting RGB colors in VS fuctions}
+
+VAR
+	{Standard variables}
+	s_ObjName                                               : STRING;
+	h_Obj,h_ObjRecord,h_ObjWall                             : HANDLE;
+	b_Result                                                : BOOLEAN;
+	i_Counter                                               : INTEGER;
+	{Script specific variables}
+	h_Sym,h_SymDef,h_CountLabel,h_TotalLabels,h_TypeLabel   : HANDLE;
+	p_Tmp1,p_Tmp2,p_LegendLoc,p_SymLoc                      : POINT;
+	s_TypeLabel,s_FixtureMode                               : STRING;
+
+{===== LOCAL FUNCTION DECLARATIONS =====}
+
+{// See SalutzToolsFunctions.vss for additional fuctions //}
+{$INCLUDE SalutzToolsFunctions.vss}
+
+FUNCTION Get_SymHandle_At_Pt(p1 : POINT; stype : STRING) : HANDLE;
+VAR
+	li_List                  : LONGINT;
+	i_ListCount,i_NumPickObj : INTEGER;
+	r_PickRadius             : REAL;
+BEGIN
+	IF(GetLScale(GetLayer(h_Obj)) > 1) THEN r_PickRadius := 2in
+	ELSE r_PickRadius := 0.1in;
+	li_List := FindObjAtPt_Create(
+	                              NIL, {Container}
+	                              1, {VisibleOnly}
+	                              1, {Trav Groups}
+	                              p1.x, p1.y, {Point}
+	                              { PDISTTOLABEL/4 }
+	                              r_PickRadius); {Radius}
+	i_NumPickObj := FindObjAtPt_GetCount(li_List);
+	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
+		IF (GetTypeN(FindObjAtPt_GetObj(li_List,i_ListCount)) = 15)
+			THEN Get_SymHandle_At_Pt := FindObjAtPt_GetObj(
+			        li_List,i_ListCount
+			        );
+	END;
+END;
+
+FUNCTION Count_Fixtures(h : HANDLE) : INTEGER;
+VAR sInst,sType,sResult : STRING;
+	iAccCount : INTEGER;
+	PROCEDURE Count_Accessories(h : HANDLE);
+	VAR i : INTEGER;
+	BEGIN
+		i := LDevice_GetAccCount(h, 0)+1;
+		FOR i := i DOWNTO -1 DO BEGIN
+			IF sInst = LDevice_GetParamStr(h,0,i,'Inst Type')
+				THEN iAccCount := iAccCount+1;
+		END;
+	END;
+BEGIN
+	sInst := GetRField(h,'Light Info Record','Inst Type');
+	sType := GetRField(h,'Light Info Record','Device Type');
+	iAccCount := 0;
+	IF ((sType = 'Accessory') OR (sType = 'Static Accessory')) THEN BEGIN
+		ForEachObject(Count_Accessories,(PON='Lighting Device'));
+		Count_Fixtures := iAccCount;
+	END ELSE Count_Fixtures := Count('Lighting Device'.'Inst Type'= sInst);
+END;
+
+FUNCTION Create_Count_String(h : HANDLE) : STRING;
+VAR sInst,sType,sResult : STRING;
+BEGIN
+	IF PLABELTYPE='Sub-Header' THEN
+		sResult := Concat(' ',PCOUNTPREFIX,'(  ')
+	ELSE sResult := Concat(' ',PCOUNTPREFIX,'(',Count_Fixtures(h));
+	IF ((PSTOCKCOUNT<>0) AND PSHOWSTOCK) THEN
+		sResult := Concat(sResult,PSTOCKSEPARATOR,PSTOCKCOUNT,')')
+	ELSE sResult := Concat(sResult,')');
+	Create_Count_String := sResult;
+END;
+
+{====================================}
+{------------- < MAIN > -------------}
+{====================================}
+
+{// Retrieve plug-in object information //}
+BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
+	{===== Parameter Limits & Set Variables =====}
+	Set_Version_Info('0 . 6 . 8');
+	Use_PIO_Text_Attributes(h_Obj);
+	IF PLABELTYPE='Sub-Header' THEN SetCntrlPtVis(h_Obj,1,TRUE)
+	ELSE SetCntrlPtVis(h_Obj,1,FALSE);
+	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
+	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
+
+	{===== Get Symbol Info =====}
+	GetSymLoc(h_Obj,p_LegendLoc.X,p_LegendLoc.Y);
+	IF PLABELTYPE<>'Fixture' THEN h_Sym := NIL
+	ELSE h_Sym := Get_SymHandle_At_Pt(p_LegendLoc,'Light Info Record');
+	h_SymDef := GetObject(GetSymName(h_Sym));
+	GetSymLoc(h_Sym,p_SymLoc.X,p_SymLoc.Y);
+	IF ((h_SymDef = NIL) OR (PLABELTYPE<>'Fixture'))
+		THEN BEGIN
+			SetRField(h_Obj,s_ObjName,'FoundInfo','No Symbol Found');
+			SetRField(h_Obj,s_ObjName,'FoundDeviceType',' ');
+			SetRField(h_Obj,s_ObjName,'FoundInstType',' ');
+			SetRField(h_Obj,s_ObjName,'FoundModel',' ');
+			SetRField(h_Obj,s_ObjName,'FoundWattage',' ');
+		END ELSE IF PLABELTYPE='Fixture' THEN BEGIN
+			SetRField(h_Obj,s_ObjName,'FoundInfo',GetSymName(h_Sym));
+			SetRField(h_Obj,s_ObjName,'FoundDeviceType',
+			          GetRField(h_SymDef,'Light Info Record','Device Type'));
+			SetRField(h_Obj,s_ObjName,'FoundInstType',
+			          GetRField(h_SymDef,'Light Info Record','Inst Type'));
+			SetRField(h_Obj,s_ObjName,'FoundModel',
+			          GetRField(h_SymDef,'Light Info Record','Model Name'));
+			SetRField(h_Obj,s_ObjName,'FoundWattage',
+			          GetRField(h_SymDef,'Light Info Record','Wattage'));
+		END;
+
+	{=== Draw Object ===}
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+	Pen_WtoB(0);
+	Locus(0,0);
+	Locus(PDISTTOLABEL,0);
+	Locus(PDISTTOMARGIN,0);
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+
+	{=== Create text labels ===}
+	BeginGroup;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+	IF (PLABELPOSI='Split') THEN TextVerticalAlign(5)
+	ELSE IF (PLABELPOSI='Center') THEN TextVerticalAlign(3)
+	ELSE IF (PLABELPOSI='Under') THEN TextVerticalAlign(1);
+
+	{== Count Label ==}
+	TextJust(3);
+	TextOrigin(PDISTTOMARGIN,0);
+	IF PSHOWCOUNT THEN BEGIN
+		CreateText(Create_Count_String(h_SymDef));
+		h_CountLabel := LNewObj;
+		SetRField(h_Obj,s_ObjName,'FoundCount',
+		          Concat(Count_Fixtures(h_SymDef)));
+	END ELSE SetRField(h_Obj,s_ObjName,'FoundCount',
+	                   Concat(Count_Fixtures(h_SymDef)));
+
+	{== Type Label ==}
+	TextJust(1);
+	TextOrigin(PDISTTOLABEL,0);
+	IF (PFIXTURETYPEOVER<>'') THEN
+		s_TypeLabel := PFIXTURETYPEOVER
+	ELSE s_TypeLabel := GetRField(h_SymDef,'Light Info Record',PLABELDISPTYPE);
+	IF s_TypeLabel='' THEN s_TypeLabel := 'No Symbol Found. Refresh object.';
+	SetRField(h_Obj,s_ObjName,'DrawnLabel', s_TypeLabel);
+
+	IF PSHOWWATTAGE
+		AND (GetRField(h_SymDef,'Light Info Record','Wattage')<>'') THEN
+		s_TypeLabel := Concat(s_TypeLabel,' @',
+		                      GetRField(h_SymDef,
+		                                'Light Info Record','Wattage'));
+	CreateText(s_TypeLabel);
+	h_TypeLabel := LNewObj;
+	SetTextWidth(h_TypeLabel,PDISTTOMARGIN-PDISTTOLABEL-HWidth(h_CountLabel));
+
+	{== Fixture Mode Label ==}
+	TextJust(1);
+	TextVerticalAlign(1);
+	TextFace([]);
+	TextSize(GetTextSize(h_TypeLabel,0)*PMODESCALE);
+	GetBBox(h_TypeLabel,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+	TextOrigin(PDISTTOLABEL,p_Tmp2.Y);
+	IF ((PFIXTUREMODE<>'') AND PSHOWFIXTUREMODE) THEN BEGIN
+		s_FixtureMode := Concat(' ',PFIXTUREMODE);
+		IF PMODELABEL<>'' THEN
+			s_FixtureMode := Concat(s_FixtureMode,' "',PMODELABEL,'"');
+		IF PADDRESSCOUNT<>0 THEN
+			s_FixtureMode := Concat(s_FixtureMode,' [',PADDRESSCOUNT,']');
+		CreateText(s_FixtureMode);
+		SetTextWidth(LNewObj,(PDISTTOMARGIN-PDISTTOLABEL));
+		GetBBox(LNewObj,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		TextOrigin(PDISTTOLABEL,p_Tmp2.Y);
+	END;
+
+	{== Console Mode Label ==}
+	IF ((PCONSOLEMODE<>'') AND PSHOWCONSOLEMODE) THEN BEGIN
+		CreateText(Concat('> ',PCONSOLEMODE));
+		SetTextWidth(LNewObj,(PDISTTOMARGIN-PDISTTOLABEL));
+	END;
+
+	EndGroup;
+	h_TotalLabels := LNewObj;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+
+
+	IF PREFRESHALL THEN BEGIN
+		SetRField(h_Obj,s_ObjName,'RefreshAll', 'FALSE');
+		ForEachObject(ResetObject,(PON='Fixture Legend (Salutz)'));
+	END;
+	IF PDRAWGUIDELINE THEN BEGIN
+		IF ((h_SymDef = NIL) OR (PLABELTYPE<>'Fixture')) THEN MoveTo(0,0)
+		ELSE MoveTo(Distance(p_LegendLoc.X,0,p_SymLoc.X,0),0);
+		LineTo(PDISTTOMARGIN,0);
+		IF PLABELPOSI='Center' THEN HMoveBackward(LNewObj,TRUE);
+		IF PLABELTYPE='Sub-Header' THEN BEGIN
+			MoveTo(0,0);
+			LineTo(0,PCONTROLPOINT01Y);
+		END;
+	END;
+	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+	IF PLABELTYPE<>'Fixture' THEN BEGIN
+		PenPatN(0);
+		GetBBox(h_TotalLabels,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		Rect(p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+		HMoveBackward(LNewObj,TRUE);
+	END;
+	PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+
+END; END; Run(Fixture_Legend);
