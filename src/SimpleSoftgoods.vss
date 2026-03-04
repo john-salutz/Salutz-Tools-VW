@@ -21,6 +21,9 @@ PROCEDURE SimpleSoftgoods;
 
 CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+	{$INCLUDE SalutzToolsVersionInfo.vss}
+	{// This file holds a CONST value for the current collective version of the
+	// tools. Individual files can be set separately for testing purposes.}
 
 VAR
 	{Standard variables}
@@ -120,7 +123,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 8');
+	Set_Version_Info(kCurrentVersion);
 	Use_PIO_Text_Attributes(h_Obj);
 	SetTexMapIntN(h_Obj,3,0,1,0); {Sets map type to Plane}
 	SetTexMapBoolN(h_Obj,3,0,7,TRUE); {Sets map to Auto-Align}
