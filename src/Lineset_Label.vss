@@ -22,6 +22,9 @@ PROCEDURE Lineset_Label;
 
 CONST
 	RGBmax = 65535;
+	{$INCLUDE SalutzToolsVersionInfo.vss}
+	{// This file holds a CONST value for the current collective version of the
+	// tools. Individual files can be set separately for testing purposes.}
 
 VAR
 	{Standard variables}
@@ -55,7 +58,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 7');
+	Set_Version_Info(kCurrentVersion);
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Parameter Limits =====}
@@ -68,7 +71,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 
 	{===== Draw Shapes =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-	Pen_WtoB(1);
+	IF (PPENCOLOR = 'Black') THEN Pen_WtoB(1);
 	Fill_WtoB(0);
 	{// Draw Poly //}
 	BeginPoly;
@@ -80,6 +83,21 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	Add2DVertex(-5.464in*i_Flip,2in,0,0);
 	Add2DVertex(-60in*i_Flip,2in,0,0);
 	EndPoly;
+	IF GetLW(h_Obj)=0 THEN BEGIN
+		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
+		PenSize(2);
+		BeginPoly;
+		Add2DVertex(-19in*i_Flip,-2in,0,0);
+		Add2DVertex(-5.464in*i_Flip,-2in,0,0);
+		Add2DVertex(-2in*i_Flip,0,0,0);
+		Add2DVertex(0,0,0,0);
+		Add2DVertex(-2in*i_Flip,0,0,0);
+		Add2DVertex(-5.464in*i_Flip,2in,0,0);
+		Add2DVertex(-19in*i_Flip,2in,0,0);
+		EndPoly;
+		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
+	END;
+
 	{// Draw Number rectangle //}
 	Fill_WtoB(0.25);
 	Rect(-19in*i_Flip,2in,-13in*i_Flip,-2in);
@@ -127,7 +145,8 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	TextSize(4*r_TextScaler);
 	TextFace([Italic]);
 	TextOrigin(-25in*i_Flip,0);
-	IF PUSEOBJZ THEN BEGIN
+	IF PTRIMOVERRIDE <> '' THEN CreateText(PTRIMOVERRIDE)
+	ELSE IF PUSEOBJZ THEN BEGIN
 		SetParameterVisibility(h_Obj,'Trim',FALSE);
 		IF (z_coor <> 0) THEN BEGIN
 			CreateText(Concat('@',Num2StrF(z_coor),' '));
@@ -171,16 +190,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	{// Draw Custom Load Depth //}
 	IF PLOADDEPTH <> 0 THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
-		Pen_WtoB(1);
+		IF (PPENCOLOR = 'Black') THEN Pen_WtoB(1);
 		Fill_WtoB(0);
+		IF GetLW(h_Obj)=0 THEN PenSize(2);
 		BeginPoly;
-		Add2DVertex(6in*i_Flip,-PLOADDEPTH/2,0,0);
-		Add2DVertex(2in*i_Flip,-PLOADDEPTH/2,0,0);
+		Add2DVertex(6in*i_Flip,-PLOADDEPTH*PHANGPOINT,0,0);
+		Add2DVertex(2in*i_Flip,-PLOADDEPTH*PHANGPOINT,0,0);
 		Add2DVertex(2in*i_Flip,0,0,0);
 		Add2DVertex(0,0,0,0);
 		Add2DVertex(2in*i_Flip,0,0,0);
-		Add2DVertex(2in*i_Flip,PLOADDEPTH/2,0,0);
-		Add2DVertex(6in*i_Flip,PLOADDEPTH/2,0,0);
+		Add2DVertex(2in*i_Flip,PLOADDEPTH-(PLOADDEPTH*PHANGPOINT),0,0);
+		Add2DVertex(6in*i_Flip,PLOADDEPTH-(PLOADDEPTH*PHANGPOINT),0,0);
 		EndPoly;
 		HMoveForward(h_Weight,TRUE);
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}

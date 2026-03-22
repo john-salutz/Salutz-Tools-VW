@@ -22,6 +22,9 @@ PROCEDURE SBD_Device;
 
 CONST
 	RGBmax   = 65535; {Max value for setting RGB colors in VS fuctions}
+	{$INCLUDE SalutzToolsVersionInfo.vss}
+	{// This file holds a CONST value for the current collective version of the
+	// tools. Individual files can be set separately for testing purposes.}
 	RegularH = 12in;
 	SmallH   = 9in;
 	MicroH   = 6in;
@@ -59,7 +62,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 7');
+	Set_Version_Info(kCurrentVersion);
 	Use_PIO_Text_Attributes(h_Obj);
 	{===== Parameter Limits =====}
 	IF (PNUMSPACES<0) THEN BEGIN
@@ -132,6 +135,7 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		TextOrigin(0,p_Tmp2.Y);
 		IF (PLOCATION <> '') THEN CreateText(Concat('@',PLOCATION))
 		ELSE CreateText(' ');
+		IF HWidth(LNewObj)>r_Width THEN Scale_Fit_Width_Real(LNewObj,r_Width,0.95);
 		IF PSIZE <> 'Small' THEN BEGIN
 			TextFace([]);
 			Pen_WtoB(0.5);

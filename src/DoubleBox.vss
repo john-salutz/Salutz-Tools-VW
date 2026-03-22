@@ -20,6 +20,9 @@
 PROCEDURE DoubleBox_and_Notes;
 CONST
 	RGBmax =  65535;
+	{$INCLUDE SalutzToolsVersionInfo.vss}
+	{// This file holds a CONST value for the current collective version of the
+	// tools. Individual files can be set separately for testing purposes.}
 VAR
 	{Standard variables}
 	s_ObjName                                               : STRING;
@@ -29,9 +32,9 @@ VAR
 	{Script specific variables}
 	r_ObjWidth,r_ObjHeight,r_HeightDiff                     : REAL;
 	h_BackRect,h_FrontRect,h_PadRect,h_Text,h_Note          : HANDLE;
-	s_NoteText,s_NoteTextTemp                               : STRING;
+	s_NoteText,s_NoteTextTemp,s_Label                       : STRING;
 	i_result,dialog1                                        : INTEGER;
-	p_Tmp1,p_Tmp2                                           : POINT;
+	p_Tmp1,p_Tmp2,p_LabelOrigin                              : POINT;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -50,7 +53,8 @@ FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
 VAR r_RRectDiam : REAL;
 BEGIN
 	IF roundTrue THEN BEGIN
-		r_RRectDiam := POFFSET_EDGE*2.25;
+		{ r_RRectDiam := POFFSET_EDGE*2.25; {\Something in VW runs a ratio of 1.38!{\ }
+		r_RRectDiam := GetLScale(GetLayer(h_Obj))*(3/16); {3/32 is VW standard}
 		RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
 	END {IF roundTrue} ELSE BEGIN
 		r_RRectDiam := 0;
@@ -64,9 +68,17 @@ FUNCTION DrawOffsetRect(
                           offsetFrom : HANDLE; offset : REAL;
                           roundTrue : BOOLEAN
                           ) : HANDLE;
-VAR Pt1,Pt2 : POINT;
+VAR Pt1,Pt2 : POINT; RRectDiam : REAL;
 BEGIN
 	GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
+	RRectDiam := (POFFSET_EDGE*2.25)-offset;
+	{ RRectDiam := (GetLScale(GetLayer(h_Obj))*(3/16))+offset; {\3/32 is VW standard!{\ }
+	{ RRect( }
+	{                               Pt1.X-offset, Pt1.Y+offset, }
+	{                               Pt2.X+offset, Pt2.Y-offset, }
+	{                               RRectDiam,RRectDiam }
+	{                               ); }
+	{ DrawOffsetRect := LNewObj; }
 	DrawOffsetRect := RectOrRRect(
 	                              Pt1.X-offset, Pt1.Y+offset,
 	                              Pt2.X+offset, Pt2.Y-offset, roundTrue
@@ -155,7 +167,7 @@ END;
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 7');
+	Set_Version_Info(kCurrentVersion);
 	Use_PIO_Text_Attributes(h_Obj);
 
 	{===== Variable Assignment =====}
@@ -189,8 +201,6 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		SetParameterVisibility(h_Obj,'Label Position',FALSE);
 		SetParameterVisibility(h_Obj,'Underline',FALSE);
 	END;
-
-	Locus(0,0);
 
 	{===== Create rectangles =====}
 	PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
@@ -244,6 +254,21 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	IF (PSHOWLABEL AND (PLABEL<>'')) THEN BEGIN
 		PushAttrs; {((((((((((((((((((((((((((((((((((((((((}
 		TextJust(2);
+		IF (PLABELHORIZ='Center') THEN BEGIN
+			TextJust(2);
+			p_LabelOrigin.Y := 0;
+			s_Label := Concat(PLABEL,'  ');
+		END ELSE IF (PLABELHORIZ='Left') THEN BEGIN
+			TextJust(1);
+			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			p_LabelOrigin.Y := p_Tmp2.Y;
+			s_Label := Concat(' ',PLABEL,' ');
+		END ELSE IF (PLABELHORIZ='Right') THEN BEGIN
+			TextJust(3);
+			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
+			p_LabelOrigin.Y := p_Tmp1.Y;
+			s_Label := Concat(' ',PLABEL,' ');
+		END;
 		TextRotate(90);
 		IF (PTEXTCOLOR='Black') THEN Pen_WtoB(1)
 		ELSE IF (PTEXTCOLOR='White') THEN Pen_WtoB(0);
@@ -252,25 +277,27 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		IF (PLABEL_POSITION='Inside') THEN BEGIN
 			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			TextOrigin(p_Tmp1.X,0);
+			p_LabelOrigin.X := p_Tmp1.X;
 			TextVerticalAlign(1);
 			Fill_WtoB(0);
 		END ELSE IF (PLABEL_POSITION='Outside') THEN BEGIN
 			GetBBox(h_BackRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-			TextOrigin(p_Tmp1.X+((-POFFSET_EDGE-PPAD)/4),0);
+			p_LabelOrigin.X := p_Tmp1.X+((-POFFSET_EDGE-PPAD)/4);
 			TextVerticalAlign(5);
 			Fill_WtoB(0);
 		END ELSE IF (PLABEL_POSITION='Pad') THEN BEGIN
 			GetBBox(h_PadRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-			TextOrigin(p_Tmp1.X-(PPAD/2),0);
+			p_LabelOrigin.X := p_Tmp1.X-(PPAD/2);
 			TextVerticalAlign(3);
 			Fill_WtoB(0);
 		END ELSE IF (PLABEL_POSITION='Offset') THEN BEGIN
 			GetBBox(h_BackRect,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
-			TextOrigin(p_Tmp1.X+(POFFSET_EDGE/2),0);
+			p_LabelOrigin.X := p_Tmp1.X+(POFFSET_EDGE/2);
 			TextVerticalAlign(3);
 			Fill_WtoB(0);
 		END;
-		CreateText(Concat(PLABEL,'  '));
+		TextOrigin(p_LabelOrigin.X,p_LabelOrigin.Y);
+		CreateText(s_Label);
 		h_Text := LNewObj;
 		Set_Tight_TextFill(h_Text,FALSE);
 		IF (PLABEL_POSITION='Inside') AND (HHeight(h_Text)>HHeight(h_PadRect))
@@ -281,11 +308,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			GetBBox(h_Text,p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y);
 			MoveTo(p_Tmp2.X,p_Tmp2.Y);
 			IF PUNDERLINE = 'Underline' THEN LineTo(p_Tmp2.X,p_Tmp1.Y)
-			ELSE BEGIN
+			ELSE IF PUNDERLINE = 'Box' THEN BEGIN
 				LineTo(p_Tmp2.X,p_Tmp1.Y);
 				LineTo(p_Tmp1.X,p_Tmp1.Y);
 				LineTo(p_Tmp1.X,p_Tmp2.Y);
 				LineTo(p_Tmp2.X,p_Tmp2.Y);
+			END ELSE IF PUNDERLINE = 'Bubble' THEN BEGIN
+				Fill_WtoB(0);
+				RRect(p_Tmp1.X,p_Tmp1.Y,p_Tmp2.X,p_Tmp2.Y,
+				      HWidth(h_Text),HWidth(h_Text));
+				SetFPat(h_Text,0);
+				HMoveForward(h_Text,TRUE);
 			END;
 		END;
 

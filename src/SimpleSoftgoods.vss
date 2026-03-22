@@ -21,6 +21,9 @@ PROCEDURE SimpleSoftgoods;
 
 CONST
 	RGBmax = 65535; {Max value for setting RGB colors in VS fuctions}
+	{$INCLUDE SalutzToolsVersionInfo.vss}
+	{// This file holds a CONST value for the current collective version of the
+	// tools. Individual files can be set separately for testing purposes.}
 
 VAR
 	{Standard variables}
@@ -31,12 +34,24 @@ VAR
 	{Script specific variables}
 	r_DrawLength                                            : REAL;
 	h_Softgood,h_Softgood2,h_Label,h_Label2,h_Rect1,h_Rect2 : HANDLE;
+	h_Section                                               : HANDLE;
+	h_temp01,h_temp02                                       : HANDLE;
 	p_TopL,p_BotR                                           : POINT;
+	b_Curves                                                : BOOLEAN;
+	s_LabelPlan,s_LabelSec,s_TrimLabel                      : STRING;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
 {// See SalutzToolsFunctions.vss for additional fuctions //}
 {$INCLUDE SalutzToolsFunctions.vss}
+
+FUNCTION Get_Zcoor_Num(h : HANDLE) : REAL;
+VAR
+	x,y,z : REAL;
+BEGIN
+	GetSymLoc3D(h_Obj,x,y,z);
+	Get_Zcoor_Num := z;
+END;
 
 PROCEDURE Set_DashStyle_Cust(h : HANDLE; style : STRING);
 VAR li_Dash : LONGINT;
@@ -63,14 +78,55 @@ BEGIN
 	SetLSN(h,li_Dash);
 END;
 
+PROCEDURE Draw_Fullness_Line(p1X,p1Y,p2X,p2Y : REAL);
+VAR
+	iFlip : INTEGER;
+	pHalfDepth,pTopDepth,pBotDepth,pMid,pEnd  : REAL;
+BEGIN
+	iFlip := 1;
+	pEnd := p1X;
+	pMid := (p1Y+p2Y)/2;
+	{ pHalfDepth := PDEPTH/2; }
+	pHalfDepth := PDEPTH;
+	pTopDepth := PDEPTH-(PDEPTH*PHANGPOINT);
+	pBotDepth := -PDEPTH*PHANGPOINT;
+	BeginPoly;
+	Add2DVertex(p1X,pMid,0,0);
+	WHILE (pEnd < p2X) DO BEGIN
+		IF iFlip > 0 THEN CurveThrough(pEnd+pHalfDepth,pTopDepth)
+		ELSE CurveThrough(pEnd+pHalfDepth,pBotDepth);
+		iFlip := -iFlip;
+		{ pEnd := pEnd + PDEPTH; }
+		pEnd := pEnd + (PDEPTH*2);
+	END;
+	Add2DVertex(p2X,pMid,0,0);
+	EndPoly;
+END;
+
+PROCEDURE Draw_Section_Poly(rHeight : REAL);
+BEGIN
+	BeginPoly;
+	Add2DVertex(0,p_BotR.Y,0,0);
+	IF ((PSOFTORHARD = 'Soft') OR (b_Curves)) THEN Add2DVertex(-rHeight,0,0,0)
+	ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
+		Add2DVertex(-rHeight,p_BotR.Y,0,0);
+		Add2DVertex(-rHeight,p_TopL.Y,0,0);
+	END;
+	Add2DVertex(0,p_TopL.Y,0,0);
+	Add2DVertex(0,p_BotR.Y,0,0);
+	EndPoly;
+END;
+
 {====================================}
 {------------- < MAIN > -------------}
 {====================================}
 
 {// Retrieve plug-in object information //}
 BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
-	Set_Version_Info('0 . 6 . 7');
+	Set_Version_Info(kCurrentVersion);
 	Use_PIO_Text_Attributes(h_Obj);
+	SetTexMapIntN(h_Obj,3,0,1,0); {Sets map type to Plane}
+	SetTexMapBoolN(h_Obj,3,0,7,TRUE); {Sets map to Auto-Align}
 
 	{===== Variable Assignment =====}
 	IF (POPENING > 0) THEN r_DrawLength := (PLENGTH-POPENING)/2
@@ -80,6 +136,21 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	p_TopL.Y := PDEPTH-(PDEPTH*PHANGPOINT);
 	p_BotR.X := PLENGTH/2;
 	p_BotR.Y := -(PDEPTH*PHANGPOINT);
+
+	IF ((PSOFTORHARD = 'Soft Curves Only') OR (PSOFTORHARD = 'Soft w/Curves'))
+		THEN b_Curves := TRUE
+	ELSE b_Curves := FALSE;
+
+	{// Label and Trim setup //}
+	IF (Get_Zcoor_Num(h_Obj)<>0)
+		THEN s_TrimLabel := Concat(' @',Num2StrF(Get_Zcoor_Num(h_Obj)))
+	ELSE s_TrimLabel := '';
+	s_LabelPlan := PLABEL;
+	s_LabelSec := PLABEL;
+	IF ((PSHOWTRIM = 'Plan') OR (PSHOWTRIM = 'Both'))
+		THEN s_LabelPlan := Concat(PLABEL,s_TrimLabel);
+	IF ((PSHOWTRIM = 'Section') OR (PSHOWTRIM = 'Both'))
+		THEN s_LabelSec := Concat(PLABEL,s_TrimLabel);
 
 	{===== Parameter Limits =====}
 	IF (PHANGPOINT<0) THEN BEGIN
@@ -95,31 +166,59 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		ResetObject(h_Obj);
 	END;
 
-	{// Draw Extrude //}
-	BeginXtrd(0,PLENGTH);
-	BeginPoly;
-	Add2DVertex(0,p_BotR.Y,0,0);
-	IF PSOFTORHARD = 'Soft' THEN Add2DVertex(-PHEIGHT,0,0,0)
-	ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
-		Add2DVertex(-PHEIGHT,p_BotR.Y,0,0);
-		Add2DVertex(-PHEIGHT,p_TopL.Y,0,0);
+	SetParameterVisibility(h_Obj,'SecOffset',PDRAWSECTION);
+	SetParameterVisibility(h_Obj,'SecLabel',PDRAWSECTION);
+	IF (POPENING=0) THEN BEGIN
+		SetParameterVisibility(h_Obj,'Portal',FALSE);
+		SetParameterVisibility(h_Obj,'OpenPortalPen',FALSE);
 	END;
-	Add2DVertex(0,p_TopL.Y,0,0);
-	Add2DVertex(0,p_BotR.Y,0,0);
-	EndPoly;
-	EndXtrd;
-	h_Softgood := LNewObj;
-	SetTextureRefN(h_Softgood,0,3,0);
 
-	{// Rotate, Move, and Duplicate //}
-	SetRot3D(h_Softgood,0,90,0,0,0,0);
-	Move3DObj(h_Softgood,-PLENGTH/2,0,0);
+	{// Draw Extrude //}
+
+	IF (PDEPTH = 0) THEN BEGIN
+		BeginXtrd(0,PHEIGHT);
+		MoveTo(-PLENGTH/2,0);
+		LineTo(PLENGTH/2,0);
+		EndXtrd;
+		h_Softgood := LNewObj;
+	END ELSE BEGIN
+		BeginXtrd(0,PLENGTH);
+		BeginPoly;
+		Add2DVertex(0,p_BotR.Y,0,0);
+		IF ((PSOFTORHARD = 'Soft') OR (b_Curves))
+			THEN Add2DVertex(-PHEIGHT,0,0,0)
+		ELSE IF PSOFTORHARD = 'Hard' THEN BEGIN
+			Add2DVertex(-PHEIGHT,p_BotR.Y,0,0);
+			Add2DVertex(-PHEIGHT,p_TopL.Y,0,0);
+		END;
+		Add2DVertex(0,p_TopL.Y,0,0);
+		Add2DVertex(0,p_BotR.Y,0,0);
+		EndPoly;
+		SetPolyClosed(LNewObj,TRUE);
+		EndXtrd;
+		h_Softgood := LNewObj;
+		{// Rotate and Move //}
+		SetRot3D(h_Softgood,0,90,0,0,0,0);
+		Move3DObj(h_Softgood,-PLENGTH/2,0,0);
+	END;
+
+	{// Texture Setup //}
+	SetTextureRefN(h_Softgood,0,3,0);
+	SetTexMapIntN(h_Softgood,3,0,1,0); {Sets map type to Plane}
+	SetTexMapBoolN(h_Softgood,3,0,7,TRUE); {Sets map to Auto-Align}
+
 	IF (POPENING > 0) THEN BEGIN
 		BeginXtrd(0,PHEIGHT-PPORTAL);
 		Rect(-POPENING/2,p_TopL.Y+1,POPENING/2,p_BotR.Y-1);
 		EndXtrd;
 		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
+	END ELSE BEGIN
+		BeginXtrd(-1in,-2in);
+		Rect(-1in,1in,1in,-1in);
+		EndXtrd;
+		i_Counter := SubtractSolid(h_Softgood,LNewObj,h_Softgood2);
 	END;
+
 
 	{// Draw 2D Components //}
 	IF (PDEPTH > 0)
@@ -129,12 +228,17 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		LineTo(PLENGTH/2,-PDEPTH+(PDEPTH*PHANGPOINT));
 	END;
 	h_Rect1 := LNewObj;
+	IF (PSOFTORHARD = 'Soft Curves Only') THEN SetLW(h_Rect1,0);
 
 	IF (POPENING > 0) THEN BEGIN
 		IF (PDEPTH > 0) THEN BEGIN
 			Rect(-POPENING/2,p_TopL.Y,POPENING/2,p_BotR.Y);
 			h_Rect2 := LNewObj;
 			ClipSurface(h_Rect1,h_Rect2);
+			IF b_Curves THEN BEGIN
+				Draw_Fullness_Line(-PLENGTH/2,p_TopL.Y,-POPENING/2,p_BotR.Y);
+				Draw_Fullness_Line(POPENING/2,p_TopL.Y,PLENGTH/2,p_BotR.Y);
+			END;
 		END ELSE BEGIN
 			{// Draw Lines for Legs //}
 			DelObject(h_Rect1);
@@ -149,6 +253,24 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 		END;
 		Set_DashStyle_Cust(h_Rect2,POPENPORTALPEN);
 		SetFPat(h_Rect2,0);
+	END ELSE IF b_Curves
+		THEN Draw_Fullness_Line(-PLENGTH/2,p_TopL.Y,PLENGTH/2,p_BotR.Y);
+
+	IF (PDRAWSECTION AND (PSECOFFSET<>0)) THEN BEGIN {// Section 2D //}
+		BeginGroup;
+		Draw_Section_Poly(PHEIGHT);
+		IF ((PPORTAL>0) AND (POPENING>0)) THEN BEGIN
+			Draw_Section_Poly(PPORTAL);
+			HMove(LNewObj,-PHEIGHT+PPORTAL,0);
+		END;
+		EndGroup;
+		h_Section := LNewObj;
+
+		IF (PSECOFFSET>0) THEN BEGIN {"Positive/East/Right"}
+			HRotate(h_Section,0,0,180);
+			HMove(h_Section,PSECOFFSET+Get_Zcoor_Num(h_Obj),p_TopL.Y+p_BotR.Y);
+		END ELSE {"Negative/West/Left"}
+			HMove(h_Section,PSECOFFSET-Get_Zcoor_Num(h_Obj),0);
 	END;
 
 	{// Draw Text //}
@@ -163,15 +285,26 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 			OR (PLABELPOSI = 'Both')
 			OR (POPENING = 0) THEN BEGIN
 				TextOrigin(0,0);
-				CreateText(PLABEL);
+				CreateText(s_LabelPlan);
 				h_Label := LNewObj;
 		END;
 		IF (POPENING > 0)
 			AND ((PLABELPOSI = 'Legs') OR (PLABELPOSI = 'Both')) THEN BEGIN
 				TextOrigin((-POPENING/2)-(r_DrawLength/2),0);
-				CreateText(PLABEL);
+				CreateText(s_LabelPlan);
 				TextOrigin((POPENING/2)+(r_DrawLength/2),0);
-				CreateText(PLABEL);
+				CreateText(s_LabelPlan);
+		END;
+		{//// Section Label ////}
+		IF (PSECLABEL AND PDRAWSECTION) THEN BEGIN
+			IF (PSECOFFSET>0) THEN BEGIN {"Positive/East/Right"}
+				TextJust(1);
+				TextOrigin(PSECOFFSET+Get_Zcoor_Num(h_Obj)+PHEIGHT+3in,0);
+			END ELSE BEGIN {"Negative/West/Left"}
+				TextJust(3);
+				TextOrigin(PSECOFFSET-Get_Zcoor_Num(h_Obj)-PHEIGHT-3in,0);
+			END;
+			CreateText(s_LabelSec);
 		END;
 		PopAttrs; {))))))))))))))))))))))))))))))))))))))))}
 	END;
