@@ -35,6 +35,7 @@ VAR
 	h_Sym,h_SymDef,h_CountLabel,h_TotalLabels,h_TypeLabel   : HANDLE;
 	p_Tmp1,p_Tmp2,p_LegendLoc,p_SymLoc                      : POINT;
 	s_TypeLabel,s_FixtureMode                               : STRING;
+	r_FontHeight                                            : REAL;
 
 {===== LOCAL FUNCTION DECLARATIONS =====}
 
@@ -47,16 +48,17 @@ VAR
 	i_ListCount,i_NumPickObj : INTEGER;
 	r_PickRadius             : REAL;
 BEGIN
-	IF(GetLScale(GetLayer(h_Obj)) > 1) THEN r_PickRadius := 2in
-	ELSE r_PickRadius := 0.1in;
-	li_List := FindObjAtPt_Create(
-	                              NIL, {Container}
-	                              1, {VisibleOnly}
-	                              1, {Trav Groups}
-	                              p1.x, p1.y, {Point}
-	                              { PDISTTOLABEL/4 }
-	                              r_PickRadius); {Radius}
+	{ IF(GetLScale(GetLayer(h_Obj)) > 1) THEN r_PickRadius := 2in }
+	{ ELSE r_PickRadius := 0.1in; }
+	r_PickRadius := r_FontHeight/2;
+
+	{// FindObjAtPt_Create(Container,VisibleOnly,Trav Groups,Point,Radius) //}
+	li_List := FindObjAtPt_Create( NIL, 1, 1, p1.x, p1.y, r_PickRadius);
 	i_NumPickObj := FindObjAtPt_GetCount(li_List);
+	IF i_NumPickObj=0
+		THEN li_List := FindObjAtPt_Create(NIL,1,1,p1.x+(PDISTTOLABEL/2),p1.y,r_PickRadius);
+	IF i_NumPickObj=0
+		THEN li_List := FindObjAtPt_Create(NIL,1,1,p1.x+(PDISTTOLABEL/4),p1.y,r_PickRadius);
 	FOR i_ListCount:=0 TO i_NumPickObj DO BEGIN
 		IF (GetTypeN(FindObjAtPt_GetObj(li_List,i_ListCount)) = 15)
 			THEN Get_SymHandle_At_Pt := FindObjAtPt_GetObj(
@@ -112,6 +114,9 @@ BEGIN IF GetCustomObjectInfo(s_ObjName,h_Obj,h_ObjRecord,h_ObjWall) THEN BEGIN
 	ELSE SetCntrlPtVis(h_Obj,1,FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01X',FALSE);
 	SetParameterVisibility(h_Obj,'ControlPoint01Y',FALSE);
+	CreateText('M');
+	r_FontHeight := HHeight(LNewObj);
+	DelObject(LNewObj);
 
 	{===== Get Symbol Info =====}
 	GetSymLoc(h_Obj,p_LegendLoc.X,p_LegendLoc.Y);
