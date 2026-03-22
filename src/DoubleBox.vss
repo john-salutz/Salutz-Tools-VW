@@ -53,7 +53,8 @@ FUNCTION RectOrRRect(x1,y1,x2,y2 : REAL; roundTrue :BOOLEAN) : HANDLE;
 VAR r_RRectDiam : REAL;
 BEGIN
 	IF roundTrue THEN BEGIN
-		r_RRectDiam := POFFSET_EDGE*2.25;
+		{ r_RRectDiam := POFFSET_EDGE*2.25; {\Something in VW runs a ratio of 1.38!{\ }
+		r_RRectDiam := GetLScale(GetLayer(h_Obj))*(3/16); {3/32 is VW standard}
 		RRect(x1,y1,x2,y2,r_RRectDiam,r_RRectDiam);
 	END {IF roundTrue} ELSE BEGIN
 		r_RRectDiam := 0;
@@ -67,9 +68,17 @@ FUNCTION DrawOffsetRect(
                           offsetFrom : HANDLE; offset : REAL;
                           roundTrue : BOOLEAN
                           ) : HANDLE;
-VAR Pt1,Pt2 : POINT;
+VAR Pt1,Pt2 : POINT; RRectDiam : REAL;
 BEGIN
 	GetBBox(offsetFrom,Pt1.X,Pt1.Y,Pt2.X,Pt2.Y);
+	RRectDiam := (POFFSET_EDGE*2.25)-offset;
+	{ RRectDiam := (GetLScale(GetLayer(h_Obj))*(3/16))+offset; {\3/32 is VW standard!{\ }
+	{ RRect( }
+	{                               Pt1.X-offset, Pt1.Y+offset, }
+	{                               Pt2.X+offset, Pt2.Y-offset, }
+	{                               RRectDiam,RRectDiam }
+	{                               ); }
+	{ DrawOffsetRect := LNewObj; }
 	DrawOffsetRect := RectOrRRect(
 	                              Pt1.X-offset, Pt1.Y+offset,
 	                              Pt2.X+offset, Pt2.Y-offset, roundTrue
